@@ -1,0 +1,24 @@
+#ignore .vscode folder
+.vscode/
+
+#ignore node_modules folder
+node_modules/
+
+#ignore build folder
+build/
+
+#ignore log files
+*.log
+
+#ignore environment files
+.env
+
+#ignore executable files
+a.out
+cuboid
+
+#ignore temporary files
+*.tmp
+
+#ignore minilibx
+extLibs/minilibx-linux/*
