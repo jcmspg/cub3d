@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/20 21:16:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/24 20:17:01 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,26 @@
 // This file includes all necessary headers for the project.
 
 // C language standard version
-# include <math.h>
 # include <fcntl.h>
 # include <limits.h>
+# include <math.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 
+// External Libraries
+# include "../extLibs/libft/libft.h"
+# include "../extLibs/minilibx-linux/mlx.h"
+
 // Project-specific headers
 # include "typedefs.h"
 
-// External libraries
-# include "libft.h"
-# include "mlx.h"
-
 // Internal headers
-# include "mlx_init.h"
 # include "ft_validation.h"
+# include "inits.h"
+# include "map_parse.h"
+# include "mylx_init.h"
+# include "mylx_utils.h"
 
 #endif /* INCLUDES_H */

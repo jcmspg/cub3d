@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:18:33 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/20 21:19:03 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/24 19:49:41 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,6 @@
 
 # include "cub3d.h"
 
-void	init_game(t_cub_data *data);
+void	init_game_window(t_cub_data *data);
 
 #endif /* INITS_H */

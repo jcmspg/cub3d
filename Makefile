@@ -6,7 +6,7 @@
 #    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2025/07/20 21:21:50 by joamiran         ###   ########.fr        #
+#    Updated: 2025/07/24 16:52:35 by joamiran         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,20 +48,15 @@ $(LIBFT):
 $(MLX): | check_mlx
 	$(MAKE) -C $(MLX_DIR)
 
-# Check if minilibx exists, if not clone it automatically
+# Check if minilibx exists in the specified directory if not clone it automatically
 # This ensures the project can be built even if minilibx is not present
 check_mlx:
 	@if [ ! -d "$(MLX_DIR)" ]; then \
-		echo "$(MLX_DIR) not found. Cloning minilibx-linux..."; \
-		mkdir -p extLibs; \
-		if git clone $(MLX_REPO) $(MLX_DIR); then \
-			echo "✅ minilibx-linux cloned successfully."; \
-		else \
-			echo "❌ Failed to clone minilibx-linux. Please check your internet connection and git installation."; \
-			exit 1; \
-		fi; \
+		echo "🔍 minilibx-linux not found, cloning..."; \
+		git clone $(MLX_REPO) $(MLX_DIR); \
+		echo "✅ minilibx-linux cloned successfully."; \
 	else \
-		echo "✅ minilibx-linux found at $(MLX_DIR)"; \
+		echo "✅ minilibx-linux already exists."; \
 	fi
 
 $(NAME): $(OBJ)

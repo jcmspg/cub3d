@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/20 21:31:41 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/24 20:41:40 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,18 @@ int	main(int argc, char **argv)
 	ft_putstr_fd("Game initialized with map: ", 1);
 	ft_putstr_fd(argv[1], 1);
 	ft_putchar_fd('\n', 1);
-	init_game(&data);
+	if (parse_cub_file(argv[1], &data) != ERR_NO_ERROR)
+	{
+		ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
+		return (ERR_FILE_NOT_FOUND);
+	}
+	init_game_window(&data);
+	while (1)
+	{
+		// Handle events, update game state, render frame
+		// This is a placeholder for the main game loop
+		mlx_loop(data.mlx->mlx_ptr);
+	}
 	// Initialize game data
 	return (ERR_NO_ERROR);
 }
