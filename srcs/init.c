@@ -6,11 +6,19 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/24 20:31:23 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 17:44:41 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/inits.h"
+
+void	init_fps_sync(t_fps_data *fps)
+{
+	fps->last_frame_time = get_time_ms();
+	fps->delta_time = 0;
+	fps->target_frame_duration = (1000 / MAX_FPS);
+	fps->frame_count = 0;
+}
 
 void	init_game_window(t_cub_data *data)
 {

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/24 20:24:42 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 18:11:44 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,14 @@ typedef struct s_map
 	char *filename;   // Name of the map file
 }							t_map;
 
+typedef struct s_fps_data
+{
+	uint64_t				last_frame_time;
+	uint64_t				delta_time;
+	uint64_t				target_frame_duration;
+	int						frame_count;
+}							t_fps_data;
+
 // Forward declarations for types that will be defined later
 typedef struct s_game		t_game;
 typedef struct s_map		t_map;
@@ -98,6 +106,9 @@ typedef struct s_raycasting	t_raycasting;
 
 typedef struct s_cub_data
 {
+	// time struct
+	t_fps_data				fps;
+
 	t_game					*game;
 	t_map					*map;
 	t_player				*player;

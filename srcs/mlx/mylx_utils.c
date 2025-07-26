@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/24 20:40:43 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 17:53:44 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 // Initialize MLX
 int	mylx_init(t_cub_data *data)
 {
+	if (!data || !data->mlx)
+		return (ft_printf_fd(STDERR_FILENO, "Error: no MLX\n"), ERR_MLX_INIT);
 	data->mlx->mlx_ptr = mlx_init();
 	if (!data->mlx->mlx_ptr)
 	{

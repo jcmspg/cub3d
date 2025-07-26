@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/24 20:41:40 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 17:50:48 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
 		return (ERR_FILE_NOT_FOUND);
 	}
+	// start a window
 	init_game_window(&data);
-	while (1)
-	{
-		// Handle events, update game state, render frame
-		// This is a placeholder for the main game loop
-		mlx_loop(data.mlx->mlx_ptr);
-	}
+	// init the fps sync
+	init_fps_sync(&data.fps);
+	// register the renderer loop within the mlx_loop
+	mlx_loop_hook(data.mlx->mlx_ptr, (int (*)(void *))main_render_loop, &data);
+	mlx_loop(data.mlx->mlx_ptr);
 	// Initialize game data
 	return (ERR_NO_ERROR);
 }
