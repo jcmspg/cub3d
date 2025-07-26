@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 18:11:44 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 22:12:32 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,10 @@
 
 # define PLAYER_SPEED 0.1f
 # define PLAYER_ROTATION_SPEED 0.05f
+
+# define PIXELS_TO_TEST 1500 // debug value for fps sync testing
+
+# define MLX_COLOR(r, g, b) (0xFF000000 | ((r) << 16) | ((g) << 8) | (b))
 
 enum						e_error
 {
@@ -98,11 +102,18 @@ typedef struct s_fps_data
 typedef struct s_game		t_game;
 typedef struct s_map		t_map;
 typedef struct s_player		t_player;
-typedef struct s_graphics	t_graphics;
 typedef struct s_input		t_input;
 typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
 typedef struct s_raycasting	t_raycasting;
+
+typedef struct s_graphics
+{
+	int						x;
+	int						y;
+	int						color;
+	int *pixels; // 1d array of width * height size
+}							t_graphics;
 
 typedef struct s_cub_data
 {

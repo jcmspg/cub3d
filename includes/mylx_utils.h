@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 19:44:03 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/24 20:31:06 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 22:10:16 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,11 @@ int		mylx_destroy_window(t_cub_data *data);
 int		mylx_destroy_mlx(t_cub_data *data);
 
 // Put a pixel in the image
-void	mylx_put_pixel(t_cub_data *data, int x, int y, int color);
+void	mylx_pixel_put(t_cub_data *data, int x, int y, int color);
 
 // Clear the image
 int		mylx_clear_image(t_cub_data *data);
+
+int		mylx_update_scene(t_cub_data *data);
 
 #endif /* MYLX_UTILS_H */

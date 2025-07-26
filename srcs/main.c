@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 17:50:48 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/26 22:16:49 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	main(int argc, char **argv)
 {
 	t_cub_data	data;
 
+	srand(time(NULL));
 	if (argc != 2)
 	{
 		ft_putstr_fd("Usage: ./cub3d <map_file>\n", 2);
@@ -34,6 +35,8 @@ int	main(int argc, char **argv)
 	}
 	// start a window
 	init_game_window(&data);
+	// allocate pixel buffer
+	graphics_init(&data);
 	// init the fps sync
 	init_fps_sync(&data.fps);
 	// register the renderer loop within the mlx_loop

@@ -1,24 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_debug.h                                         :+:      :+:    :+:   */
+/*   conversions.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 17:55:35 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 22:15:21 by joamiran         ###   ########.fr       */
+/*   Created: 2025/07/26 19:41:52 by joamiran          #+#    #+#             */
+/*   Updated: 2025/07/26 20:15:17 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_DEBUG_H
-# define FT_DEBUG_H
+#include "../includes/poormansfixed.h"
 
-# include "cub3d.h"
+t_fixed32	to_fixed32(float x)
+{
+	return (t_fixed32)(x * FIXED_ONE_32);
+}
 
-void	display_fps(t_cub_data *data, float fps);
+t_fixed64	to_fixed64(double x)
+{
+	return (t_fixed64)(x * FIXED_ONE_64);
+}
 
-int		test_sync(t_cub_data *data);
+float	from_fixed32(t_fixed32 x)
+{
+	return ((float)x / FIXED_ONE_32);
+}
 
-int		graphics_init(t_cub_data *data);
-
-#endif /* FT_DEBUG_H */
+double	from_fixed64(t_fixed64 x)
+{
+	return ((double)x / FIXED_ONE_64);
+}

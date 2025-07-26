@@ -6,7 +6,7 @@
 #    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2025/07/24 16:52:35 by joamiran         ###   ########.fr        #
+#    Updated: 2025/07/26 21:01:24 by joamiran         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,16 +24,19 @@ OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
 LIBFT_DIR = ./extLibs/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
+PMFP_DIR = ./extLibs/poormanfixedpoint
+PMFP = $(PMFP_DIR)/libpoormansfixed.a
+
 MLX_DIR = ./extLibs/minilibx-linux
 MLX = $(MLX_DIR)/libmlx.a
 MLX_REPO = https://github.com/42Paris/minilibx-linux.git
 
-INCLUDES = -I$(INC_DIR) -I$(LIBFT_DIR) -I$(MLX_DIR)
+INCLUDES = -I$(INC_DIR) -I$(LIBFT_DIR) -I$(PMFP_DIR) -I$(MLX_DIR)
 
-LDFLAGS = -L$(LIBFT_DIR) -lft -L$(MLX_DIR) -lmlx -lm -lXext -lX11
+LDFLAGS = -L$(LIBFT_DIR) -lft -L$(PMFP_DIR) -lpoormansfixed -L$(MLX_DIR) -lmlx -lm -lXext -lX11
 
 # Default target
-all: $(LIBFT) $(MLX) $(NAME)
+all: $(LIBFT) $(PMFP) $(MLX) $(NAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	@mkdir -p $(dir $@)
@@ -44,6 +47,9 @@ $(OBJ_DIR):
 
 $(LIBFT):
 	$(MAKE) -C $(LIBFT_DIR)
+
+$(PMFP):
+	$(MAKE) -C $(PMFP_DIR)
 
 $(MLX): | check_mlx
 	$(MAKE) -C $(MLX_DIR)
@@ -65,10 +71,12 @@ $(NAME): $(OBJ)
 clean:
 	rm -rf $(OBJ_DIR)
 	$(MAKE) -C $(LIBFT_DIR) clean
+	$(MAKE) -C $(PMFP_DIR) clean
 	@if [ -d "$(MLX_DIR)" ] && [ -f "$(MLX_DIR)/libmlx.a" ]; then $(MAKE) -C $(MLX_DIR) clean; fi
 
 fclean: clean
 	rm -f $(NAME)
+	$(MAKE) -C $(PMFP_DIR) fclean
 	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
