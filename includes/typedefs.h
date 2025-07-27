@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 22:12:32 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:02:05 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ enum						e_error
 	ERR_PLAYER_INIT,
 	ERR_GRAPHICS_INIT,
 	ERR_UNKNOWN,
+	ERR_CLEAN_UP,
 };
 
 typedef struct s_image_data

@@ -22,3 +22,9 @@ cuboid
 
 #ignore minilibx
 extLibs/minilibx-linux/*
+
+#ignore libft
+extLibs/libft/*
+
+#ignore poormansfixedpoint
+extLibs/poormansfixedpoint/*

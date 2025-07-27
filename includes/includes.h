@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 18:10:51 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:34:27 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,14 @@
 # include "ft_validation.h"
 # include "inits.h"
 # include "map_parse.h"
+# include "mylx_hooks.h"
 # include "mylx_init.h"
 # include "mylx_utils.h"
+
+// Cleanups
+# include "cleanup.h"
+
+// Keys
+# include "key_values.h"
 
 #endif /* INCLUDES_H */

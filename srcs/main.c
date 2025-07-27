@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 22:16:49 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/27 19:06:07 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	main(int argc, char **argv)
 {
 	t_cub_data	data;
 
+	ft_memset(&data, 0, sizeof(t_cub_data));
 	srand(time(NULL));
 	if (argc != 2)
 	{
@@ -41,7 +42,10 @@ int	main(int argc, char **argv)
 	init_fps_sync(&data.fps);
 	// register the renderer loop within the mlx_loop
 	mlx_loop_hook(data.mlx->mlx_ptr, (int (*)(void *))main_render_loop, &data);
+	mlx_hook(data.mlx->win_ptr, 2, 1L << 0, handle_key_press, &data);
+	mlx_hook(data.mlx->win_ptr, 17, 0L, handle_close, &data);
 	mlx_loop(data.mlx->mlx_ptr);
+	cleanup(&data);
 	// Initialize game data
 	return (ERR_NO_ERROR);
 }

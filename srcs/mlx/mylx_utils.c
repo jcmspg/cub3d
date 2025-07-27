@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 22:13:14 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:09:20 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ int	mylx_make_image(t_cub_data *data)
 // Destroy the image
 int	mylx_destroy_image(t_cub_data *data)
 {
+	if (!data)
+		return (ERR_IMAGE_DESTROY);
 	if (data && data->mlx && data->mlx->img && data->mlx->img->img)
 	{
 		mlx_destroy_image(data->mlx->mlx_ptr, data->mlx->img->img);
@@ -99,6 +101,8 @@ int	mylx_destroy_image(t_cub_data *data)
 // Destroy the window
 int	mylx_destroy_window(t_cub_data *data)
 {
+	if (!data || !data->mlx || !data->mlx->win_ptr)
+		return (ERR_WINDOW_DESTROY);
 	if (data && data->mlx && data->mlx->win_ptr)
 	{
 		mlx_destroy_window(data->mlx->mlx_ptr, data->mlx->win_ptr);
@@ -114,9 +118,10 @@ int	mylx_destroy_mlx(t_cub_data *data)
 {
 	if (data && data->mlx)
 	{
-		if (data->mlx->img)
+		if (data->mlx->img != NULL)
 			mylx_destroy_image(data);
-		mylx_destroy_window(data);
+		if (data->mlx->win_ptr != NULL)
+			mylx_destroy_window(data);
 		mlx_destroy_display(data->mlx->mlx_ptr);
 		free(data->mlx->mlx_ptr);
 		data->mlx->mlx_ptr = NULL;
@@ -156,7 +161,7 @@ int	mylx_clear_image(t_cub_data *data)
 		while (x < data->mlx->width)
 		{
 			mylx_pixel_put(data, x, y, MLX_COLOR(255, 0, 0));
-				// Clear with black color
+			// Clear with black color
 			x++;
 		}
 		y++;
