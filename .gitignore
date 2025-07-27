@@ -28,3 +28,5 @@ extLibs/libft/*
 
 #ignore poormansfixedpoint
 extLibs/poormansfixedpoint/*
+
+extLibs/*
