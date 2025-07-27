@@ -3,6 +3,15 @@
 > **🚧 Work in Progress**  
 > This project is currently under development. Some features may be incomplete or subject to change.
 
+---
+
+![42](https://img.shields.io/badge/42-joamiran-blue.svg?style=flat-square) ![42 Lisboa](https://img.shields.io/badge/42-Lisboa-blue.svg?style=flat-square) ![GitHub](https://img.shields.io/github/license/joamiran/cub3d?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/joamiran/cub3d?style=flat-square)
+![C-lang](https://img.shields.io/badge/language-C-blue.svg?style=flat-square) ![Status](https://img.shields.io/badge/status-under%20development-orange.svg?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.1.0-blue.svg?style=flat-square)
+![Project](https://img.shields.io/badge/project-Cub3D-blue.svg?style=flat-square)
+
+---
+
 Welcome to the Cub3D project, a simple 3D game engine inspired by Wolfenstein 3D. This project is part of the 42 school curriculum and aims to help students learn computer graphics and game development concepts.
 
 ## Table of Contents
@@ -39,12 +48,14 @@ The project provides hands-on experience with low-level graphics programming and
 ## Features
 
 ### ✅ Implemented
+
 - [x] Project structure setup
 - [x] Makefile configuration
 - [x] Basic compilation system
 - [x] Library integration (libft, minilibx)
 
 ### 🚧 In Development
+
 - [ ] Map file parsing (.cub format)
 - [ ] Player initialization and positioning
 - [ ] Raycasting engine
@@ -55,6 +66,7 @@ The project provides hands-on experience with low-level graphics programming and
 - [ ] Input handling (WASD, mouse)
 
 ### 🔮 Planned
+
 - [ ] Floor and ceiling rendering
 - [ ] Sprite support
 - [ ] Minimap display
@@ -80,12 +92,14 @@ sudo apt-get install gcc make xorg libxext-dev libbsd-dev
 ### Build Instructions
 
 1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd cub3d
    ```
 
 2. **Compile the project**:
+
    ```bash
    make
    ```
@@ -193,14 +207,14 @@ cub3d/
 
 ### Makefile Targets
 
-| Target | Description |
-|--------|-------------|
-| `make` or `make all` | Build the complete project |
-| `make clean` | Remove object files |
-| `make fclean` | Remove object files and executable |
-| `make re` | Clean and rebuild everything |
-| `make check_mlx` | Check/clone minilibx if missing |
-| `make mlx_clean` | Remove minilibx completely |
+| Target               | Description                        |
+| -------------------- | ---------------------------------- |
+| `make` or `make all` | Build the complete project         |
+| `make clean`         | Remove object files                |
+| `make fclean`        | Remove object files and executable |
+| `make re`            | Clean and rebuild everything       |
+| `make check_mlx`     | Check/clone minilibx if missing    |
+| `make mlx_clean`     | Remove minilibx completely         |
 
 ### Compilation Flags
 
@@ -226,6 +240,7 @@ The Makefile includes intelligent dependency management for MinilibX:
 - **Version control**: Uses official 42Paris MinilibX repository
 
 **Example workflow:**
+
 ```bash
 # First time building (no MinilibX)
 make
@@ -239,6 +254,7 @@ make
 ```
 
 **Manual MinilibX management:**
+
 ```bash
 make check_mlx     # Check/clone MinilibX
 make mlx_clean     # Remove MinilibX completely
@@ -248,15 +264,15 @@ make mlx_clean     # Remove MinilibX completely
 
 ### Planned Controls
 
-| Key | Action |
-|-----|--------|
-| `W` | Move forward |
-| `S` | Move backward |
-| `A` | Strafe left |
-| `D` | Strafe right |
-| `←` | Turn left |
-| `→` | Turn right |
-| `ESC` | Exit game |
+| Key   | Action        |
+| ----- | ------------- |
+| `W`   | Move forward  |
+| `S`   | Move backward |
+| `A`   | Strafe left   |
+| `D`   | Strafe right  |
+| `←`   | Turn left     |
+| `→`   | Turn right    |
+| `ESC` | Exit game     |
 
 ## Development Status
 
@@ -338,7 +354,7 @@ This project is created for educational purposes as part of the 42 school curric
 **Email**: joamiran@student.42lisboa.com  
 **42 Login**: joamiran  
 **Project**: Cub3D  
-**School**: 42 Lisboa  
+**School**: 42 Lisboa
 
 ---
 
