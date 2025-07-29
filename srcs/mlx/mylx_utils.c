@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:09:20 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 16:58:26 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ int	mylx_update_scene(t_cub_data *data)
 	// cleans the image
 	mylx_clear_image(data);
 	// draws scene
-	test_sync(data);
+	//test_sync(data);
 	// places new scene on the image
 	mylx_make_image(data);
 	return (ERR_NO_ERROR);

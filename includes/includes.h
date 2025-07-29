@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:34:27 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 16:59:08 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@
 
 // Cleanups
 # include "cleanup.h"
+
+// Game Logic
+# include "gamelogic.h"
 
 // Keys
 # include "key_values.h"

@@ -6,95 +6,161 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/07/24 20:37:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:04:57 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cub3d.h"
 
-// Function to calculate the number of lines in the file
-int	count_lines_in_file(int fd)
+// line normalization so 1d array can work
+char *normalize_line(const char *line, int width)
 {
-	char	*line;
-	int		line_count;
-
-	line_count = 0;
-	line = NULL;
-	while ((line = get_next_line(fd)) != NULL)
-	{
-		free(line);
-		line_count++;
-	}
-	return (line_count);
+    int len = ft_strlen(line);
+    char *norm = malloc(width + 1);
+    if (!norm)
+        return NULL;
+    ft_memcpy(norm, line, len);
+    ft_memset(norm + len, ' ', width - len);  // or '~' or some defined VOID_SYMBOL
+    norm[width] = '\0';
+    return norm;
 }
 
-// Function to count the number of tiles in the map
-bool	count_map_tiles(t_map *map)
+
+// process map line
+static bool	process_map_line(char **line, int *count, int *max_len)
 {
-	int		x;
-	int		y;
+	int	len;
+
+	if (is_empty_line(*line) || !is_valid_map_line(*line))
+	{
+		ft_printf_fd(STDERR_FILENO, "invalid map line [%s]\n", *line);
+		free(*line);
+		return (false);
+	}
+	(*count)++;
+	len = ft_strlen(*line);
+	if (len > *max_len)
+		*max_len = len;
+	free(*line);
+	return (true);
+}
+
+// skip texture and color
+static bool	process_pre_map_line(char **line, bool *map_started, int *count)
+{
+	if (is_texture_or_color(*line) || is_empty_line(*line))
+	{
+		free(*line);
+		return (true);
+	}
+	else if (is_valid_map_line(*line))
+	{
+		*map_started = true;
+		(*count)++;
+		free(*line);
+		return (true);
+	}
+	else
+	{
+		ft_printf_fd(STDERR_FILENO, "invalid line [%s]\n", *line);
+		free(*line);
+		return (false);
+	}
+}
+
+static bool	process_line(char **line, bool *map_started, int *count,
+		int *max_len)
+{
+	if (!*map_started)
+		return (process_pre_map_line(line, map_started, count));
+	return (process_map_line(line, count, max_len));
+}
+
+static bool	populate_line(char **line, char **dest, t_map *map)
+{
+	if (is_empty_line(*line) || !is_valid_map_line(*line))
+	{
+		ft_printf_fd(STDERR_FILENO, "invalid map line [%s]\n", *line);
+		free(*line);
+		return (false);
+	}
+	*dest = normalize_line(*line, map->width);
+	if (!*dest)
+	{
+		ft_printf_fd(STDERR_FILENO,
+			"Memory error while duplicating line [%s]\n", *line);
+		free(*line);
+		return (false);
+	}
+	free(*line);
+	return (true);
+}
+
+static bool	populate_map_lines(char **line, bool *map_started, char **line2, t_map *map)
+{
+	if (!map_started)
+		return (process_pre_map_line(line, map_started, NULL));
+	return (populate_line(line, line2, map));
+}
+
+// Function to calculate the number of lines in the file
+static bool	count_lines_in_file(t_map *map)
+{
 	char	*line;
+	bool	map_started;
+	int		line_count;
+	int		max_len;
+	int		i;
 
 	line = NULL;
-	x = 0;
-	y = 0;
+	map_started = false;
+	line_count = 0;
+	max_len = 0;
 	while ((line = get_next_line(map->fd)) != NULL)
 	{
-		if (line[0] == '\0' || line[0] == '\n')
-		{
-			free(line);
-			continue ; // Skip empty lines
-		}
-		if (x < (int)ft_strlen(line))
-			x = (int)ft_strlen(line); // Update max width
-		y++;                          // Increment line count
-		free(line);
+		if (!process_line(&line, &map_started, &line_count, &max_len))
+			return (ERR_INVALID_MAP);
 	}
-	if (x <= 0 || y <= 0)
-		return (ft_putstr_fd("Error: Invalid map dimensions.\n", STDERR_FILENO),
-			false);
-	map->width = x;
-	map->height = y;
-	if ((map->width > INT_MAX || map->height > INT_MAX) || (map->width < 0
-			|| map->height < 0))
-		return (ft_putstr_fd("Error: Map dimensions exceed limits.\n",
+	close(map->fd);
+	line = NULL;
+	map_started = false;
+	i = 0;
+	map->fd = open(map->filename, O_RDONLY);
+	if (map->fd < 0)
+	{
+		ft_putstr_fd("Error: Failed to reopen map file.\n", STDERR_FILENO);
+		return (false);
+	}
+	map->height = line_count;
+	map->width = max_len;
+	map->map_lines = ft_calloc(line_count + 1, sizeof(char *));
+	if (!map->map_lines)
+		return (ft_putstr_fd("Error: Memory allocation failed for map lines.\n",
 				STDERR_FILENO), false);
-	map->map_array = NULL; // Initialize map_array to NULL
-	free(line);
+	while ((line = get_next_line(map->fd)) != NULL)
+	{
+		if (i >= map->height)
+		{
+			ft_putstr_fd("Error: More lines than expected in map.\n",
+				STDERR_FILENO);
+			free(line);
+			return (false);
+		}
+		if (!populate_map_lines(&line, &map_started, &map->map_lines[i]))
+			return (false);
+		i++;
+	}
+	close(map->fd);
 	return (true);
 }
 
 // Function to create the Y arrays
-bool	create_y_array(t_map *map)
+static bool	create_array(t_map *map)
 {
-	map->map_array = ft_calloc(map->height, sizeof(char *));
+	map->map_array = ft_calloc((map->height * map->width), sizeof(char));
 	if (!map->map_array)
 		return (ft_putstr_fd("Error: Memory allocation failed for map array.\n",
 				STDERR_FILENO), false);
-	return (true);
-}
-
-// Function to populate the X arrays in the map
-bool	create_x_array(t_map *map)
-{
-	int	i;
-
-	i = 0;
-	while (i < map->height)
-	{
-		map->map_array[i] = ft_calloc(map->width + 1, sizeof(char));
-		if (!map->map_array[i])
-		{
-			while (i > 0)
-			{
-				free(map->map_array[--i]);
-			}
-			free(map->map_array);
-			return (ft_putstr_fd("Error: Memory allocation failed for map row.\n",
-					STDERR_FILENO), false);
-		}
-		i++;
-	}
 	return (true);
 }
 
@@ -104,11 +170,11 @@ bool	create_map_array(t_cub_data *data)
 	if (!data || !data->map || !data->map->fd)
 		return (ft_putstr_fd("Error: Invalid data structure.\n", STDERR_FILENO),
 			false);
-	if (!count_map_tiles(data->map))
-		return (ft_putstr_fd("Error: Could not count map tiles.\n",
+	if (!count_lines_in_file(data->map))
+		return (ft_putstr_fd("Error: Could not count map lines.\n",
 				STDERR_FILENO), false);
-	if (!create_y_array(data->map) || !create_x_array(data->map))
-		return (ft_putstr_fd("Error: Could not create Y arrays or X arrays.\n",
+	if (!create_array(data->map))
+		return (ft_putstr_fd("Error: Could not create map array.\n",
 				STDERR_FILENO), false);
 	if (!data->map->map_array)
 		return (ft_putstr_fd("Error: Map array is NULL.\n", STDERR_FILENO),
@@ -147,7 +213,6 @@ bool	open_map(char *filename, t_cub_data *data)
 		return (ft_putstr_fd("Error: Could not create map array.\n",
 				STDERR_FILENO), false);
 	}
-	close(fd);
 	return (true);
 }
 
@@ -166,24 +231,30 @@ int	parse_cub_file(char *filename, t_cub_data *data)
 		return (ERR_NO_ERROR);
 }
 
-/**
- * Parse texture paths from .cub file
- */
-int	parse_textures(char *line, t_cub_data *data)
-{
-	// TODO: Implement texture parsing
-	(void)line;
-	(void)data;
-	return (0);
-}
 
-/**
- * Parse color values (floor/ceiling) from .cub file
- */
-int	parse_colors(char *line, t_cub_data *data)
-{
-	// TODO: Implement color parsing
-	(void)line;
-	(void)data;
-	return (0);
-}
+
+
+
+
+
+// /**
+//  * Parse texture paths from .cub file
+//  */
+// int	parse_textures(char *line, t_cub_data *data)
+// {
+// 	// TODO: Implement texture parsing
+// 	(void)line;
+// 	(void)data;
+// 	return (0);
+// }
+
+// /**
+//  * Parse color values (floor/ceiling) from .cub file
+//  */
+// int	parse_colors(char *line, t_cub_data *data)
+// {
+// 	// TODO: Implement color parsing
+// 	(void)line;
+// 	(void)data;
+// 	return (0);
+// }

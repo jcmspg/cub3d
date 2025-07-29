@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:02:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:03:33 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing
 
 # define MLX_COLOR(r, g, b) (0xFF000000 | ((r) << 16) | ((g) << 8) | (b))
+
+#define VOID ' '
+
 
 enum						e_error
 {
@@ -84,7 +87,8 @@ typedef struct s_mlx
 
 typedef struct s_map
 {
-	char **map_array; // 2D array of map data
+	char **map_lines; // temp buffer so i wont do 2nd passover
+	char *map_array;  // 2D array of map data
 	int width;        // Width of the map in tiles
 	int height;       // Height of the map in tiles
 	int fd;           // File descriptor for the map file
@@ -96,7 +100,9 @@ typedef struct s_fps_data
 	uint64_t				last_frame_time;
 	uint64_t				delta_time;
 	uint64_t				target_frame_duration;
+	uint64_t				accumulator;
 	int						frame_count;
+
 }							t_fps_data;
 
 // Forward declarations for types that will be defined later

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 19:50:51 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/24 20:15:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 17:54:08 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,20 @@
 
 # include "cub3d.h"
 
+// checks if a line is a texture or color definition
+bool	is_texture_or_color(char *line);
+
+// checks if a line is empty
+bool	is_empty_line(const char *line);
+
+// checks if a character is valid in the map
+bool	is_valid_map_char(char c);
+
+// checks if a map line is valid
+bool    is_valid_map_line(const char *line);
+
 // Function to count the number of lines in a file
-int		count_lines_in_file(int fd);
+bool		count_lines_in_file(t_map *map);
 
 // Function to count the number of tiles in the map
 bool	count_map_tiles(t_map *map);
@@ -41,5 +53,8 @@ int		parse_textures(char *line, t_cub_data *data);
 
 // Fubction to parse color values from the .cub file
 int		parse_colors(char *line, t_cub_data *data);
+
+// function to get the map dims
+bool get_map_dimensions(t_map *map);
 
 #endif /* MAP_PARSE_H */
