@@ -1,31 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_debug.h                                         :+:      :+:    :+:   */
+/*   ft_isspace.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 17:55:35 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:44:32 by joamiran         ###   ########.fr       */
+/*   Created: 2025/07/29 19:12:19 by joamiran          #+#    #+#             */
+/*   Updated: 2025/07/29 19:14:51 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_DEBUG_H
-# define FT_DEBUG_H
+#include "../../includes/utils.h"
 
-# include "cub3d.h"
-
-void	display_fps(t_cub_data *data, float fps);
-
-int		test_sync(t_cub_data *data);
-
-int		graphics_init(t_cub_data *data);
-
-void print_map_array(const t_map *map);
-
-void draw_filled_rect(t_graphics *graphics, int x, int y, int width, int height, int color);
-
-void draw_map_grid(t_cub_data *data);
-
-
-#endif /* FT_DEBUG_H */
+int ft_isspace(char c)
+{
+    if(c == ' ')
+        return 0;
+    else
+        return 1;
+}

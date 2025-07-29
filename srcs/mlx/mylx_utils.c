@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 16:58:26 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:47:42 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ int	mylx_clear_image(t_cub_data *data)
 		x = 0;
 		while (x < data->mlx->width)
 		{
-			mylx_pixel_put(data, x, y, MLX_COLOR(255, 0, 0));
+			mylx_pixel_put(data, x, y, MLX_COLOR(0, 0, 0));
 			// Clear with black color
 			x++;
 		}
@@ -173,8 +173,13 @@ int	mylx_update_scene(t_cub_data *data)
 {
 	// cleans the image
 	mylx_clear_image(data);
+	
+	// Draw your map grid for debugging
+	draw_map_grid(data);
+	
 	// draws scene
 	//test_sync(data);
+	
 	// places new scene on the image
 	mylx_make_image(data);
 	return (ERR_NO_ERROR);

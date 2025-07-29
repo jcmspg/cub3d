@@ -1,37 +1,81 @@
-==50061== Memcheck, a memory error detector
-==50061== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
-==50061== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
-==50061== Command: ./cuboid map.cub
-==50061== Parent PID: 6690
-==50061== 
-==50061== Syscall param writev(vector[0]) points to uninitialised byte(s)
-==50061==    at 0x4AE9864: writev (writev.c:26)
-==50061==    by 0x4BE0ACA: ??? (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
-==50061==    by 0x4BE0C4E: ??? (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
-==50061==    by 0x4BE1D7E: xcb_writev (in /usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0)
-==50061==    by 0x48C40B8: _XSend (in /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0)
-==50061==    by 0x48C9148: _XReadEvents (in /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0)
-==50061==    by 0x48C952B: XWindowEvent (in /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0)
-==50061==    by 0x10FBF5: mlx_int_wait_first_expose (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10F925: mlx_new_window (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10B31B: mylx_create_window (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10BB57: init_game_window (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10C27C: main (in /home/joao/42/cub3d/cuboid)
-==50061==  Address 0x4c3e6fc is 28 bytes inside a block of size 16,384 alloc'd
-==50061==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
-==50061==    by 0x48B342D: XOpenDisplay (in /usr/lib/x86_64-linux-gnu/libX11.so.6.4.0)
-==50061==    by 0x10F6D6: mlx_init (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10B28D: mylx_init (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10BB1C: init_game_window (in /home/joao/42/cub3d/cuboid)
-==50061==    by 0x10C27C: main (in /home/joao/42/cub3d/cuboid)
-==50061== 
-==50061== 
-==50061== HEAP SUMMARY:
-==50061==     in use at exit: 0 bytes in 0 blocks
-==50061==   total heap usage: 632 allocs, 632 frees, 2,025,773 bytes allocated
-==50061== 
-==50061== All heap blocks were freed -- no leaks are possible
-==50061== 
-==50061== Use --track-origins=yes to see where uninitialised values come from
-==50061== For lists of detected and suppressed errors, rerun with: -s
-==50061== ERROR SUMMARY: 54 errors from 1 contexts (suppressed: 0 from 0)
+==74376== Memcheck, a memory error detector
+==74376== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==74376== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==74376== Command: ./cuboid map.cub
+==74376== Parent PID: 6690
+==74376== 
+==74376== Invalid free() / delete / delete[] / realloc()
+==74376==    at 0x484988F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10AE63: count_lines_in_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B21A: create_map_array (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B37B: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376==  Address 0x4c34250 is 0 bytes inside a block of size 32 free'd
+==74376==    at 0x484988F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10ABC0: process_pre_map_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10AC87: process_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10AE46: count_lines_in_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B21A: create_map_array (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B37B: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376==  Block was alloc'd at
+==74376==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10F1F9: append_buffer (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10F3F0: grab_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10D8ED: get_next_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10AE71: count_lines_in_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B21A: create_map_array (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B37B: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376== 
+==74376== Invalid free() / delete / delete[] / realloc()
+==74376==    at 0x484988F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10B0E6: count_lines_in_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B21A: create_map_array (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B37B: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376==  Address 0x4c34a40 is 0 bytes inside a block of size 32 free'd
+==74376==    at 0x484988F: free (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10ABC0: process_pre_map_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10ADD8: populate_map_lines (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10AF89: count_lines_in_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B21A: create_map_array (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B37B: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376==  Block was alloc'd at
+==74376==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10F1F9: append_buffer (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10F3F0: grab_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10D8ED: get_next_line (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B0F4: count_lines_in_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B21A: create_map_array (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B37B: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376== 
+==74376== 
+==74376== HEAP SUMMARY:
+==74376==     in use at exit: 102 bytes in 4 blocks
+==74376==   total heap usage: 47 allocs, 83 frees, 1,378 bytes allocated
+==74376== 
+==74376== 102 (40 direct, 62 indirect) bytes in 1 blocks are definitely lost in loss record 4 of 4
+==74376==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==74376==    by 0x10D24E: ft_calloc (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B2D6: open_map (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10B407: parse_cub_file (in /home/joao/42/cub3d/cuboid)
+==74376==    by 0x10C86C: main (in /home/joao/42/cub3d/cuboid)
+==74376== 
+==74376== LEAK SUMMARY:
+==74376==    definitely lost: 40 bytes in 1 blocks
+==74376==    indirectly lost: 62 bytes in 3 blocks
+==74376==      possibly lost: 0 bytes in 0 blocks
+==74376==    still reachable: 0 bytes in 0 blocks
+==74376==         suppressed: 0 bytes in 0 blocks
+==74376== 
+==74376== For lists of detected and suppressed errors, rerun with: -s
+==74376== ERROR SUMMARY: 41 errors from 3 contexts (suppressed: 0 from 0)

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/07/29 17:53:50 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:32:23 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,32 @@ bool is_texture_or_color(char *line)
 	return false;
 }
 
-bool	is_empty_line(const char *line)
+bool is_empty_line(const char *line)
 {
-	if (!line || *line == '\0')
-		return true;
-	while (*line)
-	{
-		if (!ft_isspace(*line))
-			return false;
-		line++;
-	}
-	return true;
+    if (!line)
+        return true;
+        
+    // Remove newline for checking
+    char *clean = ft_strdup(line);
+    if (!clean)
+        return false;
+    
+    int len = ft_strlen(clean);
+    if (len > 0 && clean[len-1] == '\n')
+        clean[len-1] = '\0';
+    
+    // Check if line contains only whitespace
+    for (int i = 0; clean[i]; i++)
+    {
+        if (clean[i] != ' ' && clean[i] != '\t')
+        {
+            free(clean);
+            return false;  // Not empty - contains non-whitespace
+        }
+    }
+    
+    free(clean);
+    return true;  // Empty or only whitespace
 }
 
 // Checks if a character is valid in the map
@@ -51,13 +66,37 @@ bool	is_valid_map_char(char c)
 
 bool is_valid_map_line(const char *line)
 {
-	while (*line && *line != '\n')
-	{
-		if (!is_valid_map_char(*line))
-			return false;
-		line++;
-	}
-	return true;
+    if (!line || !*line)
+        return false;
+    
+    // Remove newline for checking
+    char *clean = ft_strdup(line);
+    if (!clean)
+        return false;
+    
+    int len = ft_strlen(clean);
+    if (len > 0 && clean[len-1] == '\n')
+        clean[len-1] = '\0';
+    
+    // Must have at least one character after removing newline
+    if (ft_strlen(clean) == 0)
+    {
+        free(clean);
+        return false;
+    }
+    
+    // Use your existing validation function
+    for (int i = 0; clean[i]; i++)
+    {
+        if (!is_valid_map_char(clean[i]))
+        {
+            free(clean);
+            return false;
+        }
+    }
+    
+    free(clean);
+    return true;
 }
 
 /**
@@ -73,13 +112,13 @@ int	find_player_position(t_game *game)
 /**
  * Get map dimensions
  */
-bool	get_map_dimensions(t_map *map)
-{
-	if (!map)
-		return (false);
-	if (!skip_header(map))
-		return (false);
-	if (!scan_map(map))
-		return (false);
-}
+// bool	get_map_dimensions(t_map *map)
+// {
+// 	if (!map)
+// 		return (false);
+// 	if (!skip_header(map))
+// 		return (false);
+// 	if (!scan_map(map))
+// 		return (false);
+// }
 

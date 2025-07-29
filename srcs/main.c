@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 19:06:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:17:55 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
 		return (ERR_FILE_NOT_FOUND);
 	}
+	print_map_array(data.map);
 	// start a window
 	init_game_window(&data);
 	// allocate pixel buffer

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 16:59:08 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:16:12 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,8 @@
 
 // Keys
 # include "key_values.h"
+
+// Utils
+# include "utils.h"
 
 #endif /* INCLUDES_H */

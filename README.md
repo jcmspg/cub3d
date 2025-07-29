@@ -6,8 +6,8 @@
 ---
 
 ![42](https://img.shields.io/badge/42-joamiran-blue.svg?style=flat-square) ![42 Lisboa](https://img.shields.io/badge/42-Lisboa-blue.svg?style=flat-square) ![GitHub](https://img.shields.io/github/license/joamiran/cub3d?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/joamiran/cub3d?style=flat-square)
-![C-lang](https://img.shields.io/badge/language-C-blue.svg?style=flat-square) ![Status](https://img.shields.io/badge/status-under%20development-orange.svg?style=flat-square)
-![Version](https://img.shields.io/badge/version-0.1.0-blue.svg?style=flat-square)
+![C-lang](https://img.shields.io/badge/language-C-blue.svg?style=flat-square) ![Status](https://img.shields.io/badge/status-map%20parsing%20complete-green.svg?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.2.0-blue.svg?style=flat-square)
 ![Project](https://img.shields.io/badge/project-Cub3D-blue.svg?style=flat-square)
 
 ---
@@ -26,10 +26,11 @@ Welcome to the Cub3D project, a simple 3D game engine inspired by Wolfenstein 3D
 8. [Controls](#controls)
 9. [Development Status](#development-status)
 10. [Technical Details](#technical-details)
-11. [Resources](#resources)
-12. [Contributing](#contributing)
-13. [License](#license)
-14. [Contact Information](#contact-information)
+11. [Debugging Tools](#debugging-tools)
+12. [Resources](#resources)
+13. [Contributing](#contributing)
+14. [License](#license)
+15. [Contact Information](#contact-information)
 
 ---
 
@@ -50,13 +51,16 @@ The project provides hands-on experience with low-level graphics programming and
 ### ✅ Implemented
 
 - [x] Project structure setup
-- [x] Makefile configuration
+- [x] Makefile configuration with automatic dependency management
 - [x] Basic compilation system
-- [x] Library integration (libft, minilibx)
+- [x] Library integration (libft, poormanfixedpoint, minilibx)
+- [x] **Complete map file parsing** (.cub format)
+- [x] **Map validation and error handling**
+- [x] **Memory management** for map data
+- [x] **Debug visualization tools**
 
 ### 🚧 In Development
 
-- [ ] Map file parsing (.cub format)
 - [ ] Player initialization and positioning
 - [ ] Raycasting engine
 - [ ] Texture loading and mapping
@@ -98,11 +102,18 @@ sudo apt-get install gcc make xorg libxext-dev libbsd-dev
    cd cub3d
    ```
 
-2. **Compile the project**:
+2. **Compile the project** (automatically downloads dependencies):
 
    ```bash
    make
    ```
+
+   The Makefile will automatically:
+   - Clone libft if missing
+   - Clone poormanfixedpoint if missing  
+   - Clone minilibx-linux if missing
+   - Compile all dependencies
+   - Build the final executable
 
 3. **Clean build files** (optional):
    ```bash
@@ -134,22 +145,27 @@ sudo apt-get install gcc make xorg libxext-dev libbsd-dev
 The `.cub` file format defines the game world and textures:
 
 ```
-NO ./assets/wall_north.xpm
-SO ./assets/wall_south.xpm
-WE ./assets/wall_west.xpm
-EA ./assets/wall_east.xpm
+NO ./path_to_the_north_texture
+SO ./path_to_the_south_texture
+WE ./path_to_the_west_texture
+EA ./path_to_the_east_texture
 
 F 220,100,0
 C 225,30,0
 
-        1111111111111111111111111
-        1000000000110000000000001
-        1011000001110000000000001
-        1001000000000000000000001
+1111111111111111111111111
+1000000000110000000000001
+1011000001110000000000001
+1001000000000000000000001
 111111111011000001110000000000001
 100000000011000001110111111111111
 11110111111111011100000010001
+11110111111111011101010010001
+11000000110101011100000010001
+10000000000000001100000010001
+10000000000000001101010010001
 11000001110101011111011110N0111
+11110111 1110101 101111010001
 11111111 1111111 111111111111
 ```
 
@@ -160,47 +176,58 @@ C 225,30,0
 - **C**: Ceiling color (R,G,B format)
 - **1**: Wall
 - **0**: Empty space
+- **2**: Sprite/Item (optional)
 - **N/S/E/W**: Player starting position and orientation
+- **Space**: Valid empty space within the map
+
+### Map Validation
+
+The parser performs comprehensive validation:
+- ✅ **File format validation**
+- ✅ **Texture path verification**
+- ✅ **Color range checking** (0-255)
+- ✅ **Map boundary validation**
+- ✅ **Player position detection**
+- ✅ **Character validity checking**
+- ✅ **Memory safety guarantees**
 
 ## Directory Structure
 
 ```
 cub3d/
-├── assets/                  # Textures and sprites
-│   ├── wall_north.xpm      # North wall texture
-│   ├── wall_south.xpm      # South wall texture
-│   ├── wall_east.xpm       # East wall texture
-│   └── wall_west.xpm       # West wall texture
-├── includes/                # Header files
-│   ├── cub3d.h             # Main project header
-│   ├── ft_validation.h     # Validation functions
-│   ├── includes.h          # System includes
-│   ├── inits.h             # Initialization functions
-│   ├── mlx_init.h          # MLX initialization
-│   └── typedefs.h          # Type definitions
-├── srcs/                   # Source code
-│   ├── main.c              # Entry point
-│   ├── init.c              # Game initialization
-│   ├── map/                # Map-related functions
-│   │   ├── map_parse.c     # Map file parsing
-│   │   ├── map_validate.c  # Map validation
-│   │   └── map_utils.c     # Map utilities
-│   ├── render/             # Rendering engine
-│   │   ├── raycasting.c    # Raycasting algorithm
-│   │   ├── draw_walls.c    # Wall rendering
-│   │   └── textures.c      # Texture management
-│   ├── player/             # Player management
-│   │   ├── player.c        # Player state
-│   │   └── movement.c      # Movement handling
-│   └── mlx/                # MLX integration
-│       └── hooks.c         # Event handlers
-├── extLibs/                # External libraries
-│   ├── libft/              # Custom C library
-│   └── minilibx-linux/     # Graphics library
-├── obj/                    # Compiled object files
-├── Makefile               # Build configuration
-├── map.cub                # Sample map file
-└── README.md              # This file
+├── assets/                    # Textures and sprites
+├── includes/                  # Header files
+│   ├── cub3d.h               # Main project header
+│   ├── ft_debug.h            # Debug utilities
+│   ├── ft_validation.h       # Validation functions
+│   ├── includes.h            # System includes
+│   ├── inits.h               # Initialization functions
+│   ├── mlx_init.h            # MLX initialization
+│   └── typedefs.h            # Type definitions
+├── srcs/                     # Source code
+│   ├── main.c                # Entry point
+│   ├── init.c                # Game initialization
+│   ├── map/                  # Map-related functions ✅
+│   │   ├── map_parse.c       # Map file parsing (COMPLETE)
+│   │   ├── map_validate.c    # Map validation
+│   │   └── map_utils.c       # Map utilities
+│   ├── debugging/            # Debug tools ✅
+│   │   └── print_map.c       # Map visualization
+│   ├── render/               # Rendering engine 🚧
+│   ├── player/               # Player management 🔮
+│   ├── mlx/                  # MLX integration
+│   │   └── mylx_utils.c      # MLX utilities
+│   └── cleanup/              # Memory management ✅
+│       └── cleanup.c         # Resource cleanup
+├── extLibs/                  # External libraries (auto-managed)
+│   ├── libft/                # Custom C library
+│   ├── poormanfixedpoint/    # Fixed-point math library
+│   └── minilibx-linux/       # Graphics library
+├── obj/                      # Compiled object files
+├── Makefile                  # Build configuration
+├── LICENSE                   # MIT License
+├── map.cub                   # Sample map file
+└── README.md                 # This file
 ```
 
 ## Compilation
@@ -213,51 +240,41 @@ cub3d/
 | `make clean`         | Remove object files                |
 | `make fclean`        | Remove object files and executable |
 | `make re`            | Clean and rebuild everything       |
+| `make check_libft`   | Check/clone libft if missing       |
+| `make check_pmfp`    | Check/clone poormanfixedpoint      |
 | `make check_mlx`     | Check/clone minilibx if missing    |
+| `make libft_clean`   | Remove libft completely            |
+| `make pmfp_clean`    | Remove poormanfixedpoint           |
 | `make mlx_clean`     | Remove minilibx completely         |
 
-### Compilation Flags
+### 🚀 Automatic Dependency Management
 
-- **-Wall -Wextra -Werror**: Strict error checking
-- **-I./includes**: Include project headers
-- **-I./extLibs/libft**: Include libft headers
-- **-I./extLibs/minilibx-linux**: Include MLX headers
+The Makefile includes intelligent dependency management for all external libraries:
 
-### Linking
-
-- **-lft**: Link with libft
-- **-lmlx**: Link with minilibx
-- **-lm**: Math library
-- **-lXext -lX11**: X11 libraries
-
-### 🚀 Automatic MinilibX Management
-
-The Makefile includes intelligent dependency management for MinilibX:
-
-- **Auto-detection**: Checks if MinilibX exists before building
-- **Auto-clone**: Downloads MinilibX from GitHub if missing
+- **Auto-detection**: Checks if libraries exist before building
+- **Auto-clone**: Downloads libraries from GitHub if missing
 - **Error handling**: Provides clear feedback if cloning fails
-- **Version control**: Uses official 42Paris MinilibX repository
+- **Version control**: Uses official repositories
 
 **Example workflow:**
 
 ```bash
-# First time building (no MinilibX)
+# First time building (clean system)
 make
+# 🔍 libft not found, cloning...
+# ✅ libft cloned successfully.
+# 🔍 poormanfixedpoint not found, cloning...
+# ✅ poormanfixedpoint cloned successfully.
+# 🔍 minilibx-linux not found, cloning...
 # ✅ minilibx-linux cloned successfully.
 # [compilation continues...]
 
 # Subsequent builds
 make
-# ✅ minilibx-linux found at ./extLibs/minilibx-linux
+# ✅ libft already exists.
+# ✅ poormanfixedpoint already exists.
+# ✅ minilibx-linux already exists.
 # [compilation continues...]
-```
-
-**Manual MinilibX management:**
-
-```bash
-make check_mlx     # Check/clone MinilibX
-make mlx_clean     # Remove MinilibX completely
 ```
 
 ## Controls
@@ -276,48 +293,81 @@ make mlx_clean     # Remove MinilibX completely
 
 ## Development Status
 
-### Current Phase: **Setup & Architecture** ✅
+### Current Phase: **Map Parsing Complete** ✅
 
 - [x] Project structure organized
-- [x] Makefile configured and working
-- [x] Libraries integrated (libft, minilibx)
-- [x] Basic compilation successful
-- [x] Template functions created
+- [x] Makefile configured with auto-dependency management
+- [x] Libraries integrated (libft, poormanfixedpoint, minilibx)
+- [x] **Complete map file parsing system**
+- [x] **Comprehensive map validation**
+- [x] **Memory management and cleanup**
+- [x] **Debug visualization tools**
+- [x] **Error handling and reporting**
 
-### Next Phase: **Core Implementation** 🚧
+### Next Phase: **Raycasting Engine** 🚧
 
-- [ ] Implement map parsing logic
+- [ ] Implement raycasting algorithm
 - [ ] Create player initialization system
-- [ ] Develop raycasting algorithm
 - [ ] Add texture loading functionality
+- [ ] Develop wall rendering system
 
 ### Future Phases: **Enhancement & Polish** 🔮
 
+- [ ] Player movement and collision detection
 - [ ] Performance optimizations
 - [ ] Advanced features (sprites, effects)
-- [ ] Error handling improvements
 - [ ] Documentation completion
 
 ## Technical Details
 
+### Map Parsing Architecture
+
+- **Two-pass parsing**: First pass counts dimensions, second pass populates data
+- **Memory-safe allocation**: Proper cleanup on all error paths
+- **Validation pipeline**: Multiple validation stages with detailed error reporting
+- **Line normalization**: All map lines padded to consistent width
+
 ### Graphics Library
 
 - **MinilibX**: Lightweight graphics library for X11
-- **Raycasting**: Primary rendering technique
-- **Texture Mapping**: XPM format support
+- **Raycasting**: Primary rendering technique (planned)
+- **Texture Mapping**: XPM format support (planned)
 
-### Mathematical Concepts
+### Mathematical Libraries
 
-- Vector mathematics for ray calculations
-- Trigonometric functions for angle computations
-- DDA algorithm for grid traversal
-- Perspective projection for 3D effect
+- **Poor Man's Fixed Point**: Custom fixed-point arithmetic library
+- **Vector mathematics**: For ray calculations (planned)
+- **Trigonometric functions**: For angle computations (planned)
 
 ### Memory Management
 
-- Dynamic allocation for map data
-- Texture buffer management
-- Resource cleanup and error handling
+- **Dynamic allocation** for map data with proper cleanup
+- **Resource management** with structured cleanup functions
+- **Error handling** with memory leak prevention
+
+## Debugging Tools
+
+### Map Visualization
+
+The project includes comprehensive debugging tools:
+
+**Console Output:**
+```c
+print_map_array(map);    // Detailed character-by-character display
+print_map_grid(map);     // Visual grid representation
+```
+
+**Visual Debug Grid:**
+```c
+draw_map_grid(data);     // In-window map visualization
+```
+
+**Debug Features:**
+- ✅ Character-by-character map inspection
+- ✅ Visual grid with color coding
+- ✅ Memory allocation tracking
+- ✅ Parse step-by-step debugging
+- ✅ Validation error reporting
 
 ## Resources
 
@@ -346,7 +396,9 @@ This is a 42 school project and follows academic guidelines. External contributi
 
 ## License
 
-This project is created for educational purposes as part of the 42 school curriculum. Please respect academic integrity guidelines.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Created for educational purposes as part of the 42 school curriculum. Please respect academic integrity guidelines.
 
 ## Contact Information
 
@@ -358,6 +410,6 @@ This project is created for educational purposes as part of the 42 school curric
 
 ---
 
-**Last Updated**: July 20, 2025  
-**Version**: 0.1.0 (WIP)  
-**Status**: 🚧 Under Development
+**Last Updated**: July 29, 2025  
+**Version**: 0.2.0  
+**Status**: 🚧 Map Parsing Complete - Raycasting Engine Next

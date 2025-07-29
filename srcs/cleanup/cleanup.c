@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 19:20:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:17:33 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,18 +39,20 @@ int	cleanup_map(t_map *map)
 	if (map)
 	{
 		if (map->map_array)
+			free(map->map_array);
+		if (map->filename)
+			free(map->filename);
+		if (map->map_lines)
 		{
 			i = 0;
 			while (i < map->height)
 			{
-				if (map->map_array[i])
-					free(map->map_array[i]);
+				if (map->map_lines[i])
+					free(map->map_lines[i]);
 				i++;
 			}
-			free(map->map_array);
+			free(map->map_lines);
 		}
-		if (map->filename)
-			free(map->filename);
 		// Free any other allocated fields in t_map
 		free(map);
 	}
