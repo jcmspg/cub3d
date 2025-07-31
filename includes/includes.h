@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:16:12 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/31 19:55:38 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 // External Libraries
 # include "../extLibs/libft/libft.h"
 # include "../extLibs/minilibx-linux/mlx.h"
+# include "../extLibs/poormanfixedpoint/includes/poormansfixed.h"
 
 // Project-specific headers
 # include "typedefs.h"

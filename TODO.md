@@ -226,7 +226,7 @@ t_fixed angle_precise = pmfp_from_float(angle_degrees * PI / 180.0f);
 
 ---
 
-**Last Updated**: July 29, 2025  
+**Last Updated**: July 31, 2025  
 **Focus**: Fixed-point coordinate system implementation  
 **Library**: poormanfixedpoint integration  
 **Next**: Ray casting with fixed-point precision

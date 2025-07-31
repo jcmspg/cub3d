@@ -26,11 +26,12 @@ Welcome to the Cub3D project, a simple 3D game engine inspired by Wolfenstein 3D
 8. [Controls](#controls)
 9. [Development Status](#development-status)
 10. [Technical Details](#technical-details)
-11. [Debugging Tools](#debugging-tools)
-12. [Resources](#resources)
-13. [Contributing](#contributing)
-14. [License](#license)
-15. [Contact Information](#contact-information)
+11. [Architecture Documentation](#architecture-documentation)  👈 Add this
+12. [Debugging Tools](#debugging-tools)
+13. [Resources](#resources)
+14. [Contributing](#contributing)
+15. [License](#license)
+16. [Contact Information](#contact-information)
 
 ---
 
@@ -344,6 +345,71 @@ make
 - **Dynamic allocation** for map data with proper cleanup
 - **Resource management** with structured cleanup functions
 - **Error handling** with memory leak prevention
+
+## Architecture Documentation
+
+For detailed technical information about the coordinate system, fixed-point arithmetic, and raycasting implementation:
+
+📖 **[Technical Architecture Guide](ARCHITECTURE.md)** - Comprehensive explanation of:
+- Coordinate system design and conversion logic
+- Fixed-point arithmetic implementation
+- Trigonometric lookup table optimization
+- Raycasting algorithm architecture
+- Memory management strategies
+- Performance considerations
+
+This document provides in-depth technical reasoning behind design decisions and mathematical foundations.
+
+### Directory Structure
+
+```
+cub3d/
+├── assets/                    # Textures and sprites
+├── includes/                  # Header files
+│   ├── cub3d.h               # Main project header
+│   ├── ft_debug.h            # Debug utilities
+│   ├── ft_validation.h       # Validation functions
+│   ├── includes.h            # System includes
+│   ├── inits.h               # Initialization functions
+│   ├── mlx_init.h            # MLX initialization
+│   └── typedefs.h            # Type definitions
+├── srcs/                     # Source code
+│   ├── main.c                # Entry point
+│   ├── init.c                # Game initialization
+│   ├── map/                  # Map-related functions ✅
+│   │   ├── map_parse.c       # Map file parsing (COMPLETE)
+│   │   ├── map_validate.c    # Map validation
+│   │   └── map_utils.c       # Map utilities
+│   ├── debugging/            # Debug tools ✅
+│   │   └── print_map.c       # Map visualization
+│   ├── render/               # Rendering engine 🚧
+│   ├── player/               # Player management 🔮
+│   ├── mlx/                  # MLX integration
+│   │   └── mylx_utils.c      # MLX utilities
+│   └── cleanup/              # Memory management ✅
+│       └── cleanup.c         # Resource cleanup
+├── extLibs/                  # External libraries (auto-managed)
+│   ├── libft/                # Custom C library
+│   ├── poormanfixedpoint/    # Fixed-point math library
+│   └── minilibx-linux/       # Graphics library
+├── obj/                      # Compiled object files
+├── Makefile                  # Build configuration
+├── LICENSE                   # MIT License
+├── map.cub                   # Sample map file
+└── README.md                 # This file
+```
+
+### File Descriptions
+
+- **assets/**: Contains all texture and sprite files used in the game.
+- **includes/**: Header files for the project, containing function declarations and macros.
+- **srcs/**: Source code for the project, divided into subdirectories by functionality.
+- **extLibs/**: External libraries used in the project, managed by the Makefile.
+- **obj/**: Directory for compiled object files.
+- **Makefile**: Build configuration file for compiling the project.
+- **LICENSE**: License file for the project.
+- **map.cub**: Sample map file for testing the project.
+- **README.md**: This README file.
 
 ## Debugging Tools
 

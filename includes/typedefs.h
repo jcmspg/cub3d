@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:07:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/31 20:36:12 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,16 @@
 # define MLX_COLOR(r, g, b) (0xFF000000 | ((r) << 16) | ((g) << 8) | (b))
 
 #define VOID_SYMBOL ' '
+
+
+// Trigonometry and fixed points
+#define FIXED_PI       to_fixed32(3.14159265f)
+#define FIXED_HALF_PI  to_fixed32(3.14159265f / 2.0f)
+#define FIXED_TWO_PI   to_fixed32(6.28318530f)
+
+# define M_PI 3.14159265358979323846
+
+
 
 
 enum						e_error
@@ -64,6 +74,12 @@ enum						e_error
 	ERR_UNKNOWN,
 	ERR_CLEAN_UP,
 };
+
+typedef struct s_trig
+{
+	t_fixed32	sin[91];  // 0-90 degrees inclusive
+	t_fixed32	cos[91];
+}	t_trig;
 
 typedef struct s_image_data
 {
@@ -108,11 +124,23 @@ typedef struct s_fps_data
 // Forward declarations for types that will be defined later
 typedef struct s_game		t_game;
 typedef struct s_map		t_map;
-typedef struct s_player		t_player;
 typedef struct s_input		t_input;
 typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
 typedef struct s_raycasting	t_raycasting;
+
+typedef struct s_player
+{
+	t_fixed32	x;
+	t_fixed32	y;
+
+	t_fixed32	dir_x;
+	t_fixed32	dir_y;
+
+	t_fixed32	plane_x;
+	t_fixed32	plane_y;
+
+}	t_player;
 
 typedef struct s_graphics
 {
@@ -124,6 +152,9 @@ typedef struct s_graphics
 
 typedef struct s_cub_data
 {
+	// data struct for the trigonometric values
+	t_trig					trig;
+
 	// time struct
 	t_fps_data				fps;
 

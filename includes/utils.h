@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 19:15:05 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:15:43 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/31 20:21:34 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,7 @@
 # include "cub3d.h"
 
 int ft_isspace(char c);
+
+
 
 #endif /* UTILS_H */
