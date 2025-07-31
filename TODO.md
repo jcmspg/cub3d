@@ -1,232 +1,269 @@
-# Cub3D - TODO List (Fixed-Point Implementation)
+# Cub3D - TODO List (Updated)
 
-> **Project Status**: Map Parsing Complete ✅ → Next: Fixed-Point Coordinate System 🚧
-
----
-
-## 🎯 Current Priority
-
-### Phase 2A: Fixed-Point Coordinate System
-
-#### 🔧 Core Systems with Fixed-Point Math
-- [ ] **Fixed-Point Integration**
-  - [ ] Include poormanfixedpoint library in build system
-  - [ ] Create fixed-point type aliases for project
-  - [ ] Implement conversion helpers (int ↔ fixed, float ↔ fixed)
-  - [ ] Set up fixed-point constants (MAP_SCALE, WORLD_SCALE, etc.)
-
-- [ ] **Coordinate System Setup (Fixed-Point)**
-  - [ ] Implement 1D array to 2D coordinate translation using fixed-point
-  - [ ] Create world-to-screen coordinate transformation with fixed precision
-  - [ ] Set up player position coordinate system using pmfp_t
-  - [ ] Define map-to-world space conversion with fixed-point math
+> **Project Status**: Foundation Complete ✅ → Mathematics Complete ✅ → Player System 70% ✅ → Next: Input & 2D Rendering 🚧
 
 ---
 
-## 📋 Detailed Implementation Plan
+## 🎯 Current Priority: Input System & 2D Visualization
 
-### 🔢 Fixed-Point Architecture
+### **IMMEDIATE NEXT STEPS** (This Week)
+- [ ] **MLX Input Hooks Setup**
+  - [ ] Key press/release event registration
+  - [ ] WASD movement key bindings
+  - [ ] ESC key for exit
+  - [ ] Window close event handling
 
-#### **Type Definitions**
+- [ ] **Basic 2D Map Rendering**
+  - [ ] MLX window creation and image buffer setup
+  - [ ] Grid-based map visualization (walls vs empty)
+  - [ ] Player position indicator on 2D map
+  - [ ] Real-time position updates
+
+---
+
+## ✅ **COMPLETED FEATURES**
+
+### 🏗️ **Foundation (100% Complete)**
+- [x] **Project Structure**
+  - [x] Directory organization (`srcs/`, `includes/`, `extLibs/`)
+  - [x] Makefile with proper compilation
+  - [x] External libraries integration (libft, poormanfixedpoint, minilibx)
+  - [x] Header organization (`typedefs.h`, `cub3d.h`, `utils.h`)
+
+- [x] **Map Parsing System**
+  - [x] `.cub` file parsing and validation
+  - [x] Map conversion to 1D array (`char *map_array`)
+  - [x] Memory management and error handling
+  - [x] Map dimensions tracking (`width`, `height`)
+
+### 🔢 **Fixed-Point Mathematics (95% Complete)**
+- [x] **poormanfixedpoint Integration**
+  - [x] Library inclusion in build system
+  - [x] Type aliases (`t_fixed32`) 
+  - [x] Conversion functions (`to_fixed32`, `from_fixed32`)
+  - [x] Fixed-point constants (`FIXED_PI`, `FIXED_TWO_PI`, etc.)
+
+- [x] **Trigonometric Optimization**
+  - [x] 90-degree lookup tables (`t_trig` with dynamic allocation)
+  - [x] Quadrant transformation (`fast_sin`, `fast_cos`)
+  - [x] Memory management (`init_trig_table`, `cleanup_trig_table`)
+  - [x] Fixed-point trig functions (`fixed_sin`, `fixed_cos`)
+
+- [x] **Coordinate System**
+  - [x] Array-to-grid conversions (`index_to_coords`, `coords_to_index`)
+  - [x] World coordinate mapping (1 grid cell = 1.0 world unit)
+  - [x] Collision detection (`is_wall_at`, `get_map_char_at`)
+  - [x] World-to-screen scaling framework
+
+### 🎮 **Player System (70% Complete)**
+- [x] **Player Initialization**
+  - [x] Automatic spawn detection from map (`find_player_spawn`)
+  - [x] Grid-to-world coordinate conversion
+  - [x] Player position in fixed-point world space
+  - [x] Map character replacement ('N'→'0')
+
+- [x] **Movement Functions**
+  - [x] Basic movement (`move_player_x`, `move_player_y`)
+  - [x] Position queries (`get_player_position`, `get_player_grid_position`)
+  - [x] Collision checking (`can_player_move_to`)
+  - [x] Fixed-point arithmetic integration (`fixed32_add`, `fixed32_mul`)
+
+- [ ] **Missing: Input Integration** (Next Priority)
+  - [ ] Key hook integration for movement
+  - [ ] Smooth movement with delta time
+  - [ ] Input state management
+
+---
+
+## 🚧 **IN PROGRESS / TODO**
+
+### **PHASE 3A: Input System (Priority: URGENT)**
+
+#### 🎮 **MLX Event Handling**
 ```c
-// Fixed-point coordinate system
-typedef pmfp_t t_fixed;
-typedef struct s_fixed_point {
-    t_fixed x;
-    t_fixed y;
-} t_fixed_point;
-
-typedef struct s_player_fixed {
-    t_fixed_point position;     // World coordinates (fixed-point)
-    t_fixed angle;              // Direction in radians (fixed-point)
-    t_fixed fov;               // Field of view (fixed-point)
-} t_player_fixed;
+// Need to implement these functions:
+int key_press_hook(int keycode, t_cub_data *data);
+int key_release_hook(int keycode, t_cub_data *data);
+int close_window_hook(t_cub_data *data);
+void setup_mlx_hooks(t_cub_data *data);
 ```
 
-#### **Constants Setup**
-- [ ] Define `FIXED_MAP_UNIT` - size of one map cell in fixed-point world coords
-- [ ] Define `FIXED_PI`, `FIXED_2PI`, `FIXED_PI_2` - trigonometric constants
-- [ ] Define `FIXED_PLAYER_SPEED` - movement speed in fixed-point units
-- [ ] Define `FIXED_ROTATION_SPEED` - rotation speed in fixed-point radians
+- [ ] **Key Event Setup**
+  - [ ] Register MLX key press/release hooks
+  - [ ] Define key codes for WASD movement
+  - [ ] ESC key (65307) for graceful exit
+  - [ ] Window close button handling
 
-### 🗺️ Coordinate Transformation Functions
+- [ ] **Input State Management**
+  - [ ] Update `t_input` structure implementation
+  - [ ] Track key states (pressed/released/held)
+  - [ ] Prevent key repeat issues
+  - [ ] Smooth movement implementation
 
-#### **Core Coordinate Functions (Fixed-Point)**
-- [ ] **Map ↔ World Conversions**
-  ```c
-  t_fixed map_to_world_x_fixed(int map_x);
-  t_fixed map_to_world_y_fixed(int map_y);
-  int world_to_map_x_fixed(t_fixed world_x);
-  int world_to_map_y_fixed(t_fixed world_y);
-  ```
-
-- [ ] **World ↔ Screen Conversions**
-  ```c
-  int world_to_screen_x_fixed(t_fixed world_x, t_player_fixed *player);
-  int world_to_screen_y_fixed(t_fixed world_y, t_fixed distance);
-  t_fixed_point screen_to_world_fixed(int screen_x, int screen_y, t_player_fixed *player);
-  ```
-
-- [ ] **1D Array ↔ 2D Coordinate Translation**
-  ```c
-  int coords_to_index(int x, int y, int width);
-  t_point index_to_coords(int index, int width);
-  char get_map_at_fixed(t_fixed world_x, t_fixed world_y, t_map *map);
-  ```
-
-### 🎮 Player System (Fixed-Point)
-
-#### **Player Initialization**
-- [ ] **`find_player_position_fixed()`** - locate player and convert to fixed-point
-- [ ] **`init_player_fixed()`** - initialize player with fixed-point coordinates
-- [ ] **`set_player_direction_fixed()`** - convert N/S/E/W to fixed-point angles
-
-#### **Player Utilities**
-- [ ] **`get_player_map_position()`** - get current map cell of player
-- [ ] **`is_valid_player_position()`** - validate player position for movement
-- [ ] **`player_facing_direction()`** - get cardinal direction player is facing
-
-### 🎨 Raycasting (Fixed-Point Implementation)
-
-#### **Ray Mathematics**
-- [ ] **Ray Casting with Fixed-Point**
-  ```c
-  typedef struct s_ray_fixed {
-      t_fixed_point origin;       // Ray start position
-      t_fixed_point direction;    // Ray direction (normalized)
-      t_fixed length;            // Distance to wall hit
-      int map_x, map_y;          // Map cell hit
-      bool hit_vertical;         // Wall orientation
-  } t_ray_fixed;
-  ```
-
-- [ ] **Ray Functions**
-  ```c
-  t_ray_fixed cast_ray_fixed(t_fixed_point origin, t_fixed angle);
-  t_fixed calculate_wall_distance_fixed(t_ray_fixed ray, t_fixed player_angle);
-  int calculate_wall_height_fixed(t_fixed distance, int screen_height);
-  ```
-
-#### **DDA Algorithm (Fixed-Point)**
-- [ ] Implement DDA traversal using fixed-point arithmetic
-- [ ] Calculate step sizes and initial positions in fixed-point
-- [ ] Handle wall intersection detection with precision
-- [ ] Determine wall hit side (N/S/E/W) for texture selection
-
-### 🔧 Fixed-Point Utility Functions
-
-#### **Math Helpers**
-- [ ] **Trigonometry**
-  ```c
-  t_fixed sin_fixed(t_fixed angle);          // Using pmfp sin functions
-  t_fixed cos_fixed(t_fixed angle);          // Using pmfp cos functions
-  t_fixed atan2_fixed(t_fixed y, t_fixed x); // Angle from vector
-  t_fixed normalize_angle_fixed(t_fixed angle); // Keep in 0-2π
-  ```
-
-- [ ] **Vector Operations**
-  ```c
-  t_fixed_point vector_add_fixed(t_fixed_point a, t_fixed_point b);
-  t_fixed_point vector_subtract_fixed(t_fixed_point a, t_fixed_point b);
-  t_fixed vector_dot_fixed(t_fixed_point a, t_fixed_point b);
-  t_fixed vector_length_fixed(t_fixed_point v);
-  t_fixed_point vector_normalize_fixed(t_fixed_point v);
-  ```
-
-- [ ] **Distance and Rotation**
-  ```c
-  t_fixed distance_fixed(t_fixed_point a, t_fixed_point b);
-  t_fixed_point rotate_point_fixed(t_fixed_point point, t_fixed angle);
-  ```
-
-### 🏗️ Build System Integration
-
-#### **Makefile Updates**
-- [ ] Add poormanfixedpoint to library dependencies
-- [ ] Update include paths for pmfp headers
-- [ ] Add pmfp compilation flags if needed
-- [ ] Ensure pmfp library is built before main project
-
-#### **Header Integration**
-- [ ] Include `poormansfixed.h` in main project headers
-- [ ] Create pmfp wrapper functions for common operations
-- [ ] Add fixed-point type definitions to project headers
-
----
-
-## 🧮 Fixed-Point Implementation Strategy
-
-### **Precision Planning**
+#### 📋 **t_input Structure Implementation**
 ```c
-// Example fixed-point setup
-#define WORLD_SCALE_BITS 16        // 16.16 fixed-point for world coordinates
-#define ANGLE_SCALE_BITS 20        // Higher precision for angles
-#define DISTANCE_SCALE_BITS 12     // Sufficient for wall distances
-
-// Convert between different precisions as needed
-t_fixed world_coord = pmfp_from_int(map_x);
-t_fixed angle_precise = pmfp_from_float(angle_degrees * PI / 180.0f);
+typedef struct s_input
+{
+    bool move_forward;    // W key
+    bool move_backward;   // S key  
+    bool move_left;       // A key
+    bool move_right;      // D key
+    bool rotate_left;     // Left arrow (future)
+    bool rotate_right;    // Right arrow (future)
+    bool exit_game;       // ESC key
+} t_input;
 ```
 
-### **Performance Considerations**
-- [ ] Use integer operations where possible
-- [ ] Minimize conversions between fixed and float
-- [ ] Cache frequently used trigonometric values
-- [ ] Profile critical path functions
+### **PHASE 3B: 2D Rendering (Priority: HIGH)**
 
-### **Testing Strategy**
-- [ ] Unit tests for coordinate conversions
-- [ ] Precision validation (compare with float calculations)
-- [ ] Edge case testing (boundaries, overflow)
-- [ ] Performance benchmarks vs float implementation
+#### 🖼️ **MLX Graphics Setup**
+- [ ] **Window Management**
+  - [ ] MLX window creation (`mlx_new_window`)
+  - [ ] Window size configuration (800x600 default)
+  - [ ] Window title setup
+  - [ ] Proper window cleanup
+
+- [ ] **Image Buffer System**
+  - [ ] Image creation (`mlx_new_image`)
+  - [ ] Buffer address retrieval (`mlx_get_data_addr`)
+  - [ ] Pixel manipulation functions
+  - [ ] Double buffering for smooth rendering
+
+#### 🗺️ **2D Map Visualization**
+```c
+// Functions to implement:
+void render_2d_map(t_cub_data *data);
+void draw_map_grid(t_cub_data *data);
+void draw_player_position(t_cub_data *data);
+void update_display(t_cub_data *data);
+```
+
+- [ ] **Map Rendering**
+  - [ ] Grid-based wall/empty space visualization
+  - [ ] Color coding (walls=white, empty=black)
+  - [ ] Dynamic scaling based on window size
+  - [ ] Efficient pixel manipulation
+
+- [ ] **Player Visualization**
+  - [ ] Player position indicator (small colored square)
+  - [ ] Real-time position updates
+  - [ ] Sub-pixel position accuracy
+  - [ ] Movement trail (optional debug feature)
+
+#### 🔄 **Game Loop Integration**
+- [ ] **Main Loop Structure**
+  - [ ] Input processing
+  - [ ] Player update logic
+  - [ ] Rendering pipeline
+  - [ ] Frame rate limiting
+
+### **PHASE 4: 3D Raycasting (Future)**
+
+#### 🎯 **Ray Casting Engine**
+- [ ] **Ray Calculation**
+  - [ ] Ray direction from player angle
+  - [ ] DDA algorithm implementation
+  - [ ] Wall intersection detection
+  - [ ] Distance calculations
+
+- [ ] **3D Projection**
+  - [ ] Wall height from distance
+  - [ ] Screen column rendering  
+  - [ ] Perspective correction
+  - [ ] Field of view management
+
+#### 🎨 **Rendering Pipeline**
+- [ ] **Wall Rendering**
+  - [ ] Vertical line drawing
+  - [ ] Distance-based shading
+  - [ ] Wall texture application
+  - [ ] Floor/ceiling rendering
+
+### **PHASE 5: Polish & Advanced Features**
+
+#### 🔧 **Performance Optimization**
+- [ ] **Frame Rate Management**
+  - [ ] Target 60 FPS implementation
+  - [ ] Delta time calculations
+  - [ ] Performance monitoring
+  - [ ] Optimization profiling
+
+- [ ] **Memory Optimization**
+  - [ ] Memory pool implementation
+  - [ ] Efficient buffer management
+  - [ ] Leak detection and fixes
+
+#### 🎨 **Visual Enhancements**
+- [ ] **Textures & Colors**
+  - [ ] Wall texture loading
+  - [ ] Floor/ceiling colors
+  - [ ] Lighting effects
+  - [ ] Atmospheric perspective
+
+#### 🧪 **Testing & Validation**
+- [ ] **Quality Assurance**
+  - [ ] Unit tests for critical functions
+  - [ ] Memory leak testing (Valgrind)
+  - [ ] Performance benchmarks
+  - [ ] Cross-platform testing
 
 ---
 
-## 📋 Implementation Phases
+## 📊 **Current Status Overview**
 
-### Phase 1: Foundation (Current) 🎯
-- [ ] Set up fixed-point type system
-- [ ] Implement basic coordinate transformations
-- [ ] Create player initialization with fixed-point
-- [ ] Test 1D↔2D array conversions
-
-### Phase 2: Ray Casting 🚧
-- [ ] Implement fixed-point DDA algorithm
-- [ ] Add wall intersection detection
-- [ ] Calculate distances and wall heights
-- [ ] Basic wall rendering
-
-### Phase 3: Movement & Controls 🔮
-- [ ] Player movement with fixed-point precision
-- [ ] Smooth rotation using fixed-point angles
-- [ ] Collision detection with sub-pixel accuracy
-- [ ] Input handling and response
-
-### Phase 4: Optimization & Polish ⭐
-- [ ] Performance tuning of fixed-point operations
-- [ ] Memory usage optimization
-- [ ] Visual debugging improvements
-- [ ] Documentation and cleanup
+| Component | Status | Progress |
+|-----------|--------|----------|
+| **Foundation** | ✅ Complete | 100% |
+| **Map Parsing** | ✅ Complete | 100% |
+| **Fixed-Point Math** | ✅ Complete | 95% |
+| **Coordinate System** | ✅ Complete | 100% |
+| **Player System** | 🚧 Partial | 70% |
+| **Input System** | ❌ Not Started | 0% |
+| **2D Rendering** | ❌ Not Started | 0% |
+| **3D Raycasting** | ❌ Not Started | 0% |
 
 ---
 
-## 🔬 Debug & Validation Tools
+## 🎯 **Next Week's Goals**
 
-### **Fixed-Point Debugging**
-- [ ] `print_fixed_point()` - display fixed-point values in readable format
-- [ ] `validate_coordinate_precision()` - check conversion accuracy
-- [ ] `debug_player_position()` - show player position in multiple formats
-- [ ] `visualize_rays_fixed()` - draw ray casting with fixed-point precision
+### **Day 1-2: Input System**
+- [ ] Implement MLX key hooks
+- [ ] Add WASD movement controls
+- [ ] Test player movement with keyboard
 
-### **Coordinate System Validation**
-- [ ] Test round-trip conversions (map→world→map)
-- [ ] Verify screen projection accuracy
-- [ ] Check boundary conditions and edge cases
-- [ ] Compare fixed-point vs float results
+### **Day 3-4: 2D Rendering**
+- [ ] Create MLX window and image buffer
+- [ ] Implement basic 2D map rendering
+- [ ] Add player position visualization
+
+### **Day 5-7: Integration & Testing**
+- [ ] Integrate input with rendering
+- [ ] Test real-time movement
+- [ ] Debug and optimize performance
+- [ ] Prepare for 3D raycasting phase
+
+---
+
+## 💡 **Implementation Notes**
+
+### **Key Design Decisions Made:**
+1. **Fixed-Point Arithmetic**: Using poormanfixedpoint for deterministic behavior
+2. **1D Map Array**: Efficient memory layout with coordinate conversion functions  
+3. **Dynamic Trig Tables**: 90-degree tables with quadrant transformations (75% memory savings)
+4. **Coordinate System**: 1 grid cell = 1.0 world unit with sub-cell precision
+5. **Modular Architecture**: Clear separation between parsing, math, player, and rendering
+
+### **Current Architecture Strengths:**
+- ✅ **Deterministic behavior** across platforms
+- ✅ **Memory efficient** trigonometric calculations
+- ✅ **Precise collision detection** with fixed-point math
+- ✅ **Scalable coordinate system** for any screen size
+- ✅ **Clean separation of concerns** between modules
+
+**Ready for next phase: Input handling and 2D visualization! 🚀**
 
 ---
 
 **Last Updated**: July 31, 2025  
-**Focus**: Fixed-point coordinate system implementation  
-**Library**: poormanfixedpoint integration  
-**Next**: Ray casting with fixed-point precision
+**Current Phase**: Input System Implementation  
+**Next Milestone**: Playable 2D demo with WASD movement

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 20:36:12 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/31 21:38:43 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 
 #define VOID_SYMBOL ' '
 
+#define TRIG_TABLE_SIZE 91 // [from 0 to 90] degrees
 
 // Trigonometry and fixed points
 #define FIXED_PI       to_fixed32(3.14159265f)
@@ -77,8 +78,8 @@ enum						e_error
 
 typedef struct s_trig
 {
-	t_fixed32	sin[91];  // 0-90 degrees inclusive
-	t_fixed32	cos[91];
+	t_fixed32	*sin;  // 0-90 degrees inclusive
+	t_fixed32	*cos;	// same
 }	t_trig;
 
 typedef struct s_image_data

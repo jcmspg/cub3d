@@ -6,70 +6,58 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:04:40 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 20:42:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/31 21:39:03 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.h"
 #include <math.h>
 
-// Convert 1D array index to 2D coordinates
-void index_to_coords(int index, int width, int *x, int *y)
+void	index_to_coords(int index, int width, int *x, int *y)
 {
     *x = index % width;
     *y = index / width;
 }
 
-// Convert 2D coordinates to 1D array index
-int coords_to_index(int x, int y, int width)
+int	coords_to_index(int x, int y, int width)
 {
     return (y * width + x);
 }
 
-// Get map character at world position
-char get_map_char_at(t_cub_data *data, t_fixed32 world_x, t_fixed32 world_y)
+char	get_map_char_at(t_cub_data *data, t_fixed32 world_x, t_fixed32 world_y)
 {
-    int map_x = from_fixed32(world_x);  // Convert fixed-point to int
-    int map_y = from_fixed32(world_y);
-    
-    // Bounds checking
+    int	map_x;
+    int	map_y;
+    int	index;
+
+    map_x = from_fixed32(world_x);
+    map_y = from_fixed32(world_y);
     if (map_x < 0 || map_x >= data->map->width || 
         map_y < 0 || map_y >= data->map->height)
-        return ('1');  // Treat out-of-bounds as walls
-    
-    int index = coords_to_index(map_x, map_y, data->map->width);
+        return ('1');
+    index = coords_to_index(map_x, map_y, data->map->width);
     return (data->map->map_array[index]);
 }
 
-// Check if position is a wall
-bool is_wall_at(t_cub_data *data, t_fixed32 world_x, t_fixed32 world_y)
+bool	is_wall_at(t_cub_data *data, t_fixed32 world_x, t_fixed32 world_y)
 {
-    char c = get_map_char_at(data, world_x, world_y);
+    char	c;
+
+    c = get_map_char_at(data, world_x, world_y);
     return (c == '1');
 }
 
-
-
-#define TRIG_TABLE_SIZE 91
-
 void	calc_trig_table(t_trig *trig)
 {
-    int			i;
-    t_fixed32	deg_fixed;
-    t_fixed32	rad_fixed;
-    t_fixed32	deg_to_rad;
+    int		i;
+    float	rad;
 
-    // Pre-calculate degree-to-radian conversion in fixed-point
-    deg_to_rad = fixed_div(FIXED_PI, to_fixed32(180.0f));
     i = 0;
     while (i < TRIG_TABLE_SIZE)
     {
-        deg_fixed = to_fixed32((float)i);
-        rad_fixed = fixed_mul(deg_fixed, deg_to_rad);
-        
-        // Use your poormanfixedpoint sin/cos functions if available
-        trig->sin[i] = fixed_sin(rad_fixed);  // If pmfp has sin
-        trig->cos[i] = fixed_cos(rad_fixed);  // If pmfp has cos
+        rad = (float)i * (M_PI / 180.0f);
+        trig->sin[i] = to_fixed32(sinf(rad));
+        trig->cos[i] = to_fixed32(cosf(rad));
         i++;
     }
 }
@@ -77,13 +65,17 @@ void	calc_trig_table(t_trig *trig)
 bool	init_trig_table(t_cub_data *data)
 {
     data->trig.sin = (t_fixed32 *)ft_calloc(TRIG_TABLE_SIZE, sizeof(t_fixed32));
+    if (!data->trig.sin)
+        return (false);
+    
     data->trig.cos = (t_fixed32 *)ft_calloc(TRIG_TABLE_SIZE, sizeof(t_fixed32));
-    if (!data->trig.sin || !data->trig.cos)
+    if (!data->trig.cos)
     {
-        cleanup_trig_table(&data->trig);
-        ft_putstr_fd("Error: Failed to allocate memory for trig table\n", 2);
+        free(data->trig.sin);
+        data->trig.sin = NULL;
         return (false);
     }
+    
     calc_trig_table(&data->trig);
     return (true);
 }
@@ -113,15 +105,6 @@ t_fixed32	fast_sin(t_trig *trig, int degrees)
 {
     degrees = normalize_angle_degrees(degrees);
     return (handle_sin_quadrant(trig, degrees));
-}
-
-// For fixed-point angle input
-t_fixed32	fixed_sin_lookup(t_trig *trig, t_fixed32 angle_fixed)
-{
-    int	degrees;
-
-    degrees = from_fixed32(angle_fixed);  // Convert fixed to int degrees
-    return (fast_sin(trig, degrees));
 }
 
 static t_fixed32	handle_cos_quadrant(t_trig *trig, int degrees)

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:17:33 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/31 21:34:22 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,7 @@ int	cleanup(t_cub_data *data)
 {
 	if (!data)
 		return (ERR_UNKNOWN);
+	cleanup_trig_table(&data->trig);
 	if (data->mlx)
 		cleanup_mylx(data);
 	if (data->game)
