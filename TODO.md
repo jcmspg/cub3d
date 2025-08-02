@@ -264,6 +264,6 @@ void update_display(t_cub_data *data);
 
 ---
 
-**Last Updated**: July 31, 2025  
+**Last Updated**: August 02, 2025  
 **Current Phase**: Input System Implementation  
 **Next Milestone**: Playable 2D demo with WASD movement
