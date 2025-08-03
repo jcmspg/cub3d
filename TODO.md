@@ -1,23 +1,23 @@
 # Cub3D - TODO List (Updated)
 
-> **Project Status**: Foundation Complete ✅ → Mathematics Complete ✅ → Player System 70% ✅ → Next: Input & 2D Rendering 🚧
+> **Project Status**: Foundation ✅ → Mathematics ✅ → Input System ✅ → 2D Rendering ✅ → Next: Player Implementation & 3D Raycasting 🚧
 
 ---
 
-## 🎯 Current Priority: Input System & 2D Visualization
+## 🎯 Current Priority: Complete Player System & Begin 3D Raycasting
 
 ### **IMMEDIATE NEXT STEPS** (This Week)
-- [ ] **MLX Input Hooks Setup**
-  - [ ] Key press/release event registration
-  - [ ] WASD movement key bindings
-  - [ ] ESC key for exit
-  - [ ] Window close event handling
+- [ ] **Complete Player Implementation**
+  - [ ] Initialize player from map spawn position (N/S/E/W detection)
+  - [ ] Set proper movement and rotation speeds
+  - [ ] Implement directional vectors (dir_x, dir_y)
+  - [ ] Add camera plane vectors (plane_x, plane_y)
 
-- [ ] **Basic 2D Map Rendering**
-  - [ ] MLX window creation and image buffer setup
-  - [ ] Grid-based map visualization (walls vs empty)
-  - [ ] Player position indicator on 2D map
-  - [ ] Real-time position updates
+- [ ] **Start 3D Raycasting Engine**
+  - [ ] Basic ray casting algorithm (DDA)
+  - [ ] Wall distance calculations
+  - [ ] 3D wall projection to screen
+  - [ ] Replace 2D map view with 3D perspective
 
 ---
 
@@ -35,177 +35,183 @@
   - [x] Map conversion to 1D array (`char *map_array`)
   - [x] Memory management and error handling
   - [x] Map dimensions tracking (`width`, `height`)
+  - [x] Line-by-line processing with proper normalization
+  - [x] Texture/color line detection and filtering
 
-### 🔢 **Fixed-Point Mathematics (95% Complete)**
+### 🔢 **Fixed-Point Mathematics (100% Complete)**
 - [x] **poormanfixedpoint Integration**
   - [x] Library inclusion in build system
-  - [x] Type aliases (`t_fixed32`) 
+  - [x] Type aliases (`t_fixed32`)
   - [x] Conversion functions (`to_fixed32`, `from_fixed32`)
   - [x] Fixed-point constants (`FIXED_PI`, `FIXED_TWO_PI`, etc.)
+  - [x] Arithmetic operations (`fixed32_add`, `fixed32_sub`, `fixed32_mul`)
 
 - [x] **Trigonometric Optimization**
   - [x] 90-degree lookup tables (`t_trig` with dynamic allocation)
   - [x] Quadrant transformation (`fast_sin`, `fast_cos`)
   - [x] Memory management (`init_trig_table`, `cleanup_trig_table`)
   - [x] Fixed-point trig functions (`fixed_sin`, `fixed_cos`)
+  - [x] Angle normalization and conversion utilities
 
 - [x] **Coordinate System**
   - [x] Array-to-grid conversions (`index_to_coords`, `coords_to_index`)
   - [x] World coordinate mapping (1 grid cell = 1.0 world unit)
   - [x] Collision detection (`is_wall_at`, `get_map_char_at`)
-  - [x] World-to-screen scaling framework
+  - [x] Comprehensive math testing suite
 
-### 🎮 **Player System (70% Complete)**
-- [x] **Player Initialization**
-  - [x] Automatic spawn detection from map (`find_player_spawn`)
-  - [x] Grid-to-world coordinate conversion
-  - [x] Player position in fixed-point world space
-  - [x] Map character replacement ('N'→'0')
+### 🎮 **Input System (100% Complete)**
+- [x] **MLX Event Handling**
+  - [x] Key press/release hooks (`handle_key_press`, `handle_key_release`)
+  - [x] WASD movement key bindings
+  - [x] ESC key for exit
+  - [x] Window close event handling (`handle_close`)
 
-- [x] **Movement Functions**
-  - [x] Basic movement (`move_player_x`, `move_player_y`)
-  - [x] Position queries (`get_player_position`, `get_player_grid_position`)
-  - [x] Collision checking (`can_player_move_to`)
-  - [x] Fixed-point arithmetic integration (`fixed32_add`, `fixed32_mul`)
+- [x] **Input State Management**
+  - [x] `t_input` structure with all movement states
+  - [x] Key state tracking (forward/backward/left/right)
+  - [x] Proper key press/release toggle system
+  - [x] Exit flag handling with MLX loop termination
 
-- [ ] **Missing: Input Integration** (Next Priority)
-  - [ ] Key hook integration for movement
-  - [ ] Smooth movement with delta time
-  - [ ] Input state management
+### 🖼️ **2D Rendering System (95% Complete)**
+- [x] **MLX Graphics Framework**
+  - [x] Window creation and management (`mylx_create_window`)
+  - [x] Image buffer system (`mylx_create_image`, `mylx_pixel_put`)
+  - [x] Scene update pipeline (`mylx_update_scene`)
+  - [x] Memory cleanup (`mylx_destroy_*` functions)
+
+- [x] **Map Visualization**
+  - [x] Grid-based map rendering (`draw_map_grid`)
+  - [x] Color-coded cells (walls=white, empty=black, player=red)
+  - [x] Bordered cell rendering with multiple styles
+  - [x] Real-time map updates
+
+- [x] **Debug & Testing Tools**
+  - [x] FPS display overlay (`display_fps`)
+  - [x] Random pixel art testing (`test_sync`)
+  - [x] Dynamic map animations (`dynamic_map_test`)
+  - [x] Mathematical verification tests (`run_all_math_tests`)
+
+### 🕹️ **Game Loop & FPS (100% Complete)**
+- [x] **Frame Rate Management**
+  - [x] Target 60 FPS implementation (`main_render_loop`)
+  - [x] Delta time calculations (`get_time_ms`)
+  - [x] Fixed timestep updates (`FIXED_STEP_MS`)
+  - [x] Frame limiting with `usleep`
+
+- [x] **Game Logic Pipeline**
+  - [x] Input processing integration (`update_game_logic`)
+  - [x] Smooth frame pacing
+  - [x] FPS counter display
+  - [x] Performance monitoring
 
 ---
 
 ## 🚧 **IN PROGRESS / TODO**
 
-### **PHASE 3A: Input System (Priority: URGENT)**
+### **PHASE 4A: Complete Player System (Priority: URGENT)**
 
-#### 🎮 **MLX Event Handling**
+#### 🎮 **Player Initialization**
 ```c
-// Need to implement these functions:
-int key_press_hook(int keycode, t_cub_data *data);
-int key_release_hook(int keycode, t_cub_data *data);
-int close_window_hook(t_cub_data *data);
-void setup_mlx_hooks(t_cub_data *data);
+// Need to implement in player.c:
+bool find_player_spawn(t_cub_data *data, int *spawn_x, int *spawn_y);
+bool init_player_from_map(t_cub_data *data);
+void set_player_direction(t_player *player, char direction);
 ```
 
-- [ ] **Key Event Setup**
-  - [ ] Register MLX key press/release hooks
-  - [ ] Define key codes for WASD movement
-  - [ ] ESC key (65307) for graceful exit
-  - [ ] Window close button handling
+- [ ] **Player Spawn Detection**
+  - [ ] Scan map for player characters (N/S/E/W)
+  - [ ] Convert grid position to world coordinates
+  - [ ] Set initial direction vectors based on spawn character
+  - [ ] Replace player character with '0' in map
 
-- [ ] **Input State Management**
-  - [ ] Update `t_input` structure implementation
-  - [ ] Track key states (pressed/released/held)
-  - [ ] Prevent key repeat issues
-  - [ ] Smooth movement implementation
+- [ ] **Player State Setup**
+  - [ ] Initialize movement/rotation speeds
+  - [ ] Set directional vectors (dir_x, dir_y)
+  - [ ] Calculate camera plane vectors (plane_x, plane_y)
+  - [ ] Allocate and initialize t_player structure
 
-#### 📋 **t_input Structure Implementation**
+#### 🚶 **Movement Integration**
 ```c
-typedef struct s_input
-{
-    bool move_forward;    // W key
-    bool move_backward;   // S key  
-    bool move_left;       // A key
-    bool move_right;      // D key
-    bool rotate_left;     // Left arrow (future)
-    bool rotate_right;    // Right arrow (future)
-    bool exit_game;       // ESC key
-} t_input;
+// Currently stubbed - need real implementation:
+void move_player_x(t_cub_data *data, t_fixed32 speed);
+void move_player_y(t_cub_data *data, t_fixed32 speed);
+bool is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y);
 ```
 
-### **PHASE 3B: 2D Rendering (Priority: HIGH)**
+- [ ] **Movement Implementation**
+  - [ ] Forward/backward movement along direction vector
+  - [ ] Strafe movement (left/right)
+  - [ ] Collision detection with wall checking
+  - [ ] Smooth movement with delta time
 
-#### 🖼️ **MLX Graphics Setup**
-- [ ] **Window Management**
-  - [ ] MLX window creation (`mlx_new_window`)
-  - [ ] Window size configuration (800x600 default)
-  - [ ] Window title setup
-  - [ ] Proper window cleanup
+- [ ] **Rotation System**
+  - [ ] Left/right rotation controls
+  - [ ] Direction vector updates
+  - [ ] Camera plane rotation
+  - [ ] Angle normalization
 
-- [ ] **Image Buffer System**
-  - [ ] Image creation (`mlx_new_image`)
-  - [ ] Buffer address retrieval (`mlx_get_data_addr`)
-  - [ ] Pixel manipulation functions
-  - [ ] Double buffering for smooth rendering
+### **PHASE 4B: 3D Raycasting Engine (Priority: HIGH)**
 
-#### 🗺️ **2D Map Visualization**
+#### 🎯 **Basic Raycasting**
 ```c
-// Functions to implement:
-void render_2d_map(t_cub_data *data);
-void draw_map_grid(t_cub_data *data);
-void draw_player_position(t_cub_data *data);
-void update_display(t_cub_data *data);
+// New files to create:
+// srcs/render/raycasting_engine.c
+// srcs/render/ray_dda.c
+// includes/raycasting.h
 ```
 
-- [ ] **Map Rendering**
-  - [ ] Grid-based wall/empty space visualization
-  - [ ] Color coding (walls=white, empty=black)
-  - [ ] Dynamic scaling based on window size
-  - [ ] Efficient pixel manipulation
-
-- [ ] **Player Visualization**
-  - [ ] Player position indicator (small colored square)
-  - [ ] Real-time position updates
-  - [ ] Sub-pixel position accuracy
-  - [ ] Movement trail (optional debug feature)
-
-#### 🔄 **Game Loop Integration**
-- [ ] **Main Loop Structure**
-  - [ ] Input processing
-  - [ ] Player update logic
-  - [ ] Rendering pipeline
-  - [ ] Frame rate limiting
-
-### **PHASE 4: 3D Raycasting (Future)**
-
-#### 🎯 **Ray Casting Engine**
-- [ ] **Ray Calculation**
-  - [ ] Ray direction from player angle
+- [ ] **Ray Casting Core**
+  - [ ] Ray direction calculation from camera
   - [ ] DDA algorithm implementation
   - [ ] Wall intersection detection
-  - [ ] Distance calculations
+  - [ ] Distance calculations with fish-eye correction
 
-- [ ] **3D Projection**
-  - [ ] Wall height from distance
-  - [ ] Screen column rendering  
-  - [ ] Perspective correction
-  - [ ] Field of view management
-
-#### 🎨 **Rendering Pipeline**
 - [ ] **Wall Rendering**
-  - [ ] Vertical line drawing
-  - [ ] Distance-based shading
-  - [ ] Wall texture application
-  - [ ] Floor/ceiling rendering
+  - [ ] Wall height calculation from distance
+  - [ ] Vertical line drawing for each screen column
+  - [ ] Basic shading (distance-based darkening)
+  - [ ] Floor and ceiling solid colors
 
-### **PHASE 5: Polish & Advanced Features**
+#### 🖥️ **3D Display Pipeline**
+- [ ] **Screen Projection**
+  - [ ] Convert 3D distances to screen heights
+  - [ ] Perspective projection matrix
+  - [ ] FOV and screen resolution handling
+  - [ ] Clipping and bounds checking
 
-#### 🔧 **Performance Optimization**
-- [ ] **Frame Rate Management**
-  - [ ] Target 60 FPS implementation
-  - [ ] Delta time calculations
-  - [ ] Performance monitoring
-  - [ ] Optimization profiling
+- [ ] **Rendering Optimization**
+  - [ ] Only cast rays for visible screen columns
+  - [ ] Early termination for distant walls
+  - [ ] Efficient pixel buffer updates
+  - [ ] Frame rate maintenance
 
-- [ ] **Memory Optimization**
-  - [ ] Memory pool implementation
-  - [ ] Efficient buffer management
-  - [ ] Leak detection and fixes
+### **PHASE 5: Advanced Features (Future)**
 
-#### 🎨 **Visual Enhancements**
-- [ ] **Textures & Colors**
-  - [ ] Wall texture loading
-  - [ ] Floor/ceiling colors
-  - [ ] Lighting effects
-  - [ ] Atmospheric perspective
+#### 🎨 **Texture System**
+- [ ] **Texture Loading**
+  - [ ] XPM file parsing for wall textures
+  - [ ] Texture coordinate mapping
+  - [ ] Texture sampling and filtering
+  - [ ] Multiple wall texture support
 
-#### 🧪 **Testing & Validation**
+- [ ] **Visual Enhancements**
+  - [ ] Textured wall rendering
+  - [ ] Floor/ceiling texture support
+  - [ ] Lighting and shadows
+  - [ ] Fog/distance effects
+
+#### 🔧 **Polish & Optimization**
+- [ ] **Performance Tuning**
+  - [ ] Memory pool for ray calculations
+  - [ ] SIMD optimizations (if applicable)
+  - [ ] Lookup table expansions
+  - [ ] Cache-friendly data structures
+
 - [ ] **Quality Assurance**
-  - [ ] Unit tests for critical functions
-  - [ ] Memory leak testing (Valgrind)
-  - [ ] Performance benchmarks
-  - [ ] Cross-platform testing
+  - [ ] Memory leak testing with Valgrind
+  - [ ] Input edge case handling
+  - [ ] Map validation improvements
+  - [ ] Error recovery systems
 
 ---
 
@@ -215,55 +221,81 @@ void update_display(t_cub_data *data);
 |-----------|--------|----------|
 | **Foundation** | ✅ Complete | 100% |
 | **Map Parsing** | ✅ Complete | 100% |
-| **Fixed-Point Math** | ✅ Complete | 95% |
+| **Fixed-Point Math** | ✅ Complete | 100% |
 | **Coordinate System** | ✅ Complete | 100% |
-| **Player System** | 🚧 Partial | 70% |
-| **Input System** | ❌ Not Started | 0% |
-| **2D Rendering** | ❌ Not Started | 0% |
+| **Input System** | ✅ Complete | 100% |
+| **2D Rendering** | ✅ Complete | 95% |
+| **Game Loop/FPS** | ✅ Complete | 100% |
+| **Player System** | ❌ Incomplete | 20% |
 | **3D Raycasting** | ❌ Not Started | 0% |
+| **Textures** | ❌ Not Started | 0% |
 
 ---
 
 ## 🎯 **Next Week's Goals**
 
-### **Day 1-2: Input System**
-- [ ] Implement MLX key hooks
-- [ ] Add WASD movement controls
-- [ ] Test player movement with keyboard
+### **Day 1-2: Player Implementation**
+- [ ] Implement player spawn detection from map
+- [ ] Initialize player structure with proper values
+- [ ] Connect movement functions to input system
+- [ ] Test player movement in 2D view
 
-### **Day 3-4: 2D Rendering**
-- [ ] Create MLX window and image buffer
-- [ ] Implement basic 2D map rendering
-- [ ] Add player position visualization
+### **Day 3-4: Basic 3D Raycasting**
+- [ ] Create raycasting engine framework
+- [ ] Implement DDA algorithm for wall detection
+- [ ] Calculate wall distances and heights
+- [ ] Draw first 3D wireframe view
 
-### **Day 5-7: Integration & Testing**
-- [ ] Integrate input with rendering
-- [ ] Test real-time movement
-- [ ] Debug and optimize performance
-- [ ] Prepare for 3D raycasting phase
-
----
-
-## 💡 **Implementation Notes**
-
-### **Key Design Decisions Made:**
-1. **Fixed-Point Arithmetic**: Using poormanfixedpoint for deterministic behavior
-2. **1D Map Array**: Efficient memory layout with coordinate conversion functions  
-3. **Dynamic Trig Tables**: 90-degree tables with quadrant transformations (75% memory savings)
-4. **Coordinate System**: 1 grid cell = 1.0 world unit with sub-cell precision
-5. **Modular Architecture**: Clear separation between parsing, math, player, and rendering
-
-### **Current Architecture Strengths:**
-- ✅ **Deterministic behavior** across platforms
-- ✅ **Memory efficient** trigonometric calculations
-- ✅ **Precise collision detection** with fixed-point math
-- ✅ **Scalable coordinate system** for any screen size
-- ✅ **Clean separation of concerns** between modules
-
-**Ready for next phase: Input handling and 2D visualization! 🚀**
+### **Day 5-7: 3D Rendering Pipeline**
+- [ ] Convert from 2D map view to 3D perspective
+- [ ] Implement wall column rendering
+- [ ] Add basic floor/ceiling colors
+- [ ] Test and debug 3D visualization
 
 ---
 
-**Last Updated**: August 02, 2025  
-**Current Phase**: Input System Implementation  
-**Next Milestone**: Playable 2D demo with WASD movement
+## 💡 **Current Implementation Status**
+
+### **Working Systems:**
+✅ **Map loading and parsing** - Full .cub file support
+✅ **Mathematical foundation** - Fixed-point arithmetic with trig tables
+✅ **Input handling** - WASD movement, ESC exit, window close
+✅ **2D visualization** - Real-time map grid with player indicator
+✅ **Game loop** - 60 FPS with delta time and smooth updates
+✅ **Memory management** - Complete cleanup system
+
+### **Current Limitations:**
+❌ **No player entity** - Player position not tracked or displayed
+❌ **Movement not connected** - Input registered but no player response
+❌ **2D-only view** - Missing 3D raycasting perspective
+❌ **No collision detection** - Movement validation not implemented
+
+### **Code Quality:**
+- ✅ Comprehensive error handling and cleanup
+- ✅ Modular architecture with clear separation
+- ✅ Extensive debugging and testing tools
+- ✅ Memory-safe design with proper allocation tracking
+- ✅ Performance monitoring and optimization
+
+---
+
+## 🚀 **Architecture Strengths**
+
+### **Proven Design Decisions:**
+1. **Fixed-Point System**: Deterministic cross-platform behavior
+2. **1D Map Array**: Efficient memory layout with fast coordinate conversion
+3. **Trig Lookup Tables**: 75% memory savings with quadrant optimization
+4. **Modular MLX Wrapper**: Clean abstraction over minilibx complexity
+5. **Event-Driven Input**: Responsive controls with proper state management
+
+### **Ready for Next Phase:**
+The foundation is solid and well-tested. All core systems (parsing, math, input, rendering) are working. The next major milestone is completing the player system and transitioning from 2D to 3D visualization.
+
+**Current Status: Ready for player implementation and 3D raycasting! 🎯**
+
+---
+
+**Last Updated**: August 03, 2025  
+**Current Phase**: Player System Completion
+**Next Milestone**: First-person 3D view with basic movement
+**Target**: Playable 3D demo by end of week

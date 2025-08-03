@@ -16,6 +16,11 @@
 # include "cub3d.h"
 
 int	handle_key_press(int keycode, t_cub_data *data);
+
+int handle_key_release(int keycode, t_cub_data *data);
+
+
+
 int	handle_close(t_cub_data *data);
 
 #endif /* MYLX_HOOKS_H*/

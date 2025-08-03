@@ -11,6 +11,27 @@
 /* ************************************************************************** */
 
 #include "../includes/inits.h"
+#include <unistd.h>
+
+static bool init_input(t_cub_data *data)
+{
+    data->input = ft_calloc(sizeof(t_input), 1);
+    if (!data->input)
+    {
+        ft_putstr_fd("Error creating input struct", STDERR_FILENO);
+        return (false);
+    }
+    data->input->backward = false;
+    data->input->forward = false;
+    data->input->left = false;
+    data->input->right = false;
+    data->input->turn_left = false;
+    data->input->turn_right = false;
+    data->input->shoot = false;
+    data->input->use = false;
+    data->input->exit = false;
+    return (true);
+}
 
 void	init_fps_sync(t_fps_data *fps)
 {
@@ -32,6 +53,11 @@ void	init_game_window(t_cub_data *data)
 	data->mlx->width = START_WIDTH;
 	data->mlx->height = START_HEIGHT;
 	data->mlx->title = "Cub3D Game";
+	if (!init_input(data))
+	{
+		ft_putstr_fd("Error: Input initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
 	if (!init_trig_table(data))
 	{
 		ft_putstr_fd("Error: Lookup Tables Failed to init\n", STDERR_FILENO);

@@ -125,10 +125,22 @@ typedef struct s_fps_data
 // Forward declarations for types that will be defined later
 typedef struct s_game		t_game;
 typedef struct s_map		t_map;
-typedef struct s_input		t_input;
 typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
 typedef struct s_raycasting	t_raycasting;
+
+typedef struct s_input
+{
+    bool forward;
+    bool backward;
+    bool left;
+    bool right;
+    bool turn_left;
+    bool turn_right;
+    bool shoot;
+    bool use;
+    bool exit;
+}       t_input;
 
 typedef struct s_player
 {
@@ -140,6 +152,9 @@ typedef struct s_player
 
 	t_fixed32	plane_x;
 	t_fixed32	plane_y;
+
+	t_fixed32	move_speed;
+	t_fixed32	rotate_speed;
 
 }	t_player;
 

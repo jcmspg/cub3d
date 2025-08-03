@@ -12,11 +12,32 @@
 
 #include "../../includes/gamelogic.h"
 
+static void process_player_input(t_cub_data *data)
+{
+    if (!data || !data->player)
+        return;
+
+    t_fixed32 move_speed = data->player->move_speed;
+    t_fixed32 rotate_speed = data->player->rotate_speed;
+
+    if (data->input->forward)
+        move_player_y(data, -move_speed);
+    if (data->input->backward)
+        move_player_y(data, move_speed);
+    if (data->input->left)
+        move_player_x(data, -move_speed);
+    if (data->input->right)
+        move_player_x(data, move_speed);
+}
+
+
+
 void update_game_logic(t_cub_data *data)
 {
+    process_player_input(data);
     // Update dynamic map test animations
-    update_dynamic_map_test(data);
-    
+    //update_dynamic_map_test(data);
+
     // Future: Add player movement logic here
     // Future: Add physics updates here
 }

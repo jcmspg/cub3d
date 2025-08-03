@@ -12,10 +12,34 @@
 
 #include "../../includes/mylx_hooks.h"
 
-int	handle_key_press(int keycode, t_cub_data *data)
+int handle_key_press(int keycode, t_cub_data *data)
 {
-	if (keycode == KEY_ESC) // esc for exit
-		mlx_loop_end(data->mlx->mlx_ptr);
+  if (keycode == KEY_ESC) // esc for exit
+    data->input->exit = true;
+  else if (keycode == KEY_W)
+    data->input->forward = true;
+  else if (keycode == KEY_S)
+    data->input->backward = true;
+  else if (keycode == KEY_A)
+    data->input->left = true;
+  else if (keycode == KEY_D)
+    data->input->right = true;
+
+  if (data->input->exit)
+    mlx_loop_end(data->mlx->mlx_ptr);
+  return (ERR_NO_ERROR);
+}
+
+int	handle_key_release(int keycode, t_cub_data *data)
+{
+	if (keycode == KEY_W)
+	    data->input->forward = false;
+	else if (keycode == KEY_S)
+	    data->input->backward = false;
+	else if (keycode == KEY_A)
+	    data->input->left = false;
+	else if (keycode == KEY_D)
+	    data->input->right = false;
 	return (ERR_NO_ERROR);
 }
 

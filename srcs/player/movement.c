@@ -10,51 +10,34 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/cub3d.h"
+#include "../../includes/movements.h"
 
 /**
  * Handle forward movement
  */
-void	move_forward(t_game *game)
+void	move_player_y(t_cub_data *data, t_fixed32 speed)
 {
-	// TODO: Implement forward movement
-	(void)game;
+    // if (data->player->y + speed > 0 && data->player->y + speed < data->map->height)
+    //     data->player->y += speed;
+    // else
+    //     data->player->y = data->player->y > 0 ? data->map->height - 1 : 0;
 }
 
 /**
  * Handle backward movement
  */
-void	move_backward(t_game *game)
+void	move_player_x(t_cub_data *data, t_fixed32 speed)
 {
-	// TODO: Implement backward movement
-	(void)game;
+    // if (data->player->x + speed > 0 && data->player->x + speed < data->map->width)
+    //     data->player->x += speed;
+    // else
+    //     data->player->x = data->player->x > 0 ? data->map->width - 1 : 0;
 }
 
-/**
- * Handle strafing left
- */
-void	move_left(t_game *game)
-{
-	// TODO: Implement left strafe movement
-	(void)game;
-}
-
-/**
- * Handle strafing right
- */
-void	move_right(t_game *game)
-{
-	// TODO: Implement right strafe movement
-	(void)game;
-}
-
-/**
- * Check if movement is valid (no wall collision)
- */
-int	is_valid_move(t_game *game, double new_x, double new_y)
+int	is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y)
 {
 	// TODO: Implement collision detection
-	(void)game;
+	(void)data;
 	(void)new_x;
 	(void)new_y;
 	return (1);

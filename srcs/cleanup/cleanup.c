@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../../includes/cleanup.h"
+#include <unistd.h>
 
 int	cleanup_mylx(t_cub_data *data)
 {
@@ -76,14 +77,6 @@ int	cleanup_graphics(t_graphics *graphics)
 	return (ERR_NO_ERROR);
 }
 
-int	cleanup_input(t_input *input)
-{
-	ft_printf_fd(STDERR_FILENO, "cleaning t_input\n");
-	// * to do * //
-	(void)input;
-	return (ERR_NO_ERROR);
-}
-
 int	cleanup_textures(t_texture *textures)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_textures\n");
@@ -113,6 +106,15 @@ int	cleanup_raycasting(t_raycasting *s_raycasting)
 	// * to do * //
 	(void)s_raycasting;
 	return (ERR_NO_ERROR);
+}
+
+int cleanup_input(t_input *input)
+{
+    if (!input)
+        return ERR_NO_ERROR;
+  ft_printf_fd(STDERR_FILENO, "cleaning t_input\n");
+  free(input);
+  return (ERR_NO_ERROR);
 }
 
 int	cleanup(t_cub_data *data)
