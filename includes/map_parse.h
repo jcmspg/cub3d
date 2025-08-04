@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 19:50:51 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:11:12 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 18:41:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,5 +49,11 @@ int		parse_colors(char *line, t_cub_data *data);
 
 // function to get the map dims
 bool get_map_dimensions(t_map *map);
+
+
+
+// grab player spawn 
+bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y);
+
 
 #endif /* MAP_PARSE_H */

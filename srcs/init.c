@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 21:32:30 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 18:50:42 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,9 @@ void	init_game_window(t_cub_data *data)
 	data->mlx->width = START_WIDTH;
 	data->mlx->height = START_HEIGHT;
 	data->mlx->title = "Cub3D Game";
+
+	data->player = init_player(data);
+
 	if (!init_input(data))
 	{
 		ft_putstr_fd("Error: Input initialization failed.\n", STDERR_FILENO);

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 22:01:46 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 17:09:42 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,10 @@ int main(int argc, char **argv)
   printf("Trig tables initialized successfully!\n");
 
   // === NOW RUN MATH TESTS ===
-  run_all_math_tests(&data);
+  //run_all_math_tests(&data);
 
   // === ENABLE DYNAMIC MAP TESTING ===
-  init_dynamic_map_test(&data);
+  //init_dynamic_map_test(&data);
 
   // start a window
   init_game_window(&data);
@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 
   // init the fps sync
   init_fps_sync(&data.fps);
+
 
   // register the renderer loop within the mlx_loop
   mlx_loop_hook(data.mlx->mlx_ptr, (int (*)(void *))main_render_loop, &data);
@@ -69,6 +70,7 @@ int main(int argc, char **argv)
 
   mlx_loop(data.mlx->mlx_ptr);
 
+  
   cleanup(&data);
   return (ERR_NO_ERROR);
 }

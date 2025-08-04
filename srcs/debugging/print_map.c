@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 19:07:59 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 19:47:54 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 20:15:47 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,29 @@ void print_map_array(const t_map *map)
 }
 
 // Helper function to draw a filled rectangle
-void draw_filled_rect(t_graphics *graphics, int x, int y, int width, int height, int color)
+void draw_filled_rect(t_cub_data *data, int x, int y, int width, int height, int color)
 {
-    // This function isn't actually needed - we'll draw directly
-    (void)graphics;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    (void)color;
+    if (!data || !data->mlx || !data->mlx->img)
+        return;
+
+    int start_x = (x);
+    int start_y = (y);
+
+    for (int j = 0; j < height; j++)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            int pixel_x = start_x + i;
+            int pixel_y = start_y + j;
+
+            // Check bounds
+            if (pixel_x >= 0 && pixel_x < data->mlx->width && 
+                pixel_y >= 0 && pixel_y < data->mlx->height)
+            {
+                mylx_pixel_put(data, pixel_x, pixel_y, color);
+            }
+        }
+    }
 }
 
 void draw_map_grid(t_cub_data *data)

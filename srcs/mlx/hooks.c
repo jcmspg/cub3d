@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:31:44 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:46:46 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 18:16:02 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	handle_key_release(int keycode, t_cub_data *data)
 	else if (keycode == KEY_D)
 	    data->input->right = false;
 	return (ERR_NO_ERROR);
-}
+} 
 
 int	handle_close(t_cub_data *data)
 {

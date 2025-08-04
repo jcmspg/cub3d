@@ -1,31 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fps_gen.h                                          :+:      :+:    :+:   */
+/*   player.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 16:37:03 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 17:02:07 by joamiran         ###   ########.fr       */
+/*   Created: 2025/08/04 18:41:20 by joamiran          #+#    #+#             */
+/*   Updated: 2025/08/04 19:12:11 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FPS_GEN_H
-# define FPS_GEN_H
+#ifndef PLAYER_H
+# define PLAYER_H
 
 # include "cub3d.h"
 
-# define MAX_FPS 600
-# define MIN_FPS 300
-# define MIN_FRAME_TIME (1000 / MAX_FPS)
-# define MAX_FRAME_TIME (1000 / MIN_FPS)
-# define MAX_FRAME_SKIP 100
-# define FIXED_STEP_MS 16
+// Initialize player with default values
+t_player	*init_player(t_cub_data *data);
 
-// function to get the time and return in an uint64
-uint64_t	get_time_ms(void);
+// // draw the player on the screen
+void draw_player(t_cub_data *data);
 
-// function that handles the fps
-int			main_render_loop(t_cub_data *data);
+void print_player_coords(t_cub_data *data);
 
-#endif /* FPS_GEN_H */
+
+#endif /* PLAYER_H */ 

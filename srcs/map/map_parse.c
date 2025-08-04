@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/07/29 19:41:01 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 20:08:23 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,3 +373,39 @@ int parse_cub_file(char *filename, t_cub_data *data)
 // 	(void)data;
 // 	return (0);
 // }
+
+
+bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y)
+{
+    int i;
+
+
+    if (!map || !map->map_array)
+    {
+        ft_putstr_fd("Error: Invalid map structure.\n", STDERR_FILENO);
+        return (false);
+    }
+
+    i = 0;
+    while(map->map_array[i])
+    {
+        if (map->map_array[i] == 'N' || map->map_array[i] == 'S' ||
+            map->map_array[i] == 'E' || map->map_array[i] == 'W')
+        {
+            // Convert 1D index to 2D grid coordinates
+            *spawn_x = i % map->width;
+            *spawn_y = i / map->width;
+            printf("DEBUG: Player spawn found at grid (%d, %d)\n", *spawn_x, *spawn_y);
+            return (true);
+        }
+        i++;
+    }
+    *spawn_x = -1;
+    *spawn_y = -1;
+    printf("DEBUG: No player spawn position found in map\n");
+    ft_putstr_fd("Error: No player spawn position found in map.\n", STDERR_FILENO);
+    
+    
+    
+    return (false);
+}

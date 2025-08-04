@@ -6,12 +6,21 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 21:38:43 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 19:58:43 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TYPEDEFS_H
 # define TYPEDEFS_H
+
+
+# define CYAN 0x00FFFF
+# define RED 0xFF0000
+# define GREEN 0x00FF00
+# define BLUE 0x0000FF
+
+
+
 
 # define START_WIDTH 800
 # define START_HEIGHT 600
@@ -20,7 +29,7 @@
 # define WALL_WIDTH 32
 # define WALL_HEIGHT 32
 
-# define PLAYER_SPEED 0.1f
+# define PLAYER_SPEED 0.05f
 # define PLAYER_ROTATION_SPEED 0.05f
 
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing

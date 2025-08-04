@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:47:42 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 19:42:43 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,10 +176,10 @@ int	mylx_update_scene(t_cub_data *data)
 	
 	// Draw your map grid for debugging
 	draw_map_grid(data);
-	
+	update_game_logic(data);
 	// draws scene
 	//test_sync(data);
-	
+	draw_player(data);
 	// places new scene on the image
 	mylx_make_image(data);
 	return (ERR_NO_ERROR);

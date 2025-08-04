@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 17:55:35 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 21:56:51 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/04 20:16:13 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ int		graphics_init(t_cub_data *data);
 
 void print_map_array(const t_map *map);
 
-void draw_filled_rect(t_graphics *graphics, int x, int y, int width, int height, int color);
 
 void draw_map_grid(t_cub_data *data);
 
@@ -37,5 +36,11 @@ void run_all_math_tests(t_cub_data *data);
 void init_dynamic_map_test(t_cub_data *data);
 void update_dynamic_map_test(t_cub_data *data);
 void stop_dynamic_map_test(void);
+
+
+void print_movements(t_cub_data *data);
+
+void draw_filled_rect(t_cub_data *data, int x, int y, int width, int height, int color);
+
 
 #endif /* FT_DEBUG_H */
