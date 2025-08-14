@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:04:40 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 21:39:03 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/14 21:55:06 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,13 @@ void	calc_trig_table(t_trig *trig)
 
 bool	init_trig_table(t_cub_data *data)
 {
+    // Check if already initialized to prevent memory leaks
+    if (data->trig.sin != NULL || data->trig.cos != NULL)
+    {
+        // Already initialized, just return success
+        return (true);
+    }
+    
     data->trig.sin = (t_fixed32 *)ft_calloc(TRIG_TABLE_SIZE, sizeof(t_fixed32));
     if (!data->trig.sin)
         return (false);

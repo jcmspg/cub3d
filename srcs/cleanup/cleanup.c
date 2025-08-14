@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/31 21:34:22 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/14 21:54:38 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,9 @@ int	cleanup_map(t_map *map)
 int	cleanup_player(t_player *player)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_player\n");
-	// * to do * //
-	(void)player;
+	if (!player)
+		return (ERR_PLAYER_INIT);
+	free(player);
 	return (ERR_NO_ERROR);
 }
 
