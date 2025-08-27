@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 19:50:51 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 18:41:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/27 18:05:55 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ bool get_map_dimensions(t_map *map);
 
 
 // grab player spawn 
-bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y);
+bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y, char *direction);
 
 
 #endif /* MAP_PARSE_H */

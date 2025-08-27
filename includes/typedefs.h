@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 19:58:43 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/27 21:21:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 # define WALL_HEIGHT 32
 
 # define PLAYER_SPEED 0.05f
-# define PLAYER_ROTATION_SPEED 0.05f
+# define ROTATE_SPEED 0.05f // degrees per frame
 
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing
 
@@ -155,6 +155,9 @@ typedef struct s_player
 {
 	t_fixed32	x;
 	t_fixed32	y;
+
+	// direction vector
+	t_fixed32	dir_angle; // in degrees
 
 	t_fixed32	dir_x;
 	t_fixed32	dir_y;

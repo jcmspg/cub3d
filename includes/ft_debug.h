@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 17:55:35 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 20:16:13 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/27 18:26:26 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ void stop_dynamic_map_test(void);
 
 void print_movements(t_cub_data *data);
 
+
+void draw_filled_tri(t_cub_data *data, int x, int y, int width, int height, int color);
 void draw_filled_rect(t_cub_data *data, int x, int y, int width, int height, int color);
 
 

@@ -8,7 +8,7 @@
 
 ### **IMMEDIATE NEXT STEPS** (This Week)
 - [ ] **Complete Player Implementation**
-  - [ ] Initialize player from map spawn position (N/S/E/W detection)
+  - [x] Initialize player from map spawn position (N/S/E/W detection)
   - [ ] Set proper movement and rotation speeds
   - [ ] Implement directional vectors (dir_x, dir_y)
   - [ ] Add camera plane vectors (plane_x, plane_y)

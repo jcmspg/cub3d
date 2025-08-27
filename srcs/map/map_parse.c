@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/08/04 20:08:23 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/27 18:05:48 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -375,7 +375,7 @@ int parse_cub_file(char *filename, t_cub_data *data)
 // }
 
 
-bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y)
+bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y, char *direction)
 {
     int i;
 
@@ -392,6 +392,8 @@ bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y)
         if (map->map_array[i] == 'N' || map->map_array[i] == 'S' ||
             map->map_array[i] == 'E' || map->map_array[i] == 'W')
         {
+            // direction
+            *direction = map->map_array[i];
             // Convert 1D index to 2D grid coordinates
             *spawn_x = i % map->width;
             *spawn_y = i / map->width;
@@ -402,6 +404,7 @@ bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y)
     }
     *spawn_x = -1;
     *spawn_y = -1;
+    *direction = '\0';
     printf("DEBUG: No player spawn position found in map\n");
     ft_putstr_fd("Error: No player spawn position found in map.\n", STDERR_FILENO);
     

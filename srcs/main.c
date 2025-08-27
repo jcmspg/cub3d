@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 17:09:42 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/27 20:53:58 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ int main(int argc, char **argv)
   }
   printf("Trig tables initialized successfully!\n");
 
-  // === NOW RUN MATH TESTS ===
-  //run_all_math_tests(&data);
+ // === NOW RUN MATH TESTS ===
+  run_all_math_tests(&data);
 
-  // === ENABLE DYNAMIC MAP TESTING ===
+  //=== ENABLE DYNAMIC MAP TESTING ===
   //init_dynamic_map_test(&data);
 
   // start a window
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
   mlx_hook(data.mlx->win_ptr, 2, 1L << 0, handle_key_press, &data); // Key press
   mlx_hook(data.mlx->win_ptr, 3, 1L << 1, handle_key_release,&data); // Key release
   mlx_hook(data.mlx->win_ptr, 17, 0L, handle_close, &data);
-
+  mlx_hook(data.mlx->win_ptr, 6, 1L << 6, handle_mouse_move, &data); // Mouse motion
 
   mlx_loop(data.mlx->mlx_ptr);
 

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:56:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:05:27 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/08/27 20:55:26 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 int	handle_key_press(int keycode, t_cub_data *data);
 
 int handle_key_release(int keycode, t_cub_data *data);
+
+int handle_mouse_move(int x, int y, t_cub_data *data);
 
 
 
