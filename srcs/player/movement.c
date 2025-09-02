@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/08/27 21:17:41 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/02 20:47:44 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,6 @@ void	move_player_y(t_cub_data *data, t_fixed32 speed)
     if (!is_valid_move(data, data->player->x, new_y))
         return ;
     data->player->y = new_y;
-    printf("Player Y: %f\n", from_fixed32(data->player->y));
-
 }
 
 /**
@@ -107,8 +105,38 @@ void move_player(t_cub_data *data, t_fixed32 move_speed)
     // Update the player's position
     data->player->x = newX;
     data->player->y = newY;
+}
 
-    printf("Player moved to position: (%f, %f)\n", from_fixed32(data->player->x), from_fixed32(data->player->y));
+// Strafe player left or right
+void strafe_player(t_cub_data *data, t_fixed32 strafe_speed)
+{
+    if (!data || !data->player)
+        return;
+
+    // Ensure direction vectors are valid
+    if (data->player->dir_x == 0 && data->player->dir_y == 0)
+    {
+        ft_putstr_fd("Error: Direction vectors are not set\n", STDERR_FILENO);
+     return;
+    }
+    
+    // move, but perpendicular to the direction vector
+    t_fixed32 perp_x = -data->player->dir_y; // Perpendicular vector
+    t_fixed32 perp_y = data->player->dir_x;  // Perpendicular vector
+
+    t_fixed32 new_x = fixed32_mul(strafe_speed, perp_x);
+    t_fixed32 new_y = fixed32_mul(strafe_speed, perp_y);
+
+    t_fixed32 newX = fixed32_add(data->player->x, new_x);
+    t_fixed32 newY = fixed32_add(data->player->y, new_y);
+
+    // Check if the new position is valid
+    if (!is_valid_move(data, newX, newY))
+        return;
+
+    // Update the player's position
+    data->player->x = newX;
+    data->player->y = newY;
 }
 
 static t_fixed32 normalize_angle_fixed(t_fixed32 angle)
@@ -133,7 +161,4 @@ void rotate_player(t_cub_data *data, t_fixed32 rotation_angle)
 
     // Recalculate the direction vectors based on the new angle
     calc_player_dirs(data);
-
-    printf("Player rotated. New direction: [%f, %f]\n",
-           from_fixed32(data->player->dir_x), from_fixed32(data->player->dir_y));
 }

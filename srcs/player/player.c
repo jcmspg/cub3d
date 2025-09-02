@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/08/27 21:17:27 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/02 21:51:16 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,6 @@ void draw_player(t_cub_data *data)
                      from_fixed32(data->player->y) * 12 + 10 - 3,
                      6, 6, 0xFF0000);
     
-
     // draw a dot indicating direction
     // Draw a rectangle indicating the direction the player is facing
     int player_x = from_fixed32(data->player->x) * 12 + 10;
@@ -121,7 +120,8 @@ void draw_player(t_cub_data *data)
     // Draw the direction rectangle as a yellow line
     draw_filled_rect(data, dir_x - 2, dir_y - 2, 4, 4, 0xFFFF00);
 
-    print_player_coords(data);
+    // Uncommenting the print_player_coords function to display player coordinates
+    // print_player_coords(data);
 }
 
 void print_player_coords(t_cub_data *data)
@@ -131,8 +131,6 @@ void print_player_coords(t_cub_data *data)
         ft_putstr_fd("Error: Invalid data or player\n", STDERR_FILENO);
         return;
     }
-
-
     printf("Player position: (%.2f, %.2f)\n",
            from_fixed32(data->player->x), from_fixed32(data->player->y));
 }

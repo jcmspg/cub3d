@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 16:54:04 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/27 21:20:51 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/02 20:45:45 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ static void process_player_input(t_cub_data *data)
     if (data->input->backward)
         move_player(data, -move_speed);
     if (data->input->left)
-        move_player_x(data, -move_speed);
+        strafe_player(data, -move_speed);
     if (data->input->right)
-        move_player_x(data, move_speed);
+        strafe_player(data, move_speed);
     if (data->input->turn_left)
         rotate_player(data, -rotate_speed); // Rotate left
     if (data->input->turn_right)
@@ -43,7 +43,13 @@ void update_game_logic(t_cub_data *data)
 {
     //Update dynamic map test animations
     //update_dynamic_map_test(data);
-    
+    data->player->move_speed = to_fixed32(PLAYER_SPEED * (data->fps.delta_time / 16.67f));
+    data->player->rotate_speed = to_fixed32(ROTATE_SPEED * (data->fps.delta_time / 16.67f));
+
+    calc_player_dirs(data);
+
+
+
     // Future: Add player movement logic here
     process_player_input(data);
     // print_player_coords(data);

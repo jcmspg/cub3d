@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/27 21:21:28 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/02 20:53:09 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,16 @@
 
 
 
-# define START_WIDTH 800
-# define START_HEIGHT 600
+# define START_WIDTH 1980
+# define START_HEIGHT 1060
 # define START_FOV 60.0f
 
 # define WALL_WIDTH 32
 # define WALL_HEIGHT 32
 
 # define PLAYER_SPEED 0.05f
-# define ROTATE_SPEED 0.05f // degrees per frame
+# define STRAFE_SPEED 0.05f
+# define ROTATE_SPEED 5.0f // degrees per frame
 
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing
 

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:31:44 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/27 21:03:06 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/02 21:44:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,18 @@ int handle_key_press(int keycode, t_cub_data *data)
 {
   if (keycode == KEY_ESC) // esc for exit
     data->input->exit = true;
-  else if (keycode == KEY_W)
+  else if (keycode == KEY_W || keycode == KEY_UP)
     data->input->forward = true;
-  else if (keycode == KEY_S)
+  else if (keycode == KEY_S || keycode == KEY_DOWN)
     data->input->backward = true;
   else if (keycode == KEY_A)
     data->input->left = true;
   else if (keycode == KEY_D)
     data->input->right = true;
+  else if ( keycode == KEY_LEFT)
+    data->input->turn_left = true;
+  else if (keycode == KEY_RIGHT)
+    data->input->turn_right = true;
 
   if (data->input->exit)
     mlx_loop_end(data->mlx->mlx_ptr);
@@ -32,14 +36,19 @@ int handle_key_press(int keycode, t_cub_data *data)
 
 int	handle_key_release(int keycode, t_cub_data *data)
 {
-	if (keycode == KEY_W)
+	if (keycode == KEY_W || keycode == KEY_UP)
 	    data->input->forward = false;
-	else if (keycode == KEY_S)
+	else if (keycode == KEY_S || keycode == KEY_DOWN)
 	    data->input->backward = false;
 	else if (keycode == KEY_A)
 	    data->input->left = false;
 	else if (keycode == KEY_D)
 	    data->input->right = false;
+  else if (keycode == KEY_LEFT)
+    data->input->turn_left = false;
+  else if (keycode == KEY_RIGHT)
+    data->input->turn_right = false;
+  
 	return (ERR_NO_ERROR);
 } 
 // mouse hooks for rotation left and right
@@ -68,6 +77,10 @@ int handle_mouse_move(int x, int y, t_cub_data *data)
         data->input->turn_left = false;
         data->input->turn_right = false;
     }
+
+    // Warp the mouse back to the center of the window
+    mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr ,data->mlx->width / 2, data->mlx->height / 2);
+    last_x = data->mlx->width / 2; // Reset last_x to the center
 
     last_x = x; // Update the last X position
     (void)y; // Ignore Y-axis

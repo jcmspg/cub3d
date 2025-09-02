@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 16:36:37 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 18:26:17 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/02 21:22:07 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,5 +49,6 @@ int	main_render_loop(t_cub_data *data)
 	fps = 1000.0f / data->fps.delta_time;
 	display_fps(data, fps); // Draw FPS overlay on screen
 	print_movements(data); // Print current movement state to console
+	print_player_pos(data); // Print player coordinates on screen
 	return (ERR_NO_ERROR);
 }
