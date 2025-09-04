@@ -54,16 +54,19 @@ void	init_game_window(t_cub_data *data)
 	data->mlx->height = START_HEIGHT;
 	data->mlx->title = "Cub3D Game";
 
+	// Initialize trig tables FIRST (required by player initialization)
+	if (!init_trig_table(data))
+	{
+		ft_putstr_fd("Error: Lookup Tables Failed to init\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+
+	// Now initialize player (uses trig tables in calc_player_dirs)
 	data->player = init_player(data);
 
 	if (!init_input(data))
 	{
 		ft_putstr_fd("Error: Input initialization failed.\n", STDERR_FILENO);
-		cleanup_and_exit(data);
-	}
-	if (!init_trig_table(data))
-	{
-		ft_putstr_fd("Error: Lookup Tables Failed to init\n", STDERR_FILENO);
 		cleanup_and_exit(data);
 	}
 	mylx_init(data);

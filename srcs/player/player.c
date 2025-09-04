@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/09/02 21:51:16 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/04 21:11:31 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,63 @@
 
 static t_fixed32 direction_to_angle(char direction)
 {
+    t_fixed32 angle;
+    
     if (direction == 'N')
-        return to_fixed32(270.0f); // Facing up
+        angle = to_fixed32(270.0f); // Facing up
     else if (direction == 'S')
-        return to_fixed32(90.0f);  // Facing down
+        angle = to_fixed32(90.0f);  // Facing down
     else if (direction == 'E')
-        return to_fixed32(0.0f);   // Facing right
+        angle = to_fixed32(0.0f);   // Facing right
     else if (direction == 'W')
-        return to_fixed32(180.0f); // Facing left
+        angle = to_fixed32(180.0f); // Facing left
     else
-        return to_fixed32(0.0f);   // Default to facing right
+        angle = to_fixed32(0.0f);   // Default to facing right
+        
+    // Debug print for direction to angle conversion
+    printf("🧭 DIRECTION TO ANGLE: '%c' -> %.1f degrees\n", 
+           direction, from_fixed32(angle));
+           
+    return angle;
 }
-// player direction math and vectors
+
+// SUPER EFFICIENT CACHING - avoid all calculations when possible
+static t_fixed32 cached_plane_length = 0;
+static int last_angle = -999; // Invalid initial value
+
+// player direction math and vectors - SUPER OPTIMIZED
 void calc_player_dirs(t_cub_data *data)
 {
     if (!data || !data->player)
-    {
-        ft_putstr_fd("Error: Invalid data or player\n", STDERR_FILENO);
         return;
+
+    int angle_degrees = (int)from_fixed32(data->player->dir_angle);
+    
+    // OPTIMIZATION: Skip ALL calculations if angle hasn't changed!
+    if (angle_degrees == last_angle)
+    {
+        return; // Direction vectors are already correct
+    }
+        
+    // Cache the plane length on first call (use fast lookup tables!)
+    if (cached_plane_length == 0)
+    {
+        // tan(33°) = sin(33°) / cos(33°) - using your fast lookup tables
+        t_fixed32 sin_33 = fast_sin(&data->trig, 33);
+        t_fixed32 cos_33 = fast_cos(&data->trig, 33);
+        cached_plane_length = fixed32_div(sin_33, cos_33);
     }
 
-    // Convert angle to radians for trig functions
-    t_fixed32 dir_rad = fixed32_mul(data->player->dir_angle, to_fixed32(M_PI / 180.0f));
-
-    // Calculate direction vector
-    data->player->dir_x = fixed32_cos(dir_rad);
-    data->player->dir_y = fixed32_sin(dir_rad);
+    // Use your optimized trig lookup tables (0-90° with quadrant magic!)
+    data->player->dir_x = fast_cos(&data->trig, angle_degrees);
+    data->player->dir_y = fast_sin(&data->trig, angle_degrees);
+      
+    // Cache this angle to avoid recalculating
+    last_angle = angle_degrees;
 
     // Calculate camera plane (perpendicular to direction)
-    // FOV of 66 degrees, so plane length is tan(33 degrees) ~ 0.66
-    t_fixed32 plane_length = fixed32_tan(to_fixed32(33.0f * (M_PI / 180.0f)));
-    data->player->plane_x = fixed32_mul(data->player->dir_y, plane_length);
-    data->player->plane_y = fixed32_mul(data->player->dir_x, -plane_length);
+    data->player->plane_x = fixed32_mul(-data->player->dir_y, cached_plane_length);
+    data->player->plane_y = fixed32_mul(data->player->dir_x, cached_plane_length);
 }
 
 // init player
@@ -69,8 +94,10 @@ t_player *init_player(t_cub_data *data)
     //look for player spawn
     int spawn_x = -1;
     int spawn_y = -1;
-    char direction = '\0';
+    char direction = 'X';
 
+    printf("🔍 PLAYER INIT: Searching for spawn position...\n");
+    
     if (!look_for_spawn(data->map, &spawn_x, &spawn_y, &direction))
     {
         ft_putstr_fd("Error: Failed to find player spawn position\n", STDERR_FILENO);
@@ -81,7 +108,10 @@ t_player *init_player(t_cub_data *data)
         ft_putstr_fd("Error: No player spawn position found in map\n", STDERR_FILENO);
         exit(ERR_PLAYER_INIT);
     }
-
+    
+    printf("📍 SPAWN FOUND: Grid position (%d, %d) with direction '%c'\n", 
+           spawn_x, spawn_y, direction);
+    
     // Set player initial position and direction based on spawn
     player->x = to_fixed32(spawn_x + 0.5f); // Center the player in the cell
     player->y = to_fixed32(spawn_y + 0.5f); // Center the player in the cell
@@ -89,9 +119,22 @@ t_player *init_player(t_cub_data *data)
     player->move_speed = to_fixed32(PLAYER_SPEED);
     player->rotate_speed = to_fixed32(ROTATE_SPEED);
 
+    printf("🎮 PLAYER INITIALIZED:\n");
+    printf("   World Position: (%.3f, %.3f)\n", 
+           from_fixed32(player->x), from_fixed32(player->y));
+    printf("   Direction Angle: %.1f degrees\n", 
+           from_fixed32(player->dir_angle));
+    printf("   Move Speed: %.3f\n", 
+           from_fixed32(player->move_speed));
+    printf("   Rotate Speed: %.3f\n", 
+           from_fixed32(player->rotate_speed));
+
     // Calculate initial direction vectors
+    printf("🧮 CALCULATING INITIAL DIRECTION VECTORS...\n");
     calc_player_dirs(data);
 
+    printf("✅ PLAYER INITIALIZATION COMPLETE!\n\n");
+    
     return player;
 }
 
@@ -99,7 +142,7 @@ void draw_player(t_cub_data *data)
 {
     if (!data || !data->player)
     {
-        ft_putstr_fd("Error: Invalid data or player\n", STDERR_FILENO);
+        // Silently return instead of spamming error messages
         return;
     }
 
@@ -128,7 +171,7 @@ void print_player_coords(t_cub_data *data)
 {
     if (!data || !data->player)
     {
-        ft_putstr_fd("Error: Invalid data or player\n", STDERR_FILENO);
+        // Silently return instead of spamming error messages
         return;
     }
     printf("Player position: (%.2f, %.2f)\n",

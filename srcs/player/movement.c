@@ -22,7 +22,7 @@ static bool	is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y)
         return (false);
 
     // Define a buffer zone to avoid touching walls
-    const float buffer = 0.3f; // Adjust this value as needed
+    const float buffer = 0.1f; // Reduced for smoother movement
 
     // Calculate the player's position with the buffer
     float pos_x = from_fixed32(new_x);
@@ -74,7 +74,6 @@ void	move_player_x(t_cub_data *data, t_fixed32 speed)
     if (!is_valid_move(data, new_player_x, data->player->y))
         return ;
     data->player->x = new_player_x;
-    printf("Player X: %f\n", from_fixed32(data->player->x));
 }
 
 
@@ -87,9 +86,14 @@ void move_player(t_cub_data *data, t_fixed32 move_speed)
     // Ensure direction vectors are valid
     if (data->player->dir_x == 0 && data->player->dir_y == 0)
     {
+        printf("ERROR: Direction vectors are ZERO! dir_x=%.4f, dir_y=%.4f, angle=%.1f\n", 
+               from_fixed32(data->player->dir_x), from_fixed32(data->player->dir_y), 
+               from_fixed32(data->player->dir_angle));
         ft_putstr_fd("Error: Direction vectors are not set\n", STDERR_FILENO);
         return;
     }
+    
+    // Movement debug removed for cleaner output
 
     // Calculate the new position based on the current direction vector
     t_fixed32 new_x = fixed32_mul(move_speed, data->player->dir_x);

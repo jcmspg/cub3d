@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/02 20:53:09 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/04 17:46:35 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 
 
 
-# define START_WIDTH 1980
-# define START_HEIGHT 1060
+# define START_WIDTH 800
+# define START_HEIGHT 600
 # define START_FOV 60.0f
 
 # define WALL_WIDTH 32
@@ -170,6 +170,17 @@ typedef struct s_player
 	t_fixed32	rotate_speed;
 
 }	t_player;
+
+typedef struct s_bres
+{
+	int			x;
+	int			y;
+	int			dx;
+	int			dy;
+	int			step_x;
+	int			step_y;
+	int			err;
+}				t_bres;
 
 typedef struct s_graphics
 {
