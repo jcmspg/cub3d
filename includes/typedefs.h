@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/04 17:46:35 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:17:39 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,11 +133,9 @@ typedef struct s_fps_data
 }							t_fps_data;
 
 // Forward declarations for types that will be defined later
-typedef struct s_game		t_game;
 typedef struct s_map		t_map;
 typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
-typedef struct s_raycasting	t_raycasting;
 
 typedef struct s_input
 {
@@ -188,7 +186,30 @@ typedef struct s_graphics
 	int						y;
 	int						color;
 	int *pixels; // 1d array of width * height size
-}							t_graphics;
+}
+							t_graphics;
+typedef struct s_ray
+{
+	t_fixed32 hit_x;
+	t_fixed32 hit_y;
+
+	t_fixed32 distance;
+
+	int side; // 0 for x-side, 1 for y-side
+}							t_ray;
+
+typedef struct s_raycasting
+{
+	struct s_ray	*rays; // array of rays, one per screen column
+	int			num_rays; // typically equal to screen width
+
+}							t_raycasting;
+typedef struct s_game
+{
+	t_fixed32	fov; // in degrees
+	struct s_ray	*rays; // array of rays, one per screen column
+
+}							t_game;
 
 typedef struct s_cub_data
 {

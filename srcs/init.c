@@ -6,12 +6,34 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 18:50:42 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:19:32 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/inits.h"
 #include <unistd.h>
+
+static bool init_raytcaster(t_cub_data *data)
+{
+	if (!data)
+		return (false);
+	data->raycasting = ft_calloc(sizeof(t_raycasting), 1);
+	if (!data->raycasting)
+	{
+		ft_putstr_fd("Error creating raycaster struct", STDERR_FILENO);
+		return (false);
+	}
+	data->raycasting->num_rays = data->mlx->width;
+	data->raycasting->rays = ft_calloc(sizeof(t_ray), data->raycasting->num_rays);
+	if (!data->raycasting->rays)
+	{
+		free(data->raycasting);
+		data->raycasting = NULL;
+		ft_putstr_fd("Error creating rays array", STDERR_FILENO);
+		return (false);
+	}
+	return (true);
+}
 
 static bool init_input(t_cub_data *data)
 {
@@ -63,12 +85,26 @@ void	init_game_window(t_cub_data *data)
 
 	// Now initialize player (uses trig tables in calc_player_dirs)
 	data->player = init_player(data);
+	if (!data->player)
+	{
+		ft_putstr_fd("Error: Player initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+	
+	// Initialize the ray struct and rays array
+	if (!init_raytcaster(data))
+	{
+		ft_putstr_fd("Error: Raycaster initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
 
+	// Initialize the input struct
 	if (!init_input(data))
 	{
 		ft_putstr_fd("Error: Input initialization failed.\n", STDERR_FILENO);
 		cleanup_and_exit(data);
 	}
+
 	mylx_init(data);
 	if (!data->mlx->mlx_ptr)
 	{

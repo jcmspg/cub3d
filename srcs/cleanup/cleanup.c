@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/14 21:54:38 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:22:13 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,8 +104,12 @@ int	cleanup_fps(t_fps_data fps)
 int	cleanup_raycasting(t_raycasting *s_raycasting)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_raycasting\n");
-	// * to do * //
-	(void)s_raycasting;
+	if (s_raycasting)
+	{
+		if (s_raycasting->rays)
+			free(s_raycasting->rays);
+		free(s_raycasting);
+	}
 	return (ERR_NO_ERROR);
 }
 

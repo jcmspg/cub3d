@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 18:42:04 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 19:53:16 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,9 @@
 
 // player
 # include "player.h"
+
+// renderer
+# include "render.h"
 
 
 #endif /* INCLUDES_H */

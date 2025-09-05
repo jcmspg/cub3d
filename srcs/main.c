@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/04 18:37:10 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 19:40:40 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,18 +46,19 @@ int main(int argc, char **argv)
   // === NOW RUN MATH TESTS ===
   //run_all_math_tests(&data);
 
-  //=== ENABLE DYNAMIC MAP TESTING ===
-  //init_dynamic_map_test(&data);
-
+  
   // start a window
   init_game_window(&data);
-
+  
   // allocate pixel buffer
   graphics_init(&data);
-
+  
   // init the fps sync
   init_fps_sync(&data.fps);
-
+  
+  //=== ENABLE DYNAMIC MAP TESTING ===
+  // init_dynamic_map_test(&data);
+  
   // hide mouse and center it so i can look freely and smoothly
   mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
   mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2, data.mlx->height / 2);
