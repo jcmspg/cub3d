@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/09/04 21:11:31 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 20:58:06 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,18 +36,21 @@ static t_fixed32 direction_to_angle(char direction)
 
 // SUPER EFFICIENT CACHING - avoid all calculations when possible
 static t_fixed32 cached_plane_length = 0;
-static int last_angle = -999; // Invalid initial value
+static t_fixed32 last_angle = 999 << 16; // Invalid initial value (raw fixed32)
 
-// player direction math and vectors - SUPER OPTIMIZED
+// player direction math and vectors - SUPER OPTIMIZED (FIXED)
 void calc_player_dirs(t_cub_data *data)
 {
     if (!data || !data->player)
         return;
 
-    int angle_degrees = (int)from_fixed32(data->player->dir_angle);
+    // Keep full precision - DON'T convert to int!
+    t_fixed32 angle_degrees = data->player->dir_angle;
     
     // OPTIMIZATION: Skip ALL calculations if angle hasn't changed!
-    if (angle_degrees == last_angle)
+    // Compare with small epsilon for floating point precision
+    t_fixed32 angle_diff = angle_degrees - last_angle;
+    if (angle_diff < to_fixed32(0.01f) && angle_diff > to_fixed32(-0.01f))
     {
         return; // Direction vectors are already correct
     }
@@ -56,12 +59,13 @@ void calc_player_dirs(t_cub_data *data)
     if (cached_plane_length == 0)
     {
         // tan(33°) = sin(33°) / cos(33°) - using your fast lookup tables
-        t_fixed32 sin_33 = fast_sin(&data->trig, 33);
-        t_fixed32 cos_33 = fast_cos(&data->trig, 33);
+        // FIX: Pass t_fixed32, not int!
+        t_fixed32 sin_33 = fast_sin(&data->trig, to_fixed32(33.0f));
+        t_fixed32 cos_33 = fast_cos(&data->trig, to_fixed32(33.0f));
         cached_plane_length = fixed32_div(sin_33, cos_33);
     }
 
-    // Use your optimized trig lookup tables (0-90° with quadrant magic!)
+    // FIX: Use t_fixed32 angle, not int!
     data->player->dir_x = fast_cos(&data->trig, angle_degrees);
     data->player->dir_y = fast_sin(&data->trig, angle_degrees);
       
@@ -71,6 +75,12 @@ void calc_player_dirs(t_cub_data *data)
     // Calculate camera plane (perpendicular to direction)
     data->player->plane_x = fixed32_mul(-data->player->dir_y, cached_plane_length);
     data->player->plane_y = fixed32_mul(data->player->dir_x, cached_plane_length);
+
+    // Debug output to verify calculations
+    printf("🧮 CALC_PLAYER_DIRS: angle=%.2f° | dir_x=%.4f | dir_y=%.4f\n",
+           from_fixed32(angle_degrees),
+           from_fixed32(data->player->dir_x),
+           from_fixed32(data->player->dir_y));
 }
 
 // init player
