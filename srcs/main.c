@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/05 19:40:40 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 19:06:32 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ int main(int argc, char **argv)
 {
   t_cub_data data;
 
-  ft_memset(&data, 0, sizeof(t_cub_data));
-  srand(time(NULL));
   if (argc != 2) {
     ft_putstr_fd("Usage: ./cub3d <map_file>\n", 2);
     return (ERR_INVALID_ARG);
   }
 
+  ft_memset(&data, 0, sizeof(t_cub_data));
+  srand(time(NULL));
   ft_putstr_fd("Game initialized with map: ", 1);
   ft_putstr_fd(argv[1], 1);
   ft_putchar_fd('\n', 1);
