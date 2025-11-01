@@ -6,7 +6,7 @@
 #    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2025/07/27 19:18:39 by joamiran         ###   ########.fr        #
+#    Updated: 2025/11/01 18:02:48 by hladeiro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,13 +29,22 @@ PMFP_DIR = ./extLibs/poormanfixedpoint
 PMFP = $(PMFP_DIR)/libpoormansfixed.a
 PMFP_REPO = https://github.com/jcmspg/poor-mans-FixedPoint-lib
 
-MLX_DIR = ./extLibs/minilibx-linux
+MLX_DIR = ./extLibs/mlx
 MLX = $(MLX_DIR)/libmlx.a
 MLX_REPO = https://github.com/42Paris/minilibx-linux.git
+MLX_FLAGS= -L $(MLX_DIR) -lmlx -framework OpenGL -framework AppKit -lz
+
+
+ifeq ($(shell uname), Linux)
+	MLX_DIR = ./extLibs/minilibx-linux
+	MLX = $(MLX_DIR)/libmlx.a
+	MLX_REPO = https://github.com/42Paris/minilibx-linux.git
+	MLX_FLAGS= -L $(MLX_DIR) -lmlx -lm -lXext -lX11
+endif
 
 INCLUDES = -I$(INC_DIR) -I$(LIBFT_DIR) -I$(PMFP_DIR) -I$(MLX_DIR)
 
-LDFLAGS = -L$(LIBFT_DIR) -lft -L$(PMFP_DIR) -lpoormansfixed -L$(MLX_DIR) -lmlx -lm -lXext -lX11
+LDFLAGS = -L$(LIBFT_DIR) -lft -L$(PMFP_DIR) -lpoormansfixed -L$(MLX_DIR) $(MLX_FLAGS)
 
 # Default target
 all: $(LIBFT) $(PMFP) $(MLX) $(NAME)
