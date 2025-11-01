@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/05 20:17:39 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 19:34:29 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 
 #define VOID_SYMBOL ' '
 
-#define TRIG_TABLE_SIZE 91 // [from 0 to 90] degrees
+#define TRIG_TABLE_SIZE 9001  // [from 0 to 90] degrees evrery 0.01 degree
 
 // Trigonometry and fixed points
 #define FIXED_PI       to_fixed32(3.14159265f)
