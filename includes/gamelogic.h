@@ -1,28 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mylx_hooks.h                                       :+:      :+:    :+:   */
+/*   gamelogic.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/27 17:56:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/27 20:55:26 by joamiran         ###   ########.fr       */
+/*   Created: 2025/07/29 16:55:26 by joamiran          #+#    #+#             */
+/*   Updated: 2025/07/29 16:56:21 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MYLX_HOOKS_H
-# define MYLX_HOOKS_H
+#ifndef GAMELOGIC_H
+# define GAMELOGIC_H
 
 # include "cub3d.h"
 
-int	handle_key_press(int keycode, t_cub_data *data);
+void update_game_logic(t_cub_data *data);
 
-int handle_key_release(int keycode, t_cub_data *data);
-
-int handle_mouse_move(int x, int y, t_cub_data *data);
-
-
-
-int	handle_close(t_cub_data *data);
-
-#endif /* MYLX_HOOKS_H*/
+#endif /* GAMELOGIC_H */

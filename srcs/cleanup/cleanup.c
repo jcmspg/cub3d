@@ -6,11 +6,12 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 19:20:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:22:13 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cleanup.h"
+#include <unistd.h>
 
 int	cleanup_mylx(t_cub_data *data)
 {
@@ -39,18 +40,20 @@ int	cleanup_map(t_map *map)
 	if (map)
 	{
 		if (map->map_array)
+			free(map->map_array);
+		if (map->filename)
+			free(map->filename);
+		if (map->map_lines)
 		{
 			i = 0;
 			while (i < map->height)
 			{
-				if (map->map_array[i])
-					free(map->map_array[i]);
+				if (map->map_lines[i])
+					free(map->map_lines[i]);
 				i++;
 			}
-			free(map->map_array);
+			free(map->map_lines);
 		}
-		if (map->filename)
-			free(map->filename);
 		// Free any other allocated fields in t_map
 		free(map);
 	}
@@ -60,8 +63,9 @@ int	cleanup_map(t_map *map)
 int	cleanup_player(t_player *player)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_player\n");
-	// * to do * //
-	(void)player;
+	if (!player)
+		return (ERR_PLAYER_INIT);
+	free(player);
 	return (ERR_NO_ERROR);
 }
 
@@ -71,14 +75,6 @@ int	cleanup_graphics(t_graphics *graphics)
 	if (graphics->pixels)
 		free(graphics->pixels);
 	free(graphics);
-	return (ERR_NO_ERROR);
-}
-
-int	cleanup_input(t_input *input)
-{
-	ft_printf_fd(STDERR_FILENO, "cleaning t_input\n");
-	// * to do * //
-	(void)input;
 	return (ERR_NO_ERROR);
 }
 
@@ -108,15 +104,29 @@ int	cleanup_fps(t_fps_data fps)
 int	cleanup_raycasting(t_raycasting *s_raycasting)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_raycasting\n");
-	// * to do * //
-	(void)s_raycasting;
+	if (s_raycasting)
+	{
+		if (s_raycasting->rays)
+			free(s_raycasting->rays);
+		free(s_raycasting);
+	}
 	return (ERR_NO_ERROR);
+}
+
+int cleanup_input(t_input *input)
+{
+    if (!input)
+        return ERR_NO_ERROR;
+  ft_printf_fd(STDERR_FILENO, "cleaning t_input\n");
+  free(input);
+  return (ERR_NO_ERROR);
 }
 
 int	cleanup(t_cub_data *data)
 {
 	if (!data)
 		return (ERR_UNKNOWN);
+	cleanup_trig_table(&data->trig);
 	if (data->mlx)
 		cleanup_mylx(data);
 	if (data->game)

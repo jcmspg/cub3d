@@ -6,11 +6,54 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 17:44:41 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:19:32 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/inits.h"
+#include <unistd.h>
+
+static bool init_raytcaster(t_cub_data *data)
+{
+	if (!data)
+		return (false);
+	data->raycasting = ft_calloc(sizeof(t_raycasting), 1);
+	if (!data->raycasting)
+	{
+		ft_putstr_fd("Error creating raycaster struct", STDERR_FILENO);
+		return (false);
+	}
+	data->raycasting->num_rays = data->mlx->width;
+	data->raycasting->rays = ft_calloc(sizeof(t_ray), data->raycasting->num_rays);
+	if (!data->raycasting->rays)
+	{
+		free(data->raycasting);
+		data->raycasting = NULL;
+		ft_putstr_fd("Error creating rays array", STDERR_FILENO);
+		return (false);
+	}
+	return (true);
+}
+
+static bool init_input(t_cub_data *data)
+{
+    data->input = ft_calloc(sizeof(t_input), 1);
+    if (!data->input)
+    {
+        ft_putstr_fd("Error creating input struct", STDERR_FILENO);
+        return (false);
+    }
+    data->input->backward = false;
+    data->input->forward = false;
+    data->input->left = false;
+    data->input->right = false;
+    data->input->turn_left = false;
+    data->input->turn_right = false;
+    data->input->shoot = false;
+    data->input->use = false;
+    data->input->exit = false;
+    return (true);
+}
 
 void	init_fps_sync(t_fps_data *fps)
 {
@@ -32,6 +75,36 @@ void	init_game_window(t_cub_data *data)
 	data->mlx->width = START_WIDTH;
 	data->mlx->height = START_HEIGHT;
 	data->mlx->title = "Cub3D Game";
+
+	// Initialize trig tables FIRST (required by player initialization)
+	if (!init_trig_table(data))
+	{
+		ft_putstr_fd("Error: Lookup Tables Failed to init\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+
+	// Now initialize player (uses trig tables in calc_player_dirs)
+	data->player = init_player(data);
+	if (!data->player)
+	{
+		ft_putstr_fd("Error: Player initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+	
+	// Initialize the ray struct and rays array
+	if (!init_raytcaster(data))
+	{
+		ft_putstr_fd("Error: Raycaster initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+
+	// Initialize the input struct
+	if (!init_input(data))
+	{
+		ft_putstr_fd("Error: Input initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+
 	mylx_init(data);
 	if (!data->mlx->mlx_ptr)
 	{

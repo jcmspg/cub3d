@@ -1,28 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mylx_hooks.h                                       :+:      :+:    :+:   */
+/*   render.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/27 17:56:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/27 20:55:26 by joamiran         ###   ########.fr       */
+/*   Created: 2025/09/05 19:46:00 by joamiran          #+#    #+#             */
+/*   Updated: 2025/09/05 19:47:27 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MYLX_HOOKS_H
-# define MYLX_HOOKS_H
+#ifndef RENDER_H
+# define RENDER_H
 
-# include "cub3d.h"
 
-int	handle_key_press(int keycode, t_cub_data *data);
-
-int handle_key_release(int keycode, t_cub_data *data);
-
-int handle_mouse_move(int x, int y, t_cub_data *data);
+#include "cub3d.h"
 
 
 
-int	handle_close(t_cub_data *data);
-
-#endif /* MYLX_HOOKS_H*/
+#endif /* RENDER_H */

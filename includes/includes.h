@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:34:27 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 19:53:16 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 // External Libraries
 # include "../extLibs/libft/libft.h"
 # include "../extLibs/minilibx-linux/mlx.h"
+# include "../extLibs/poormanfixedpoint/includes/poormansfixed.h"
 
 // Project-specific headers
 # include "typedefs.h"
@@ -50,7 +51,23 @@
 // Cleanups
 # include "cleanup.h"
 
+// Game Logic
+# include "gamelogic.h"
+
 // Keys
 # include "key_values.h"
+
+// Utils
+# include "utils.h"
+
+// movements
+# include "movements.h"
+
+// player
+# include "player.h"
+
+// renderer
+# include "render.h"
+
 
 #endif /* INCLUDES_H */

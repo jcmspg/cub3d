@@ -6,12 +6,21 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/27 18:02:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:17:39 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TYPEDEFS_H
 # define TYPEDEFS_H
+
+
+# define CYAN 0x00FFFF
+# define RED 0xFF0000
+# define GREEN 0x00FF00
+# define BLUE 0x0000FF
+
+
+
 
 # define START_WIDTH 800
 # define START_HEIGHT 600
@@ -20,12 +29,27 @@
 # define WALL_WIDTH 32
 # define WALL_HEIGHT 32
 
-# define PLAYER_SPEED 0.1f
-# define PLAYER_ROTATION_SPEED 0.05f
+# define PLAYER_SPEED 0.05f
+# define STRAFE_SPEED 0.05f
+# define ROTATE_SPEED 5.0f // degrees per frame
 
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing
 
 # define MLX_COLOR(r, g, b) (0xFF000000 | ((r) << 16) | ((g) << 8) | (b))
+
+#define VOID_SYMBOL ' '
+
+#define TRIG_TABLE_SIZE 91 // [from 0 to 90] degrees
+
+// Trigonometry and fixed points
+#define FIXED_PI       to_fixed32(3.14159265f)
+#define FIXED_HALF_PI  to_fixed32(3.14159265f / 2.0f)
+#define FIXED_TWO_PI   to_fixed32(6.28318530f)
+
+# define M_PI 3.14159265358979323846
+
+
+
 
 enum						e_error
 {
@@ -62,6 +86,12 @@ enum						e_error
 	ERR_CLEAN_UP,
 };
 
+typedef struct s_trig
+{
+	t_fixed32	*sin;  // 0-90 degrees inclusive
+	t_fixed32	*cos;	// same
+}	t_trig;
+
 typedef struct s_image_data
 {
 	void					*img;
@@ -84,7 +114,8 @@ typedef struct s_mlx
 
 typedef struct s_map
 {
-	char **map_array; // 2D array of map data
+	char **map_lines; // temp buffer so i wont do 2nd passover
+	char *map_array;  // 2D array of map data
 	int width;        // Width of the map in tiles
 	int height;       // Height of the map in tiles
 	int fd;           // File descriptor for the map file
@@ -96,17 +127,58 @@ typedef struct s_fps_data
 	uint64_t				last_frame_time;
 	uint64_t				delta_time;
 	uint64_t				target_frame_duration;
+	uint64_t				accumulator;
 	int						frame_count;
+
 }							t_fps_data;
 
 // Forward declarations for types that will be defined later
-typedef struct s_game		t_game;
 typedef struct s_map		t_map;
-typedef struct s_player		t_player;
-typedef struct s_input		t_input;
 typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
-typedef struct s_raycasting	t_raycasting;
+
+typedef struct s_input
+{
+    bool forward;
+    bool backward;
+    bool left;
+    bool right;
+    bool turn_left;
+    bool turn_right;
+    bool shoot;
+    bool use;
+    bool exit;
+}       t_input;
+
+typedef struct s_player
+{
+	t_fixed32	x;
+	t_fixed32	y;
+
+	// direction vector
+	t_fixed32	dir_angle; // in degrees
+
+	t_fixed32	dir_x;
+	t_fixed32	dir_y;
+
+	t_fixed32	plane_x;
+	t_fixed32	plane_y;
+
+	t_fixed32	move_speed;
+	t_fixed32	rotate_speed;
+
+}	t_player;
+
+typedef struct s_bres
+{
+	int			x;
+	int			y;
+	int			dx;
+	int			dy;
+	int			step_x;
+	int			step_y;
+	int			err;
+}				t_bres;
 
 typedef struct s_graphics
 {
@@ -114,10 +186,36 @@ typedef struct s_graphics
 	int						y;
 	int						color;
 	int *pixels; // 1d array of width * height size
-}							t_graphics;
+}
+							t_graphics;
+typedef struct s_ray
+{
+	t_fixed32 hit_x;
+	t_fixed32 hit_y;
+
+	t_fixed32 distance;
+
+	int side; // 0 for x-side, 1 for y-side
+}							t_ray;
+
+typedef struct s_raycasting
+{
+	struct s_ray	*rays; // array of rays, one per screen column
+	int			num_rays; // typically equal to screen width
+
+}							t_raycasting;
+typedef struct s_game
+{
+	t_fixed32	fov; // in degrees
+	struct s_ray	*rays; // array of rays, one per screen column
+
+}							t_game;
 
 typedef struct s_cub_data
 {
+	// data struct for the trigonometric values
+	t_trig					trig;
+
 	// time struct
 	t_fps_data				fps;
 

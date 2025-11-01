@@ -1,21 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_validation.c                                    :+:      :+:    :+:   */
+/*   map_validate.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:47:37 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/20 21:04:16 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/07/29 15:17:22 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_validation.h"
+#include "../../includes/cub3d.h"
+
 
 bool	validate_map_name(const char *map_name)
 {
-	size_t	len;
-
+	size_t len;
+	
 	if (!map_name || ft_strlen(map_name) == 0)
 		return (false);
 	// Check if the map name ends with ".cub"
