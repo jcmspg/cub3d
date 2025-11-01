@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/05 19:53:16 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 17:55:31 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,11 @@
 
 // External Libraries
 # include "../extLibs/libft/libft.h"
-# include "../extLibs/minilibx-linux/mlx.h"
+# if defined(__APPLE__) && defined(__MACH__)
+	# include "../extLibs/mlx/mlx.h"
+# else
+	# include "../extLibs/minilibx-linux/mlx.h"
+# endif
 # include "../extLibs/poormanfixedpoint/includes/poormansfixed.h"
 
 // Project-specific headers
