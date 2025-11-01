@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/05 19:40:40 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 20:33:10 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   printf("Trig tables initialized successfully!\n");
 
   // === NOW RUN MATH TESTS ===
-  //run_all_math_tests(&data);
+  run_all_math_tests(&data);
 
   
   // start a window

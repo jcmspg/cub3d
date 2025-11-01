@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 19:34:29 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 21:00:17 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@
 # define WALL_WIDTH 32
 # define WALL_HEIGHT 32
 
-# define PLAYER_SPEED 0.05f
-# define STRAFE_SPEED 0.05f
-# define ROTATE_SPEED 5.0f // degrees per frame
+# define PLAYER_SPEED 0.02f
+# define STRAFE_SPEED 0.02f
+# define ROTATE_SPEED 1.5f // degrees per frame
 
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing
 

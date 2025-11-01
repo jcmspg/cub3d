@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:04:40 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 19:43:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2025/11/01 20:54:26 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,11 @@ bool	is_wall_at(t_cub_data *data, t_fixed32 world_x, t_fixed32 world_y)
     return (c == '1');
 }
 
-// Optimized table calculation with better memory access patterns
+// Optimized table calculation with 0.01° precision
 void	calc_trig_table(t_trig *trig)
 {
     int		i;
-    double	angle_degrees;  // Use double for initial calculation precision
+    double	angle_degrees;
     double	rad;
 
     i = 0;
@@ -75,10 +75,7 @@ bool	init_trig_table(t_cub_data *data)
 {
     // Check if already initialized to prevent memory leaks
     if (data->trig.sin != NULL || data->trig.cos != NULL)
-    {
-        // Already initialized, just return success
         return (true);
-    }
     
     data->trig.sin = (t_fixed32 *)ft_calloc(TRIG_TABLE_SIZE, sizeof(t_fixed32));
     if (!data->trig.sin)
@@ -99,24 +96,24 @@ bool	init_trig_table(t_cub_data *data)
 // Enhanced angle normalization for fractional degrees
 t_fixed32	normalize_angle_degrees(t_fixed32 angle)
 {
-    while (angle < to_fixed32(0.0f))
-        angle += to_fixed32(360.0f);
+    while (angle < 0)
+        angle = fixed32_add(angle, to_fixed32(360.0f));
     while (angle >= to_fixed32(360.0f))
-        angle -= to_fixed32(360.0f);
+        angle = fixed32_sub(angle, to_fixed32(360.0f));
     return (angle);
 }
 
-// Improved angle-to-index conversion with better precision handling
+// Convert t_fixed32 angle to table index for 0.01° precision
 static int	angle_to_index(t_fixed32 angle_degrees)
 {
     t_fixed32 index_fixed;
     int index;
     
-    // Convert to hundredths of degrees with proper rounding
+    // Convert to hundredths of degrees: angle * 100
     index_fixed = fixed32_mul(angle_degrees, to_fixed32(100.0f));
     index = from_fixed32(index_fixed);
     
-    // Ensure we don't go out of bounds
+    // Clamp to valid range
     if (index < 0)
         index = 0;
     if (index >= TRIG_TABLE_SIZE)
@@ -125,22 +122,7 @@ static int	angle_to_index(t_fixed32 angle_degrees)
     return (index);
 }
 
-// Optional: Linear interpolation between table entries for even higher precision
-static t_fixed32	interpolate_sin(t_trig *trig, t_fixed32 angle_degrees)
-{
-    t_fixed32 index_fixed = fixed32_mul(angle_degrees, to_fixed32(100.0f));
-    int index = from_fixed32(index_fixed);
-    t_fixed32 fraction = index_fixed - to_fixed32((float)index);
-    
-    if (index >= TRIG_TABLE_SIZE - 1)
-        return (trig->sin[TRIG_TABLE_SIZE - 1]);
-    
-    // Linear interpolation: sin[i] + fraction * (sin[i+1] - sin[i])
-    t_fixed32 delta = trig->sin[index + 1] - trig->sin[index];
-    return (trig->sin[index] + fixed32_mul(fraction, delta));
-}
-
-// Improved quadrant handling
+// Complete the quadrant handling for sine
 static t_fixed32	handle_sin_quadrant(t_trig *trig, t_fixed32 degrees)
 {
     int index;
@@ -175,16 +157,7 @@ static t_fixed32	handle_sin_quadrant(t_trig *trig, t_fixed32 degrees)
     }
 }
 
-// Enhanced fast sine with fractional degree support
-t_fixed32	fast_sin(t_trig *trig, t_fixed32 degrees)
-{
-    degrees = normalize_angle_degrees
-(degrees);
-    return (handle_sin_quadrant
-    (trig, degrees));
-}
-
-// Improved quadrant handling
+// Complete the quadrant handling for cosine
 static t_fixed32	handle_cos_quadrant(t_trig *trig, t_fixed32 degrees)
 {
     int index;
@@ -219,16 +192,27 @@ static t_fixed32	handle_cos_quadrant(t_trig *trig, t_fixed32 degrees)
     }
 }
 
-// Enhanced fast cosine with fractional degree support
-t_fixed32	fast_cos(t_trig *trig, t_fixed32 degrees)
+// Enhanced fast sine with 0.01° precision (unified function)
+t_fixed32	fast_sin(t_trig *trig, t_fixed32 degrees)
 {
-    degrees = normalize_angle_degrees
-(degrees);
-    return (handle_cos_quadrant
-    (trig, degrees));
+    if (!trig || !trig->sin)
+        return (0);
+    
+    degrees = normalize_angle_degrees(degrees);
+    return (handle_sin_quadrant(trig, degrees));
 }
 
-// Convert fixed-point radians to fixed-point degrees with precision
+// Enhanced fast cosine with 0.01° precision (unified function)
+t_fixed32	fast_cos(t_trig *trig, t_fixed32 degrees)
+{
+    if (!trig || !trig->cos)
+        return (to_fixed32(1.0f));
+    
+    degrees = normalize_angle_degrees(degrees);
+    return (handle_cos_quadrant(trig, degrees));
+}
+
+// Convert fixed-point radians to fixed-point degrees
 t_fixed32	fixed_radians_to_degrees(t_fixed32 radians)
 {
     return (fixed32_mul(radians, to_fixed32(180.0f / M_PI)));
@@ -239,10 +223,8 @@ t_fixed32	fixed_sin(t_trig *trig, t_fixed32 radians)
 {
     t_fixed32 degrees;
 
-    degrees = fixed_radians_to_degrees
-(radians);
-    return (fast_sin
-    (trig, degrees));
+    degrees = fixed_radians_to_degrees(radians);
+    return (fast_sin(trig, degrees));
 }
 
 // Enhanced cosine function from radians with 0.01° precision
@@ -250,10 +232,8 @@ t_fixed32	fixed_cos(t_trig *trig, t_fixed32 radians)
 {
     t_fixed32 degrees;
 
-    degrees = fixed_radians_to_degrees
-(radians);
-    return (fast_cos
-    (trig, degrees));
+    degrees = fixed_radians_to_degrees(radians);
+    return (fast_cos(trig, degrees));
 }
 
 void	cleanup_trig_table(t_trig *trig)
@@ -269,4 +249,3 @@ void	cleanup_trig_table(t_trig *trig)
         trig->cos = NULL;
     }
 }
-
