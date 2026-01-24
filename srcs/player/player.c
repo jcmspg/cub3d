@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/11/01 20:58:06 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 19:48:31 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,12 +75,6 @@ void calc_player_dirs(t_cub_data *data)
     // Calculate camera plane (perpendicular to direction)
     data->player->plane_x = fixed32_mul(-data->player->dir_y, cached_plane_length);
     data->player->plane_y = fixed32_mul(data->player->dir_x, cached_plane_length);
-
-    // Debug output to verify calculations
-    printf("🧮 CALC_PLAYER_DIRS: angle=%.2f° | dir_x=%.4f | dir_y=%.4f\n",
-           from_fixed32(angle_degrees),
-           from_fixed32(data->player->dir_x),
-           from_fixed32(data->player->dir_y));
 }
 
 // init player

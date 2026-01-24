@@ -6,13 +6,13 @@
 #    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2025/11/01 18:02:48 by hladeiro         ###   ########.fr        #
+#    Updated: 2026/01/24 19:17:59 by joamiran         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cuboid
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=gnu99
 
 SRC_DIR = ./srcs
 OBJ_DIR = ./obj
@@ -63,7 +63,9 @@ $(PMFP): | check_pmfp
 	$(MAKE) -C $(PMFP_DIR)
 
 $(MLX): | check_mlx
-	$(MAKE) -C $(MLX_DIR)
+	@if [ ! -f "$(MLX)" ]; then \
+		cd $(MLX_DIR) && ./configure 2>/dev/null || true; \
+	fi
 
 # Check if libft exists in the specified directory if not clone it automatically
 check_libft:

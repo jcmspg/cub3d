@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 19:42:43 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 19:46:57 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,13 +173,13 @@ int	mylx_update_scene(t_cub_data *data)
 {
 	// cleans the image
 	mylx_clear_image(data);
-	
-	// Draw your map grid for debugging
-	draw_map_grid(data);
 	update_game_logic(data);
-	// draws scene
-	//test_sync(data);
+	// Cast rays and render 3D view (walls, floor, ceiling)
+	start_rays(data);
+	// Draw minimap overlay on top of 3D view
+	draw_map_grid(data);
 	draw_player(data);
+	draw_ray_debug(data);
 	// places new scene on the image
 	mylx_make_image(data);
 	return (ERR_NO_ERROR);

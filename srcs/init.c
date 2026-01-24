@@ -6,34 +6,12 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/05 20:19:32 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 19:43:01 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/inits.h"
 #include <unistd.h>
-
-static bool init_raytcaster(t_cub_data *data)
-{
-	if (!data)
-		return (false);
-	data->raycasting = ft_calloc(sizeof(t_raycasting), 1);
-	if (!data->raycasting)
-	{
-		ft_putstr_fd("Error creating raycaster struct", STDERR_FILENO);
-		return (false);
-	}
-	data->raycasting->num_rays = data->mlx->width;
-	data->raycasting->rays = ft_calloc(sizeof(t_ray), data->raycasting->num_rays);
-	if (!data->raycasting->rays)
-	{
-		free(data->raycasting);
-		data->raycasting = NULL;
-		ft_putstr_fd("Error creating rays array", STDERR_FILENO);
-		return (false);
-	}
-	return (true);
-}
 
 static bool init_input(t_cub_data *data)
 {
@@ -90,9 +68,27 @@ void	init_game_window(t_cub_data *data)
 		ft_putstr_fd("Error: Player initialization failed.\n", STDERR_FILENO);
 		cleanup_and_exit(data);
 	}
+
+	// Initialize game settings (FOV, etc.)
+	data->game = ft_calloc(1, sizeof(t_game));
+	if (!data->game)
+	{
+		ft_putstr_fd("Error: Game initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+	data->game->fov = to_fixed32(START_FOV);
+
+	// Initialize textures with default colors
+	data->textures = init_textures();
+	if (!data->textures)
+	{
+		ft_putstr_fd("Error: Textures initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
 	
 	// Initialize the ray struct and rays array
-	if (!init_raytcaster(data))
+	data->raycasting = init_raycasting(data->mlx->width);
+	if (!data->raycasting)
 	{
 		ft_putstr_fd("Error: Raycaster initialization failed.\n", STDERR_FILENO);
 		cleanup_and_exit(data);

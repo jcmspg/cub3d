@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 21:00:17 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 19:41:41 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@
 
 
 
-# define START_WIDTH 800
-# define START_HEIGHT 600
-# define START_FOV 60.0f
+# define START_WIDTH 1280
+# define START_HEIGHT 720
+# define START_FOV 66.0f
 
 # define WALL_WIDTH 32
 # define WALL_HEIGHT 32
@@ -132,9 +132,52 @@ typedef struct s_fps_data
 
 }							t_fps_data;
 
+/*
+** =============================================================================
+** TEXTURE/SURFACE TYPES
+** For now using solid colors, later will support XPM textures
+** =============================================================================
+*/
+
+// Texture/surface indices
+# define TEX_NORTH		0
+# define TEX_SOUTH		1
+# define TEX_EAST		2
+# define TEX_WEST		3
+# define TEX_FLOOR		4
+# define TEX_CEILING	5
+# define TEX_COUNT		6
+
+// Default colors for each surface (used until real textures are loaded)
+# define COLOR_NORTH	0x8B0000	// Dark red
+# define COLOR_SOUTH	0x006400	// Dark green
+# define COLOR_EAST		0x00008B	// Dark blue
+# define COLOR_WEST		0x8B8B00	// Dark yellow
+# define COLOR_FLOOR	0x404040	// Dark gray
+# define COLOR_CEILING	0x87CEEB	// Sky blue
+
+typedef struct s_texture
+{
+	int		color;			// Solid color (used when no texture loaded)
+	void	*img;			// MLX image pointer (NULL if using color)
+	int		*pixels;		// Pixel data array
+	int		width;			// Texture width
+	int		height;			// Texture height
+	char	*path;			// Path to texture file (NULL if using color)
+	bool	loaded;			// True if texture is loaded from file
+}	t_texture;
+
+typedef struct s_textures
+{
+	t_texture	walls[4];		// N, S, E, W
+	t_texture	floor;
+	t_texture	ceiling;
+	int			floor_color;	// Parsed from .cub file (F line)
+	int			ceiling_color;	// Parsed from .cub file (C line)
+}	t_textures;
+
 // Forward declarations for types that will be defined later
 typedef struct s_map		t_map;
-typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
 
 typedef struct s_input
@@ -190,13 +233,25 @@ typedef struct s_graphics
 							t_graphics;
 typedef struct s_ray
 {
-	t_fixed32 hit_x;
-	t_fixed32 hit_y;
-
-	t_fixed32 distance;
-
-	int side; // 0 for x-side, 1 for y-side
-}							t_ray;
+    // Input
+    t_fixed32 dir_x;      // Ray direction
+    t_fixed32 dir_y;
+    
+    // DDA state
+    int       map_x;      // Current grid cell
+    int       map_y;
+    int       step_x;     // -1 or +1
+    int       step_y;
+    t_fixed32 side_dist_x; // Distance to next X gridline
+    t_fixed32 side_dist_y; // Distance to next Y gridline
+    t_fixed32 delta_dist_x; // Distance between X gridlines
+    t_fixed32 delta_dist_y; // Distance between Y gridlines
+    
+    // Output
+    t_fixed32 perp_dist;  // Perpendicular distance (no fisheye)
+    int       side;       // 0=vertical wall, 1=horizontal wall
+    int       hit;        // Did we hit something?
+}   t_ray;
 
 typedef struct s_raycasting
 {
@@ -224,7 +279,7 @@ typedef struct s_cub_data
 	t_player				*player;
 	t_graphics				*graphics;
 	t_input					*input;
-	t_texture				*textures;
+	t_textures				*textures;
 	t_sprite				*sprites;
 	t_raycasting			*raycasting;
 	t_mlx					*mlx;

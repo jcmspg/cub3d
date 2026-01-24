@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/05 20:22:13 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 19:43:01 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,11 @@ int	cleanup_graphics(t_graphics *graphics)
 	return (ERR_NO_ERROR);
 }
 
-int	cleanup_textures(t_texture *textures)
+int	cleanup_textures(t_textures *textures)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_textures\n");
-	// * to do * //
-	(void)textures;
+	if (textures)
+		free_textures(textures);
 	return (ERR_NO_ERROR);
 }
 
