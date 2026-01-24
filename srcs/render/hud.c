@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 21:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:31:39 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:35:38 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ int	init_hud(t_cub_data *data)
 /**
  * Cleanup HUD resources
  */
-void	cleanup_hud(t_hud *hud)
+int	cleanup_hud(t_hud *hud)
 {
 	if (!hud)
-		return ;
+		return (ERR_NO_ERROR);
 	// If texture was loaded, it would be freed here
 	if (hud->bg_img)
 	{
@@ -49,6 +49,7 @@ void	cleanup_hud(t_hud *hud)
 		hud->bg_img = NULL;
 	}
 	free(hud);
+	return (ERR_NO_ERROR);
 }
 
 /**
@@ -84,6 +85,7 @@ void	draw_hud_background(t_cub_data *data)
 /**
  * Draw minimap inside the HUD - player-centered scrolling view
  * Fixed square on bottom-right, shows area around player
+ * Smooth scrolling: map moves with player's fractional position
  */
 void	draw_hud_minimap(t_cub_data *data)
 {
@@ -94,10 +96,16 @@ void	draw_hud_minimap(t_cub_data *data)
 	int		minimap_y;
 	float	player_x;
 	float	player_y;
+	float	frac_x;
+	float	frac_y;
+	int		offset_x;
+	int		offset_y;
 	int		start_cell_x;
 	int		start_cell_y;
 	int		x;
 	int		y;
+	int		draw_x;
+	int		draw_y;
 
 	if (!data || !data->hud || !data->hud->enabled)
 		return ;
@@ -113,18 +121,29 @@ void	draw_hud_minimap(t_cub_data *data)
 	// Get player position
 	player_x = from_fixed32(data->player->x);
 	player_y = from_fixed32(data->player->y);
+	// Calculate fractional offset (how much to shift cells for smooth scrolling)
+	frac_x = player_x - (int)player_x;
+	frac_y = player_y - (int)player_y;
+	offset_x = (int)(frac_x * cell_size);
+	offset_y = (int)(frac_y * cell_size);
 	// Calculate which map cells to show (centered on player)
-	start_cell_x = (int)player_x - view_cells / 2;
-	start_cell_y = (int)player_y - view_cells / 2;
-	// Draw visible map cells
+	// Draw one extra cell on each side to cover gaps during smooth scrolling
+	start_cell_x = (int)player_x - view_cells / 2 - 1;
+	start_cell_y = (int)player_y - view_cells / 2 - 1;
+	// Draw visible map cells with smooth offset
 	y = 0;
-	while (y < view_cells)
+	while (y < view_cells + 2)
 	{
 		x = 0;
-		while (x < view_cells)
+		while (x < view_cells + 2)
 		{
-			draw_minimap_cell_at(data, start_cell_x + x, start_cell_y + y,
-				minimap_x + x * cell_size, minimap_y + y * cell_size, cell_size);
+			draw_x = minimap_x + x * cell_size - offset_x;
+			draw_y = minimap_y + y * cell_size - offset_y;
+			// Only draw if at least partially visible in minimap area
+			if (draw_x < minimap_x + minimap_size && draw_x + cell_size > minimap_x
+				&& draw_y < minimap_y + minimap_size && draw_y + cell_size > minimap_y)
+				draw_minimap_cell_at(data, start_cell_x + x, start_cell_y + y,
+					draw_x, draw_y, cell_size);
 			x++;
 		}
 		y++;

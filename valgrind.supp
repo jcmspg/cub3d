@@ -1,0 +1,36 @@
+# Suppressions for X11/XCB/minilibx false positives
+{
+   x11_xcb_writev
+   Memcheck:Param
+   writev(vector[...])
+   ...
+   fun:_xcb_conn_wait*
+   ...
+}
+
+{
+   x11_xcb_send
+   Memcheck:Param
+   writev(vector[...])
+   ...
+   fun:_XSend
+   ...
+}
+
+{
+   mlx_new_window
+   Memcheck:Param
+   writev(vector[...])
+   ...
+   fun:mlx_new_window
+   ...
+}
+
+{
+   mlx_init_display
+   Memcheck:Param
+   writev(vector[...])
+   ...
+   fun:XOpenDisplay
+   ...
+}

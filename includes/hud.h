@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 21:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:28:29 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:35:38 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 
 // HUD initialization
 int		init_hud(t_cub_data *data);
-void	cleanup_hud(t_hud *hud);
 
 // HUD rendering
 void	render_hud(t_cub_data *data);
