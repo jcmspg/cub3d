@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:41:41 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:24:02 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,20 @@
 # define PLAYER_SPEED 0.02f
 # define STRAFE_SPEED 0.02f
 # define ROTATE_SPEED 1.5f // degrees per frame
+# define SPRINT_MULTIPLIER 3.5f
+# define JUMP_HEIGHT 100 // pixels to offset view
+# define JUMP_DURATION 500 // ms for full jump arc
+# define BOB_AMPLITUDE 6 // pixels of vertical bounce
+# define BOB_FREQUENCY 2.0f // oscillations per second
+# define HEAD_BOB_ENABLED 1 // 1 = on, 0 = off
+
+// HUD settings
+# define HUD_HEIGHT 100 // height of HUD bar at bottom
+# define HUD_BG_COLOR 0x2A2A2A // dark gray background
+# define HUD_BORDER_COLOR 0x555555 // lighter gray border
+# define HUD_BORDER_WIDTH 2 // border thickness
+# define HUD_MINIMAP_CELL 8 // pixels per cell on minimap
+# define HUD_MINIMAP_PADDING 4 // padding around minimap
 
 # define PIXELS_TO_TEST 1500 // debug value for fps sync testing
 
@@ -156,6 +170,21 @@ typedef struct s_fps_data
 # define COLOR_FLOOR	0x404040	// Dark gray
 # define COLOR_CEILING	0x87CEEB	// Sky blue
 
+// HUD structure
+typedef struct s_hud
+{
+	int			x;              // HUD x position (0 = left edge)
+	int			y;              // HUD y position (screen_height - HUD_HEIGHT)
+	int			width;          // HUD width (screen width)
+	int			height;         // HUD height
+	int			minimap_x;      // Minimap x position within HUD
+	int			minimap_y;      // Minimap y position within HUD
+	int			minimap_size;   // Size of minimap
+	int			bg_color;       // Background color
+	void		*bg_img;        // Background texture (NULL = use color)
+	bool		enabled;        // Toggle HUD on/off
+}   t_hud;
+
 typedef struct s_texture
 {
 	int		color;			// Solid color (used when no texture loaded)
@@ -191,6 +220,9 @@ typedef struct s_input
     bool shoot;
     bool use;
     bool exit;
+    bool sprint;
+    bool jumping;
+    uint64_t jump_start_time;
 }       t_input;
 
 typedef struct s_player
@@ -209,6 +241,9 @@ typedef struct s_player
 
 	t_fixed32	move_speed;
 	t_fixed32	rotate_speed;
+	int			view_offset; // vertical offset for jumping
+	float		bob_phase; // phase of head bob oscillation
+	int			bob_offset; // current bob offset in pixels
 
 }	t_player;
 
@@ -279,8 +314,7 @@ typedef struct s_cub_data
 	t_player				*player;
 	t_graphics				*graphics;
 	t_input					*input;
-	t_textures				*textures;
-	t_sprite				*sprites;
+	t_textures				*textures;	t_hud				*hud;	t_sprite				*sprites;
 	t_raycasting			*raycasting;
 	t_mlx					*mlx;
 }							t_cub_data;

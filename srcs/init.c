@@ -6,11 +6,12 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:43:01 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:15:57 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/inits.h"
+#include "../includes/hud.h"
 #include <unistd.h>
 
 static bool init_input(t_cub_data *data)
@@ -110,6 +111,12 @@ void	init_game_window(t_cub_data *data)
 	if (mylx_create_window(data) != ERR_NO_ERROR)
 		exit(ERR_WINDOW_CREATE);
 	mylx_create_image(data);
+	// Initialize HUD after MLX is ready
+	if (!init_hud(data))
+	{
+		ft_putstr_fd("Error: HUD initialization failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
 	mylx_clear_image(data);
 	mylx_make_image(data);
 }

@@ -6,11 +6,12 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:46:57 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:17:14 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/mylx_utils.h"
+#include "../../includes/hud.h"
 
 // Initialize MLX
 int	mylx_init(t_cub_data *data)
@@ -145,27 +146,16 @@ void	mylx_pixel_put(t_cub_data *data, int x, int y, int color)
 	*(unsigned int *)distance = color;
 }
 
-// Clear the image
+// Clear the image using fast memset
 int	mylx_clear_image(t_cub_data *data)
 {
-	int	x;
-	int	y;
+	int	total_bytes;
 
 	if (!data || !data->mlx || !data->mlx->img || !data->mlx->img->address)
 		return (ft_printf_fd(STDERR_FILENO, "Error clearing image\n"),
 			ERR_IMAGE_CLEAR);
-	y = 0;
-	while (y < data->mlx->height)
-	{
-		x = 0;
-		while (x < data->mlx->width)
-		{
-			mylx_pixel_put(data, x, y, MLX_COLOR(0, 0, 0));
-			// Clear with black color
-			x++;
-		}
-		y++;
-	}
+	total_bytes = data->mlx->img->line_length * data->mlx->height;
+	ft_memset(data->mlx->img->address, 0, total_bytes);
 	return (ERR_NO_ERROR);
 }
 
@@ -173,13 +163,11 @@ int	mylx_update_scene(t_cub_data *data)
 {
 	// cleans the image
 	mylx_clear_image(data);
-	update_game_logic(data);
+	// NOTE: update_game_logic is called in main_render_loop's fixed timestep
 	// Cast rays and render 3D view (walls, floor, ceiling)
 	start_rays(data);
-	// Draw minimap overlay on top of 3D view
-	draw_map_grid(data);
-	draw_player(data);
-	draw_ray_debug(data);
+	// Render HUD with minimap at bottom of screen
+	render_hud(data);
 	// places new scene on the image
 	mylx_make_image(data);
 	return (ERR_NO_ERROR);

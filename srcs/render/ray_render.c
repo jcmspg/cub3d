@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:43:01 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:11:05 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ static int	calculate_wall_slice(t_cub_data *data, t_ray *ray,
 {
 	int		line_height;
 	float	perp_dist;
+	int		view_offset;
 
 	// Convert perpendicular distance to float for calculation
 	perp_dist = from_fixed32(ray->perp_dist);
@@ -33,9 +34,11 @@ static int	calculate_wall_slice(t_cub_data *data, t_ray *ray,
 		perp_dist = 0.001f;
 	// Calculate height of wall slice on screen
 	line_height = (int)(data->mlx->height / perp_dist);
-	// Calculate start and end points, centered on screen
-	*draw_start = (data->mlx->height - line_height) / 2;
-	*draw_end = (data->mlx->height + line_height) / 2;
+	// Combine jump offset + head bob offset
+	view_offset = data->player->view_offset + data->player->bob_offset;
+	// Calculate start and end points, centered on screen + combined offset
+	*draw_start = (data->mlx->height - line_height) / 2 + view_offset;
+	*draw_end = (data->mlx->height + line_height) / 2 + view_offset;
 	// Clamp to screen bounds
 	if (*draw_start < 0)
 		*draw_start = 0;

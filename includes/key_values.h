@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 18:33:02 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 18:43:21 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:07:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 #  define KEY_ENTER 65293
 #  define KEY_E 14
 #  define KEY_Q 12
+#  define KEY_SHIFT 56
 #  define MOUSE_LEFT 10000
 #  define MOUSE_RIGHT 30000
 #  define MOUSE_MIDDLE 2000
@@ -48,6 +49,7 @@
 #  define KEY_ENTER 65293
 #  define KEY_E 101
 #  define KEY_Q 113
+#  define KEY_SHIFT 65505
 #  define MOUSE_LEFT 1
 #  define MOUSE_RIGHT 3
 #  define MOUSE_MIDDLE 2
