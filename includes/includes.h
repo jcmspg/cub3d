@@ -11,67 +11,67 @@
 /* ************************************************************************** */
 
 #ifndef INCLUDES_H
-# define INCLUDES_H
+#define INCLUDES_H
 
 // This file includes all necessary headers for the project.
 
 // C language standard version
-# include <fcntl.h>
-# include <limits.h>
-# include <math.h>
-# include <stdbool.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 // C lib for time functions
-# include <sys/stat.h>
-# include <sys/time.h>
-# include <sys/types.h>
-# include <time.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <time.h>
 
 // External Libraries
-# include "../extLibs/libft/libft.h"
-# if defined(__APPLE__) && defined(__MACH__)
-	# include "../extLibs/mlx/mlx.h"
-# else
-	# include "../extLibs/minilibx-linux/mlx.h"
-# endif
-# include "../extLibs/poormanfixedpoint/includes/poormansfixed.h"
+#include "../extLibs/libft/libft.h"
+#if defined(__APPLE__) && defined(__MACH__)
+#include "../extLibs/mlx/mlx.h"
+#else
+#include "../extLibs/minilibx-linux/mlx.h"
+#endif
+#include "../extLibs/poormanfixedpoint/includes/poormansfixed.h"
 
 // Project-specific headers
-# include "typedefs.h"
+#include "typedefs.h"
 
 // Internal headers
-# include "fps_gen.h"
-# include "ft_debug.h"
-# include "ft_validation.h"
-# include "inits.h"
-# include "map_parse.h"
-# include "mylx_hooks.h"
-# include "mylx_init.h"
-# include "mylx_utils.h"
+#include "fps_gen.h"
+#include "ft_debug.h"
+#include "ft_validation.h"
+#include "inits.h"
+#include "map_parse.h"
+#include "mylx_hooks.h"
+#include "mylx_init.h"
+#include "mylx_utils.h"
 
 // Cleanups
-# include "cleanup.h"
+#include "cleanup.h"
 
 // Game Logic
-# include "gamelogic.h"
+#include "gamelogic.h"
 
 // Keys
-# include "key_values.h"
+#include "key_values.h"
 
 // Utils
-# include "utils.h"
+#include "utils.h"
 
 // movements
-# include "movements.h"
+#include "movements.h"
 
 // player
-# include "player.h"
+#include "player.h"
 
 // renderer
-# include "render.h"
-
+#include "render.h"
 
 #endif /* INCLUDES_H */

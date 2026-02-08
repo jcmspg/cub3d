@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #ifndef RENDER_H
-# define RENDER_H
+#define RENDER_H
 
-# include "cub3d.h"
+#include "cub3d.h"
 
 /*
 ** =============================================================================
@@ -22,16 +22,16 @@
 */
 
 // Allocate raycasting structure and ray array
-t_raycasting	*init_raycasting(int screen_width);
+t_raycasting *init_raycasting(int screen_width);
 
 // Reset a single ray before casting
-void			reset_ray(t_ray *ray);
+void reset_ray(t_ray *ray);
 
 // Reset all rays before a new frame
-void			reset_all_rays(t_raycasting *rc);
+void reset_all_rays(t_raycasting *rc);
 
 // Free raycasting structure
-void			free_raycasting(t_raycasting *rc);
+void free_raycasting(t_raycasting *rc);
 
 /*
 ** =============================================================================
@@ -40,22 +40,22 @@ void			free_raycasting(t_raycasting *rc);
 */
 
 // Calculate ray direction for a screen column
-void			calculate_ray_dir(t_cub_data *data, t_ray *ray, int x);
+void calculate_ray_dir(t_cub_data *data, t_ray *ray, int x);
 
 // Initialize DDA parameters (step directions, side distances)
-void			init_dda(t_cub_data *data, t_ray *ray);
+void init_dda(t_cub_data *data, t_ray *ray);
 
 // Perform DDA stepping until wall hit
-int				perform_dda(t_cub_data *data, t_ray *ray);
+int perform_dda(t_cub_data *data, t_ray *ray);
 
 // Calculate perpendicular distance (no fish-eye)
-void			calculate_perp_distance(t_ray *ray);
+void calculate_perp_distance(t_cub_data *data, t_ray *ray);
 
 // Cast a single ray
-void			cast_single_ray(t_cub_data *data, t_ray *ray, int x);
+void cast_single_ray(t_cub_data *data, t_ray *ray, int x);
 
 // Cast all rays for the frame
-void			cast_all_rays(t_cub_data *data);
+void cast_all_rays(t_cub_data *data);
 
 /*
 ** =============================================================================
@@ -64,10 +64,10 @@ void			cast_all_rays(t_cub_data *data);
 */
 
 // Draw all rays on the minimap (full FOV fan)
-void			draw_rays_on_minimap(t_cub_data *data);
+void draw_rays_on_minimap(t_cub_data *data);
 
 // Complete ray debug visualization (call after cast_all_rays)
-void			draw_ray_debug(t_cub_data *data);
+void draw_ray_debug(t_cub_data *data);
 
 /*
 ** =============================================================================
@@ -76,7 +76,7 @@ void			draw_ray_debug(t_cub_data *data);
 */
 
 // Main raycasting function called each frame
-void			start_rays(t_cub_data *data);
+void start_rays(t_cub_data *data);
 
 /*
 ** =============================================================================
@@ -85,13 +85,13 @@ void			start_rays(t_cub_data *data);
 */
 
 // Initialize all textures with default colors
-t_textures		*init_textures(void);
+t_textures *init_textures(void);
 
 // Get wall color based on ray direction
-int				get_wall_color(t_ray *ray, t_textures *textures);
+int get_wall_color(t_ray *ray, t_textures *textures);
 
 // Free all texture resources
-void			free_textures(t_textures *textures);
+void free_textures(t_textures *textures);
 
 /*
 ** =============================================================================
@@ -100,6 +100,6 @@ void			free_textures(t_textures *textures);
 */
 
 // Render all walls (ceiling + walls + floor) for the frame
-void			render_walls(t_cub_data *data);
+void render_walls(t_cub_data *data);
 
 #endif /* RENDER_H */

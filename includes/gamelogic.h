@@ -11,11 +11,14 @@
 /* ************************************************************************** */
 
 #ifndef GAMELOGIC_H
-# define GAMELOGIC_H
+#define GAMELOGIC_H
 
-# include "cub3d.h"
-# include "fps_gen.h"
+#include "cub3d.h"
+#include "fps_gen.h"
 
 void update_game_logic(t_cub_data *data);
+void update_doors(t_cub_data *data);
+void interact_doors(t_cub_data *data);
+t_door *get_door_at(t_cub_data *data, int x, int y);
 
 #endif /* GAMELOGIC_H */
