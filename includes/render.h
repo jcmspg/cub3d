@@ -102,4 +102,10 @@ void free_textures(t_textures *textures);
 // Render all walls (ceiling + walls + floor) for the frame
 void render_walls(t_cub_data *data);
 
+// Render all sprites (ammo, etc.)
+void render_sprites(t_cub_data *data);
+
+// Render placeholder weapon (rect)
+void render_weapon(t_cub_data *data);
+
 #endif /* RENDER_H */

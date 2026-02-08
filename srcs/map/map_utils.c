@@ -50,7 +50,7 @@ bool is_empty_line(const char *line) {
 // Checks if a character is valid in the map
 bool is_valid_map_char(char c) {
   if (c == '0' || c == '1' || c == '2' || c == 'N' || c == 'S' || c == 'E' ||
-      c == 'W' || c == ' ' || c == 'D')
+      c == 'W' || c == ' ' || c == 'D' || c == 'M')
     return true;
   return false;
 }

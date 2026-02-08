@@ -20,5 +20,7 @@ void update_game_logic(t_cub_data *data);
 void update_doors(t_cub_data *data);
 void interact_doors(t_cub_data *data);
 t_door *get_door_at(t_cub_data *data, int x, int y);
+void player_shoot(t_cub_data *data);
+void check_ammo_pickups(t_cub_data *data);
 
 #endif /* GAMELOGIC_H */

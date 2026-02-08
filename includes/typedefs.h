@@ -202,6 +202,24 @@ typedef struct s_door {
   float open_amount; // 0.0 (closed) -> 1.0 (fully open)
 } t_door;
 
+typedef struct s_character {
+  int health;
+  int max_health;
+  int ammo;
+  int max_ammo;
+  int damage;
+} t_character;
+
+typedef struct s_enemy {
+  t_fixed32 x;
+  t_fixed32 y;
+  t_fixed32 dir_x;
+  t_fixed32 dir_y;
+  t_character stats;
+  int state; // 0=Idle, 1=Chase, 2=Attack, 3=Hit, 4=Dead
+  int id;
+} t_enemy;
+
 typedef struct s_input {
   bool forward;
   bool backward;
@@ -215,11 +233,13 @@ typedef struct s_input {
   bool sprint;
   bool jumping;
   uint64_t jump_start_time;
+  bool fire_held; // To prevent machine-gunning single fire weapons
 } t_input;
 
 typedef struct s_player {
   t_fixed32 x;
   t_fixed32 y;
+  t_character stats; // Gameplay stats
 
   // direction vector
   t_fixed32 dir_angle; // in degrees

@@ -13,8 +13,7 @@
 #include "../includes/cub3d.h"
 #include "../includes/inits.h"
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   t_cub_data data;
 
   ft_memset(&data, 0, sizeof(t_cub_data));
@@ -46,34 +45,40 @@ int main(int argc, char **argv)
   // === NOW RUN MATH TESTS ===
   run_all_math_tests(&data);
 
-  
   // start a window
   init_game_window(&data);
-  
+
   // allocate pixel buffer
   graphics_init(&data);
-  
+
   // init the fps sync
   init_fps_sync(&data.fps);
-  
+
   //=== ENABLE DYNAMIC MAP TESTING ===
   // init_dynamic_map_test(&data);
-  
+
   // hide mouse and center it so i can look freely and smoothly
   mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
-  mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2, data.mlx->height / 2);
+  mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2,
+                 data.mlx->height / 2);
 
   // register the renderer loop within the mlx_loop
   mlx_loop_hook(data.mlx->mlx_ptr, (int (*)(void *))main_render_loop, &data);
 
   // In main() function, update your hook registration:
   mlx_hook(data.mlx->win_ptr, 2, 1L << 0, handle_key_press, &data); // Key press
-  mlx_hook(data.mlx->win_ptr, 3, 1L << 1, handle_key_release,&data); // Key release
+  mlx_hook(data.mlx->win_ptr, 3, 1L << 1, handle_key_release,
+           &data);                                          // Key release
   mlx_hook(data.mlx->win_ptr, 17, 0L, handle_close, &data); // Window close
-  mlx_hook(data.mlx->win_ptr, 6, 1L << 6, handle_mouse_move, &data); // Mouse motion
+  mlx_hook(data.mlx->win_ptr, 6, 1L << 6, handle_mouse_move,
+           &data); // Mouse motion
+  mlx_hook(data.mlx->win_ptr, 4, 1L << 2, handle_mouse_button,
+           &data); // Mouse button press
+  mlx_hook(data.mlx->win_ptr, 5, 1L << 3, handle_mouse_release,
+           &data); // Mouse button release
 
   mlx_loop(data.mlx->mlx_ptr);
-  
+
   cleanup(&data);
   return (ERR_NO_ERROR);
 }

@@ -61,6 +61,12 @@ void init_game_window(t_cub_data *data) {
     ft_putstr_fd("Error: Player initialization failed.\n", STDERR_FILENO);
     cleanup_and_exit(data);
   }
+  // Init gameplay stats
+  data->player->stats.max_health = 100;
+  data->player->stats.health = 100;
+  data->player->stats.max_ammo = 200;
+  data->player->stats.ammo = 20;
+  data->player->stats.damage = 10;
 
   // Initialize game settings (FOV, etc.)
   data->game = ft_calloc(1, sizeof(t_game));

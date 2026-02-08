@@ -116,4 +116,6 @@ void update_game_logic(t_cub_data *data) {
   update_jump(data);
   update_head_bob(data);
   update_doors(data);
+  player_shoot(data);
+  check_ammo_pickups(data);
 }

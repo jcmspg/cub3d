@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hooks.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:31:44 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:07:28 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/08 16:05:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,32 @@ int handle_key_release(int keycode, t_cub_data *data) {
     data->input->turn_right = false;
   else if (keycode == KEY_SHIFT)
     data->input->sprint = false;
+
   else if (keycode == KEY_E)
     interact_doors(data);
   return (ERR_NO_ERROR);
 }
+
+// Mouse button handler for shooting
+int handle_mouse_button(int button, int x, int y, t_cub_data *data) {
+  (void)x;
+  (void)y;
+
+  if (button == MOUSE_LEFT)
+    data->input->shoot = true;
+  return (0);
+}
+
+// Mouse button release handler
+int handle_mouse_release(int button, int x, int y, t_cub_data *data) {
+  (void)x;
+  (void)y;
+
+  if (button == MOUSE_LEFT)
+    data->input->shoot = false;
+  return (0);
+}
+
 // mouse hooks for rotation - proportional smooth rotation
 int handle_mouse_move(int x, int y, t_cub_data *data) {
   static int center_x = -1;
