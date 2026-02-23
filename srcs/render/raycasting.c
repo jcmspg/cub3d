@@ -5,29 +5,29 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2026/01/24 19:46:57 by joamiran         ###   ########.fr       */
+/*   Created: 2026/01/24 19:30:00 by joamiran          #+#    #+#             */
+/*   Updated: 2026/02/23 02:55:10 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/render.h"
+#include "../../includes/cub3d.h"
 
-/*
-** Main raycasting entry point
-** Called each frame to:
-** 1. Reset ray data
-** 2. Cast all rays using DDA
-** 3. Render 3D walls (ceiling + walls + floor)
-** Note: Minimap/debug overlay is drawn separately after this
-*/
-
-void start_rays(t_cub_data *data) {
-  if (!data || !data->raycasting)
-    return;
-  reset_all_rays(data->raycasting);
+int render_raycasting(t_cub_data *data) {
+  if (!data || !data->mlx || !data->player || !data->raycasting)
+    return (1);
   cast_all_rays(data);
   render_walls(data);
   render_sprites(data);
   render_door_overlays(data);
   render_weapon(data);
+  render_hud(data);
+  mlx_put_image_to_window(data->mlx->mlx_ptr, data->mlx->win_ptr,
+                          data->mlx->img->img, 0, 0);
+  return (0);
+}
+
+void cast_rays(t_cub_data *data) {
+  if (!data || !data->raycasting)
+    return;
+  cast_all_rays(data);
 }

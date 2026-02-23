@@ -1,18 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mlx_init.h                                         :+:      :+:    :+:   */
+/*   mylx_init.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 20:32:12 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/20 21:16:40 by joamiran         ###   ########.fr       */
+/*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
+/*   Updated: 2025/11/01 17:55:31 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MLX_INIT_H
-# define MLX_INIT_H
+#ifndef MYLX_INIT_H
+# define MYLX_INIT_H
 
 # include "cub3d.h"
 
-#endif /* MLX_INIT_H */
+void		mylx_init(t_cub_data *data);
+void		mylx_create_window(t_cub_data *data);
+void		mylx_create_image(t_cub_data *data);
+void		mylx_make_image(t_cub_data *data);
+
+#endif

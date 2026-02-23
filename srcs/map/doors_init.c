@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 21:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 21:00:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 02:28:10 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,15 +53,15 @@ static void fill_doors_array(t_cub_data *data) {
   }
 }
 
-bool init_doors(t_cub_data *data) {
+int init_doors(t_cub_data *data) {
   data->game->door_count = count_doors(data->map);
   if (data->game->door_count == 0) {
     data->game->doors = NULL;
-    return (true);
+    return (1);
   }
   data->game->doors = malloc(sizeof(t_door) * data->game->door_count);
   if (!data->game->doors)
-    return (false);
+    return (0);
   fill_doors_array(data);
-  return (true);
+  return (1);
 }

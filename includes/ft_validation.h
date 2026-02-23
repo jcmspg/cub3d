@@ -15,20 +15,20 @@
 
 # include "cub3d.h"
 
-typedef struct s_mapstruct{
-char *so;
-char *we;
-char *no;
-char *ea;
-int c[3];
-int f[3];
-char **map;
-double pos;
-
-}		t_mapstruct;
+typedef struct s_mapstruct
+{
+	char		*so;
+	char		*we;
+	char		*no;
+	char		*ea;
+	int			c[3];
+	int			f[3];
+	char		**map;
+	double		pos;
+}	t_mapstruct;
 
 bool	validate_map_name(const char *map_name);
 bool	validate_map_shape(const char *map);
 bool	validate_map(const char *map_file);
 
-#endif /* FT_VALIDATION_H */
+#endif

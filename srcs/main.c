@@ -5,80 +5,36 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 20:33:10 by joamiran         ###   ########.fr       */
+/*   Created: 2025/07/20 21:07:31 by joamiran          #+#    #+#             */
+/*   Updated: 2026/02/23 03:20:10 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cub3d.h"
-#include "../includes/inits.h"
 
-int main(int argc, char **argv) {
-  t_cub_data data;
+int	main(int argc, char **argv)
+{
+	t_cub_data	data;
 
-  ft_memset(&data, 0, sizeof(t_cub_data));
-  srand(time(NULL));
-  if (argc != 2) {
-    ft_putstr_fd("Usage: ./cub3d <map_file>\n", 2);
-    return (ERR_INVALID_ARG);
-  }
-
-  ft_putstr_fd("Game initialized with map: ", 1);
-  ft_putstr_fd(argv[1], 1);
-  ft_putchar_fd('\n', 1);
-
-  if (parse_cub_file(argv[1], &data) != ERR_NO_ERROR) {
-    ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
-    return (ERR_FILE_NOT_FOUND);
-  }
-
-  print_map_array(data.map);
-
-  // === INITIALIZE TRIG TABLES FIRST ===
-  printf("Initializing trigonometric lookup tables...\n");
-  if (!init_trig_table(&data)) {
-    ft_putstr_fd("Error: Failed to initialize trig tables\n", STDERR_FILENO);
-    return (ERR_MEMORY_ALLOCATION);
-  }
-  printf("Trig tables initialized successfully!\n");
-
-  // === NOW RUN MATH TESTS ===
-  run_all_math_tests(&data);
-
-  // start a window
-  init_game_window(&data);
-
-  // allocate pixel buffer
-  graphics_init(&data);
-
-  // init the fps sync
-  init_fps_sync(&data.fps);
-
-  //=== ENABLE DYNAMIC MAP TESTING ===
-  // init_dynamic_map_test(&data);
-
-  // hide mouse and center it so i can look freely and smoothly
-  mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
-  mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2,
-                 data.mlx->height / 2);
-
-  // register the renderer loop within the mlx_loop
-  mlx_loop_hook(data.mlx->mlx_ptr, (int (*)(void *))main_render_loop, &data);
-
-  // In main() function, update your hook registration:
-  mlx_hook(data.mlx->win_ptr, 2, 1L << 0, handle_key_press, &data); // Key press
-  mlx_hook(data.mlx->win_ptr, 3, 1L << 1, handle_key_release,
-           &data);                                          // Key release
-  mlx_hook(data.mlx->win_ptr, 17, 0L, handle_close, &data); // Window close
-  mlx_hook(data.mlx->win_ptr, 6, 1L << 6, handle_mouse_move,
-           &data); // Mouse motion
-  mlx_hook(data.mlx->win_ptr, 4, 1L << 2, handle_mouse_button,
-           &data); // Mouse button press
-  mlx_hook(data.mlx->win_ptr, 5, 1L << 3, handle_mouse_release,
-           &data); // Mouse button release
-
-  mlx_loop(data.mlx->mlx_ptr);
-
-  cleanup(&data);
-  return (ERR_NO_ERROR);
+	if (argc != 2)
+	{
+		ft_putstr_fd("Usage: ./cub3d <map.cub>\n", 1);
+		return (1);
+	}
+	ft_memset(&data, 0, sizeof(t_cub_data));
+	if (!parse_cub_file(argv[1], &data))
+		return (1);
+	init_game_window(&data);
+	graphics_init(&data);
+	init_fps_sync(&data);
+	mlx_loop_hook(data.mlx->mlx_ptr, main_loop, &data);
+	mlx_hook(data.mlx->win_ptr, 2, 1L << 0, handle_key_press, &data);
+	mlx_hook(data.mlx->win_ptr, 3, 1L << 1, handle_key_release, &data);
+	mlx_hook(data.mlx->win_ptr, 17, 0L, handle_close, &data);
+	mlx_hook(data.mlx->win_ptr, 6, 1L << 6, handle_mouse_move, &data);
+	mlx_hook(data.mlx->win_ptr, 4, 1L << 2, handle_mouse_button, &data);
+	mlx_hook(data.mlx->win_ptr, 5, 1L << 3, handle_mouse_release, &data);
+	mlx_loop(data.mlx->mlx_ptr);
+	cleanup_and_exit(&data);
+	return (0);
 }

@@ -15,15 +15,9 @@
 
 # include "cub3d.h"
 
-// Initialize player with default values
-t_player	*init_player(t_cub_data *data);
+t_player		*init_player(t_cub_data *data);
+void			draw_player(t_cub_data *data);
+void			print_player_coords(t_cub_data *data);
+void			calc_player_dirs(t_cub_data *data);
 
-// // draw the player on the screen
-void draw_player(t_cub_data *data);
-
-void print_player_coords(t_cub_data *data);
-
-void calc_player_dirs(t_cub_data *data);
-
-
-#endif /* PLAYER_H */ 
+#endif

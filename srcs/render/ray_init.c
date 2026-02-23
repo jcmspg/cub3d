@@ -6,16 +6,12 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 19:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:13:26 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 02:40:10 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cub3d.h"
 
-/**
- * Allocate the raycasting structure and ray array
- * Returns NULL on failure
- */
 t_raycasting *init_raycasting(int screen_width) {
   t_raycasting *rc;
 
@@ -31,9 +27,6 @@ t_raycasting *init_raycasting(int screen_width) {
   return (rc);
 }
 
-/**
- * Reset a single ray to default values before casting
- */
 void reset_ray(t_ray *ray) {
   ray->dir_x = 0;
   ray->dir_y = 0;
@@ -56,9 +49,6 @@ void reset_ray(t_ray *ray) {
   ray->hit_content = 0;
 }
 
-/**
- * Reset all rays in the array before a new frame
- */
 void reset_all_rays(t_raycasting *rc) {
   int i;
 
@@ -69,9 +59,6 @@ void reset_all_rays(t_raycasting *rc) {
   }
 }
 
-/**
- * Free the raycasting structure and ray array
- */
 void free_raycasting(t_raycasting *rc) {
   if (!rc)
     return;

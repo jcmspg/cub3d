@@ -3,64 +3,47 @@
 /*                                                        :::      ::::::::   */
 /*   weapon.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/08 17:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/08 17:00:00 by joamiran         ###   ########.fr       */
+/*   Created: 2026/01/24 21:30:00 by joamiran          #+#    #+#             */
+/*   Updated: 2026/02/23 02:55:10 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/render.h"
+#include "../../includes/cub3d.h"
 
-/**
- * Render a placeholder weapon (rectangle)
- */
-void render_weapon(t_cub_data *data) {
-  int w_width;
-  int w_height;
-  int x_start;
-  int y_start;
-  int x, y;
-  int color;
+static void draw_weapon_rect(t_cub_data *data, t_rect rect) {
+  int x;
+  int y;
 
-  // Dimensions relative to screen
-  w_width = data->mlx->width / 6;
-  w_height = data->mlx->height / 3;
-
-  // Position: Bottom center
-  x_start = (data->mlx->width / 2) - (w_width / 2);
-  // slightly offset to right like Doom/Wolf3D often is, or just center?
-  // User asked for "weapon texture placeholder.. for now leave it as a
-  // rectangle" Let's stick to center-ish right or center. Center is classic
-  // Wolf3D. Actually Wolf3D is center. Doom is center.
-
-  // Let's add extensive bobbing to make it feel "alive" later,
-  // for now static or simple bob from player
-
-  int bob_y = 0;
-  // Simple bobbing if moving
-  if (data->input->forward || data->input->backward || data->input->left ||
-      data->input->right)
-    bob_y = abs(data->player->bob_offset) * 2;
-
-  y_start = data->mlx->height - w_height + bob_y;
-
-  color = 0x555555; // Grey gun
-
-  // Draw rectangle
-  for (y = 0; y < w_height; y++) {
-    for (x = 0; x < w_width; x++) {
-      int screen_x = x_start + x;
-      int screen_y = y_start + y;
-
-      // Simple border check
-      if (x == 0 || x == w_width - 1 || y == 0)
-        mylx_pixel_put(data, screen_x, screen_y, 0x222222);
-      else
-        mylx_pixel_put(data, screen_x, screen_y, color);
+  y = rect.y;
+  while (y < rect.y + rect.height) {
+    x = rect.x;
+    while (x < rect.x + rect.width) {
+      mylx_pixel_put(data, x, y, rect.color);
+      x++;
     }
+    y++;
   }
+}
 
-  // Draw "muzzle" or something to distinguish front?
-  // Nah, just a box as requested.
+void render_weapon(t_cub_data *data) {
+  t_rect rect;
+  int bob;
+
+  if (!data || !data->player)
+    return;
+  bob = data->player->bob_offset;
+  rect.width = 120;
+  rect.height = 180;
+  rect.x = data->mlx->width / 2 - rect.width / 2;
+  rect.y = data->mlx->height - rect.height + bob;
+  rect.color = 0x333333;
+  draw_weapon_rect(data, rect);
+  rect.width = 40;
+  rect.height = 100;
+  rect.x = data->mlx->width / 2 - rect.width / 2;
+  rect.y = data->mlx->height - rect.height - 40 + bob;
+  rect.color = 0x111111;
+  draw_weapon_rect(data, rect);
 }
