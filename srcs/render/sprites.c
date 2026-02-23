@@ -29,17 +29,13 @@ static void draw_sprite_stripe(t_cub_data *data, int stripe, int draw_start,
 }
 
 /**
- * Render a single ammo box at (mx, my) formatted specifically as a small
- * rectangle
+ * Render a billboard sprite at world position (sx, sy) with given color
+ * Reusable for ammo boxes, enemies, etc.
  */
-static void render_ammo_sprite(t_cub_data *data, float sx, float sy) {
+static void render_billboard(t_cub_data *data, float sx, float sy, int color,
+                             int scale_div) {
   float spriteX = sx - from_fixed32(data->player->x);
   float spriteY = sy - from_fixed32(data->player->y);
-
-  // Transform sprite with inverse camera matrix
-  // [ planeX   dirX ] -1                                       [ dirY -dirX ]
-  // [ planeY   dirY ]       =  1/(planeX*dirY-dirX*planeY) *   [ -planeY planeX
-  // ]
 
   float dirX = from_fixed32(data->player->dir_x);
   float dirY = from_fixed32(data->player->dir_y);
@@ -51,19 +47,16 @@ static void render_ammo_sprite(t_cub_data *data, float sx, float sy) {
   float transformX = invDet * (dirY * spriteX - dirX * spriteY);
   float transformY = invDet * (-planeY * spriteX + planeX * spriteY);
 
-  if (transformY <= 0.1f) // Behind player or too close
+  if (transformY <= 0.1f)
     return;
 
   int spriteScreenX =
       (int)((data->mlx->width / 2) * (1 + transformX / transformY));
 
-  // Calculate height of the sprite on screen
-  // Using 0.2f as a scale factor for "small rectangle"
-  int spriteHeight = abs((int)(data->mlx->height / transformY)) / 4;
-  int spriteWidth = spriteHeight; // Square for now
+  int spriteHeight = abs((int)(data->mlx->height / transformY)) / scale_div;
+  int spriteWidth = spriteHeight;
 
   int draw_start_y = -spriteHeight / 2 + data->mlx->height / 2;
-  // Lower it towards the ground
   draw_start_y += (int)(data->mlx->height / (4 * transformY));
   if (draw_start_y < 0)
     draw_start_y = 0;
@@ -79,30 +72,44 @@ static void render_ammo_sprite(t_cub_data *data, float sx, float sy) {
   if (draw_end_x >= data->mlx->width)
     draw_end_x = data->mlx->width - 1;
 
-  // Golden color for ammo
-  int color = 0xFFD700;
-
-  // Loop through every vertical stripe of the sprite on screen
   for (int stripe = draw_start_x; stripe < draw_end_x; stripe++) {
-    // Check Z-buffer
-    if (transformY < from_fixed32(data->raycasting->rays[stripe].perp_dist)) {
+    if (transformY < from_fixed32(data->raycasting->rays[stripe].perp_dist))
       draw_sprite_stripe(data, stripe, draw_start_y, draw_end_y, color);
-    }
   }
 }
 
 /**
- * Scan map for 'M' and render them as billboards
+ * Render all sprites: ammo pickups + enemies
  */
 void render_sprites(t_cub_data *data) {
+  int x;
+  int y;
+  int i;
+
   if (!data || !data->map || !data->raycasting)
     return;
 
-  for (int y = 0; y < data->map->height; y++) {
-    for (int x = 0; x < data->map->width; x++) {
-      if (data->map->map_array[y * data->map->width + x] == 'M') {
-        render_ammo_sprite(data, (float)x + 0.5f, (float)y + 0.5f);
-      }
+  // Render ammo pickups
+  y = 0;
+  while (y < data->map->height) {
+    x = 0;
+    while (x < data->map->width) {
+      if (data->map->map_array[y * data->map->width + x] == 'M')
+        render_billboard(data, (float)x + 0.5f, (float)y + 0.5f, 0xFFD700, 4);
+      x++;
     }
+    y++;
+  }
+
+  // Render enemies
+  if (!data->game || !data->game->enemies)
+    return;
+  i = 0;
+  while (i < data->game->enemy_count) {
+    if (data->game->enemies[i].state != ENEMY_DEAD) {
+      render_billboard(data, from_fixed32(data->game->enemies[i].x),
+                       from_fixed32(data->game->enemies[i].y), 0xFF0000, 2);
+    }
+    i++;
   }
 }

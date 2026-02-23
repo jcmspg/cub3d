@@ -170,6 +170,8 @@ void draw_minimap_cell_at(t_cub_data *data, int map_x, int map_y, int screen_x,
       color = 0x8B4513; // Brown for doors
     else if (c == 'M')
       color = 0xFFD700; // Gold for ammo pickups
+    else if (c == 'X')
+      color = 0xFF0000; // Red for enemies
     else if (c == '0' || c == 'N' || c == 'S' || c == 'E' || c == 'W')
       color = 0x444444; // Gray for floor
     else

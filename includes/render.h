@@ -102,7 +102,10 @@ void free_textures(t_textures *textures);
 // Render all walls (ceiling + walls + floor) for the frame
 void render_walls(t_cub_data *data);
 
-// Render all sprites (ammo, etc.)
+// Render door overlays (separate pass, after sprites)
+void render_door_overlays(t_cub_data *data);
+
+// Render all sprites (ammo, enemies, etc.)
 void render_sprites(t_cub_data *data);
 
 // Render placeholder weapon (rect)

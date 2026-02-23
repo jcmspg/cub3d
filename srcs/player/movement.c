@@ -31,6 +31,9 @@ static bool check_collision(t_cub_data *data, int x, int y) {
     if (door && door->open_amount < 0.7f)
       return (true); // Collision if less than 70% open
   }
+  // Living enemies are solid
+  if (cell == 'X' && get_enemy_at(data, x, y))
+    return (true);
   return (false);
 }
 
@@ -62,13 +65,13 @@ static bool is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y) {
   // Check corners/buffer points
   // We need to check the grid cells that the buffer zone extends into
   if (check_collision(data, (int)(pos_x - buffer), (int)pos_y))
-    return false;
+    return (false);
   if (check_collision(data, (int)(pos_x + buffer), (int)pos_y))
-    return false;
+    return (false);
   if (check_collision(data, (int)pos_x, (int)(pos_y - buffer)))
-    return false;
+    return (false);
   if (check_collision(data, (int)pos_x, (int)(pos_y + buffer)))
-    return false;
+    return (false);
 
   return (true);
 }

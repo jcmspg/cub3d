@@ -15,6 +15,10 @@
 t_door *get_door_at(t_cub_data *data, int x, int y) {
   int i;
 
+  if (!data)
+    return (NULL);
+  if (!data->game)
+    return (NULL);
   if (!data->game->doors)
     return (NULL);
   i = 0;

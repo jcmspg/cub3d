@@ -263,10 +263,22 @@ static void render_column(t_cub_data *data, int x, t_ray *ray) {
     draw_wall_slice(data, x, ray);
   // Draw floor below the wall
   draw_floor_slice(data, x, draw_end);
+}
 
-  // OVERLAY: Draw door if we hit one
-  if (ray->door_hit)
-    draw_door_slice(data, x, ray);
+/**
+ * Render all door overlays as a separate pass (after sprites)
+ */
+void render_door_overlays(t_cub_data *data) {
+  int x;
+
+  if (!data || !data->raycasting || !data->raycasting->rays)
+    return;
+  x = 0;
+  while (x < data->raycasting->num_rays) {
+    if (data->raycasting->rays[x].door_hit)
+      draw_door_slice(data, x, &data->raycasting->rays[x]);
+    x++;
+  }
 }
 
 /**

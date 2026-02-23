@@ -29,11 +29,17 @@
 #define STRAFE_SPEED 0.02f
 #define ROTATE_SPEED 1.5f // degrees per frame
 #define SPRINT_MULTIPLIER 3.5f
-#define JUMP_HEIGHT 100    // pixels to offset view
-#define JUMP_DURATION 500  // ms for full jump arc
-#define BOB_AMPLITUDE 6    // pixels of vertical bounce
-#define BOB_FREQUENCY 2.0f // oscillations per second
-#define HEAD_BOB_ENABLED 1 // 1 = on, 0 = off
+#define JUMP_HEIGHT 100       // pixels to offset view
+#define JUMP_DURATION 500     // ms for full jump arc
+#define BOB_AMPLITUDE 6       // pixels of vertical bounce
+#define BOB_FREQUENCY 2.0f    // oscillations per second
+#define HEAD_BOB_ENABLED 1    // 1 = on, 0 = off
+#define AMMO_PICKUP_AMOUNT 42 // what else
+
+// Enemy defaults
+#define ENEMY_MAX_HEALTH 50
+#define ENEMY_DAMAGE 10
+#define ENEMY_AMMO 0
 
 // HUD settings
 #define HUD_HEIGHT 100            // height of HUD bar at bottom
@@ -313,8 +319,17 @@ typedef struct s_game {
   struct s_ray *rays; // array of rays, one per screen column
   t_door *doors;
   int door_count;
+  t_enemy *enemies;
+  int enemy_count;
 
 } t_game;
+
+// Enemy states
+#define ENEMY_IDLE 0
+#define ENEMY_CHASE 1
+#define ENEMY_ATTACK 2
+#define ENEMY_HIT 3
+#define ENEMY_DEAD 4
 
 typedef struct s_cub_data {
   // data struct for the trigonometric values

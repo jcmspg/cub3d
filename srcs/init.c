@@ -82,6 +82,12 @@ void init_game_window(t_cub_data *data) {
     cleanup_and_exit(data);
   }
 
+  // Initialize enemies
+  if (!init_enemies(data)) {
+    ft_putstr_fd("Error: Enemies initialization failed.\n", STDERR_FILENO);
+    cleanup_and_exit(data);
+  }
+
   // Initialize textures with default colors
   data->textures = init_textures();
   if (!data->textures) {

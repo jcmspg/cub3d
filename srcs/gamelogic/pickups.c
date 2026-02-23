@@ -38,7 +38,7 @@ void check_ammo_pickups(t_cub_data *data) {
   // If it's an ammo pickup
   if (*cell == 'M') {
     // Add ammo
-    data->player->stats.ammo += 42;
+    data->player->stats.ammo += AMMO_PICKUP_AMOUNT;
     if (data->player->stats.ammo > data->player->stats.max_ammo)
       data->player->stats.ammo = data->player->stats.max_ammo;
 

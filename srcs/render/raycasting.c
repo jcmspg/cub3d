@@ -28,5 +28,6 @@ void start_rays(t_cub_data *data) {
   cast_all_rays(data);
   render_walls(data);
   render_sprites(data);
+  render_door_overlays(data);
   render_weapon(data);
 }
