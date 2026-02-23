@@ -11,10 +11,10 @@ build/
 *.log
 
 #ignore environment files
-.env
+*.env
 
 #igonore object files
-.o
+.*o
 
 #ignore executable files
 a.out

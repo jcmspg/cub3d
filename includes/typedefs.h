@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:24:02 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,12 @@
 #define BOB_AMPLITUDE 6    // pixels of vertical bounce
 #define BOB_FREQUENCY 2.0f // oscillations per second
 #define HEAD_BOB_ENABLED 1 // 1 = on, 0 = off
+#define AMMO_PICKUP_AMOUNT 42
+
+// Enemy defaults
+#define ENEMY_MAX_HEALTH 50
+#define ENEMY_DAMAGE 10
+#define ENEMY_AMMO 0
 
 // HUD settings
 #define HUD_HEIGHT 100            // height of HUD bar at bottom
@@ -210,13 +216,21 @@ typedef struct s_character {
   int damage;
 } t_character;
 
+typedef enum e_enemy_state {
+  ENEMY_IDLE,
+  ENEMY_CHASE,
+  ENEMY_ATTACK,
+  ENEMY_HIT,
+  ENEMY_DEAD
+} t_enemy_state;
+
 typedef struct s_enemy {
   t_fixed32 x;
   t_fixed32 y;
   t_fixed32 dir_x;
   t_fixed32 dir_y;
   t_character stats;
-  int state; // 0=Idle, 1=Chase, 2=Attack, 3=Hit, 4=Dead
+  t_enemy_state state;
   int id;
 } t_enemy;
 
@@ -313,7 +327,8 @@ typedef struct s_game {
   struct s_ray *rays; // array of rays, one per screen column
   t_door *doors;
   int door_count;
-
+  t_enemy *enemies;
+  int enemy_count;
 } t_game;
 
 typedef struct s_cub_data {

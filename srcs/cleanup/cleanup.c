@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 17:32:32 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:36:50 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,13 @@ int	cleanup_game(t_game *game)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_game\n");
 	if (game)
+	{
+		if (game->doors)
+			free(game->doors);
+		if (game->enemies)
+			free(game->enemies);
 		free(game);
+	}
 	return (ERR_NO_ERROR);
 }
 

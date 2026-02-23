@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/11/01 17:38:29 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 static bool check_collision(t_cub_data *data, int x, int y) {
   char cell;
   t_door *door;
+  t_enemy *enemy;
 
   if (x < 0 || x >= data->map->width || y < 0 || y >= data->map->height)
     return (true);
@@ -29,7 +30,13 @@ static bool check_collision(t_cub_data *data, int x, int y) {
   if (cell == 'D') {
     door = get_door_at(data, x, y);
     if (door && door->open_amount < 0.7f)
-      return (true); // Collision if less than 70% open
+      return (true);
+  }
+  // Check for living enemy at this position (skip if game not initialized)
+  if (data->game && data->game->enemies) {
+    enemy = get_enemy_at(data, x, y);
+    if (enemy)
+      return (true);
   }
   return (false);
 }

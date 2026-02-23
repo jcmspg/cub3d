@@ -11,9 +11,12 @@ This document provides comprehensive technical documentation for the Cub3D rayca
 3. [Fixed-Point Arithmetic Implementation](#fixed-point-arithmetic-implementation)
 4. [Trigonometric Optimization](#trigonometric-optimization)
 5. [Raycasting Algorithm](#raycasting-algorithm)
-6. [Memory Management Strategy](#memory-management-strategy)
-7. [Performance Considerations](#performance-considerations)
-8. [Cross-Platform Compatibility](#cross-platform-compatibility)
+6. [Sprite Rendering System](#sprite-rendering-system)
+7. [Enemy System Architecture](#enemy-system-architecture)
+8. [Door System](#door-system)
+9. [Memory Management Strategy](#memory-management-strategy)
+10. [Performance Considerations](#performance-considerations)
+11. [Cross-Platform Compatibility](#cross-platform-compatibility)
 
 ---
 
@@ -475,6 +478,214 @@ t_fixed32 current_y = to_fixed32(11.5f);
 
 This complete pipeline demonstrates how the three coordinate systems work together to create efficient, deterministic raycasting with sub-pixel precision and optimal performance.
 
+---
+
+## Sprite Rendering System
+
+### Billboard Rendering Approach
+
+Sprites (enemies, ammo, items) are rendered as **billboards** — 2D images that always face the player:
+
+```
+Player View:
+                    ┌───────────────────────┐
+                    │     SCREEN            │
+                    │                       │
+          Wall ────►│▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│
+                    │▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│
+      Sprite ──────►│▓▓▓▓▓▓▓▓[ENEMY]▓▓▓▓▓▓▓▓│
+                    │▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│
+                    └───────────────────────┘
+```
+
+### Sprite Rendering Pipeline
+
+```c
+// 1. Calculate sprite position relative to player
+sprite_x = sprite->world_x - player->x;
+sprite_y = sprite->world_y - player->y;
+
+// 2. Transform to camera space
+inv_det = 1.0 / (plane_x * dir_y - dir_x * plane_y);
+transform_x = inv_det * (dir_y * sprite_x - dir_x * sprite_y);
+transform_y = inv_det * (-plane_y * sprite_x + plane_x * sprite_y);
+
+// 3. Calculate screen X position
+screen_x = (screen_width / 2) * (1 + transform_x / transform_y);
+
+// 4. Calculate sprite dimensions based on distance
+sprite_height = abs((int)(screen_height / transform_y)) / scale_div;
+sprite_width = abs((int)(screen_height / transform_y)) / scale_div;
+```
+
+### Distance Sorting (Painter's Algorithm)
+
+Sprites are sorted by distance to render far objects first:
+
+```c
+// Sort sprites by distance (furthest first)
+for (int i = 0; i < sprite_count; i++) {
+    sprite_distances[i] = calculate_distance(player, &sprites[i]);
+}
+// Render from far to near (painter's algorithm)
+```
+
+### View Offset Compensation
+
+Sprites account for player jumping and head-bobbing effects:
+
+```c
+// Calculate vertical position with view offset
+int view_offset = data->player->view_offset + data->player->bob_offset;
+int start_y = sprite->draw_start_y - view_offset;
+int end_y = sprite->draw_end_y - view_offset;
+```
+
+---
+
+## Door System
+
+### Door States and Animation
+
+Doors transition through states with smooth animation:
+
+```c
+typedef enum e_door_state
+{
+    DOOR_CLOSED,
+    DOOR_OPENING,
+    DOOR_OPEN,
+    DOOR_CLOSING
+} t_door_state;
+
+typedef struct s_door
+{
+    int x, y;              // Grid position
+    t_door_state state;    // Current state
+    float open_percent;    // 0.0 (closed) to 1.0 (open)
+} t_door;
+```
+
+### Per-Scanline Door Occlusion
+
+The most complex rendering feature: sprites behind doors are partially visible based on door animation state.
+
+```c
+// Calculate how much of the screen column the door covers
+void get_door_coverage(t_cub_data *data, int stripe,
+                       int *door_top, int *door_bottom)
+{
+    // Cast ray to find door position
+    // Calculate door's screen coverage at this stripe
+    // Return pixel range where door is visible
+}
+
+// Draw sprite stripe with door occlusion
+void draw_sprite_stripe_occluded(t_cub_data *data, t_sprite *sprite,
+                                  int stripe, int door_top, int door_bottom)
+{
+    for (int y = sprite->draw_start_y; y < sprite->draw_end_y; y++)
+    {
+        // Skip pixels covered by door
+        if (y >= door_top && y <= door_bottom)
+            continue;
+        
+        // Draw visible pixels normally
+        draw_sprite_pixel(data, sprite, stripe, y);
+    }
+}
+```
+
+**Visual Example:**
+```
+Door Opening Animation:
+ 
+Frame 1 (Closed):     Frame 2 (25%):      Frame 3 (75%):      Frame 4 (Open):
+ ┌─────────────┐      ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+ │█████████████│      │████     ████│     │██         ██│     │             │
+ │█████████████│      │████[ENM]████│     │██ [ENEMY] ██│     │  [ENEMY]    │
+ │█████████████│      │████     ████│     │██         ██│     │             │
+ └─────────────┘      └─────────────┘     └─────────────┘     └─────────────┘
+  Door hides enemy    Partial visibility  More visibility     Full sprite shown
+```
+
+---
+
+## Enemy System Architecture
+
+### Enemy Data Structure
+
+```c
+typedef enum e_enemy_state
+{
+    ENEMY_IDLE,
+    ENEMY_PATROL,
+    ENEMY_CHASE,
+    ENEMY_ATTACK,
+    ENEMY_HURT,
+    ENEMY_DEAD
+} t_enemy_state;
+
+typedef struct s_enemy
+{
+    t_fixed32     x, y;           // World position (fixed-point)
+    int           map_x, map_y;   // Grid position
+    t_enemy_state state;          // Current state
+    int           health;         // Current health
+    int           max_health;     // Maximum health (ENEMY_MAX_HEALTH = 50)
+    float         distance;       // Distance to player (for sorting)
+} t_enemy;
+```
+
+### Enemy Initialization from Map
+
+Enemies are spawned from `'X'` markers in the map file:
+
+```c
+int init_enemies(t_game *game, t_map *map)
+{
+    // 1. Count enemy markers ('X') in map
+    int count = count_enemies(map);
+    
+    // 2. Allocate enemy array
+    game->enemies = malloc(sizeof(t_enemy) * count);
+    game->enemy_count = count;
+    
+    // 3. Initialize each enemy at map position
+    for (int i = 0; i < map->width * map->height; i++)
+    {
+        if (map->map_array[i] == 'X')
+        {
+            int x, y;
+            index_to_coords(i, map->width, &x, &y);
+            init_enemy_at_position(&game->enemies[idx++], x, y);
+        }
+    }
+    return (0);
+}
+```
+
+### Enemy Collision Detection
+
+Players cannot walk through enemies:
+
+```c
+// In movement.c - check_collision()
+t_enemy *enemy = get_enemy_at(data, grid_x, grid_y);
+if (enemy != NULL && enemy->state != ENEMY_DEAD)
+    return (1);  // Collision detected - block movement
+```
+
+### Enemy Constants
+
+```c
+#define ENEMY_MAX_HEALTH  50   // Starting health
+#define ENEMY_DAMAGE      10   // Damage dealt to player
+#define ENEMY_AMMO        0    // Ammo drop on death (configurable)
+```
+
+---
+
 ## Memory Management Strategy
 
 ### Dynamic Memory Allocation
@@ -598,29 +809,42 @@ The architecture is specifically designed for the 42 school evaluation environme
 
 ## Implementation Timeline
 
-### Phase 1: Foundation (Complete ✅)
+### Phase 1: Foundation ✅
 - [x] Map parsing and validation system
 - [x] Memory management architecture
 - [x] Coordinate conversion functions
 - [x] Debug visualization tools
 
-### Phase 2: Mathematics (In Progress 🚧)
-- [ ] Fixed-point arithmetic integration
-- [ ] Trigonometric lookup table implementation
-- [ ] Player positioning system
-- [ ] Basic collision detection
+### Phase 2: Mathematics ✅
+- [x] Fixed-point arithmetic integration
+- [x] Trigonometric lookup table implementation
+- [x] Player positioning system
+- [x] Basic collision detection
 
-### Phase 3: Raycasting (Planned 🔮)
-- [ ] DDA algorithm implementation
-- [ ] Wall distance calculations
-- [ ] Texture mapping system
-- [ ] 3D rendering pipeline
+### Phase 3: Raycasting ✅
+- [x] DDA algorithm implementation
+- [x] Wall distance calculations
+- [x] Texture mapping system
+- [x] 3D rendering pipeline
 
-### Phase 4: Optimization (Future 🎯)
+### Phase 4: Interactive Elements ✅
+- [x] Door system with animation
+- [x] Ammo pickup system
+- [x] HUD rendering (health, ammo, crosshair)
+- [x] Player jump and view bobbing
+
+### Phase 5: Sprites & Enemies ✅
+- [x] Billboard sprite rendering
+- [x] Enemy initialization from map
+- [x] Sprite depth sorting (painter's algorithm)
+- [x] Per-scanline door occlusion
+- [x] Enemy collision blocking
+
+### Phase 6: Optimization (In Progress 🚧)
+- [ ] Enemy AI and pathfinding
+- [ ] Enemy attack behavior
+- [ ] Sound system integration
 - [ ] Performance profiling and optimization
-- [ ] Advanced rendering features
-- [ ] Platform-specific optimizations
-- [ ] Comprehensive testing suite
 
 ## Mathematical Foundations
 
@@ -812,7 +1036,17 @@ The design decisions prioritize:
 - **Maintainability**: Clear code organization for easy debugging and extension
 - **Educational Value**: Transparent implementation of computer graphics concepts
 
-**Next Steps**: Implement the raycasting core using this mathematical foundation, followed by texture mapping and advanced rendering features.
+### Implemented Features
+
+- **Raycasting Engine**: DDA-based wall rendering with textured surfaces
+- **Sprite System**: Billboard rendering with distance sorting and door occlusion
+- **Enemy System**: Map-based spawning, collision detection, state management
+- **Interactive Elements**: Animated doors, collectible ammo, HUD display
+- **Player Mechanics**: Movement, collision, jumping, shooting
+
+### Next Steps
+
+Implementation of enemy AI behavior including pathfinding, attack patterns, and sound system integration.
 
 ---
 
