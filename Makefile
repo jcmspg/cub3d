@@ -6,18 +6,19 @@
 #    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2025/11/01 18:02:48 by hladeiro         ###   ########.fr        #
+#    Updated: 2026/01/24 21:35:00 by joamiran         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cuboid
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=gnu99
 
 SRC_DIR = ./srcs
 OBJ_DIR = ./obj
 INC_DIR = ./includes
 
+# Automatically find all .c files in subdirectories of srcs
 SRC = $(shell find $(SRC_DIR) -name "*.c")
 OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
 
@@ -63,7 +64,9 @@ $(PMFP): | check_pmfp
 	$(MAKE) -C $(PMFP_DIR)
 
 $(MLX): | check_mlx
-	$(MAKE) -C $(MLX_DIR)
+	@if [ ! -f "$(MLX)" ]; then \
+		cd $(MLX_DIR) && ./configure 2>/dev/null || true; \
+	fi
 
 # Check if libft exists in the specified directory if not clone it automatically
 check_libft:
@@ -141,4 +144,3 @@ mlx_clean:
 	fi
 
 .PHONY: all clean fclean re check_libft check_pmfp check_mlx libft_clean pmfp_clean mlx_clean
-

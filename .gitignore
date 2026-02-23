@@ -13,6 +13,9 @@ build/
 #ignore environment files
 .env
 
+#igonore object files
+.o
+
 #ignore executable files
 a.out
 cuboid

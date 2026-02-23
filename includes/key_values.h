@@ -6,53 +6,59 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 18:33:02 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 18:43:21 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/01/24 20:07:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef KEY_VALUES_H
-# define KEY_VALUES_H
+#define KEY_VALUES_H
 
-# include "cub3d.h"
+#include "cub3d.h"
 
-# if defined(__APPLE__) && defined(__MACH__)
-#  define KEY_ESC 53
-#  define KEY_W 13
-#  define KEY_A 0
-#  define KEY_S 1
-#  define KEY_D 2
-#  define KEY_LEFT 123
-#  define KEY_RIGHT 124
-#  define KEY_UP 126
-#  define KEY_DOWN 125
-#  define KEY_SPACE 32
-#  define KEY_ENTER 65293
-#  define KEY_E 14
-#  define KEY_Q 12
-#  define MOUSE_LEFT 10000
-#  define MOUSE_RIGHT 30000
-#  define MOUSE_MIDDLE 2000
-#  define MOUSE_SCROLL_UP 4000
-#  define MOUSE_SCROLL_DOWN 5000
-# else
-#  define KEY_ESC 65307
-#  define KEY_W 119
-#  define KEY_A 97
-#  define KEY_S 115
-#  define KEY_D 100
-#  define KEY_LEFT 65361
-#  define KEY_RIGHT 65363
-#  define KEY_UP 65362
-#  define KEY_DOWN 65364
-#  define KEY_SPACE 32
-#  define KEY_ENTER 65293
-#  define KEY_E 101
-#  define KEY_Q 113
-#  define MOUSE_LEFT 1
-#  define MOUSE_RIGHT 3
-#  define MOUSE_MIDDLE 2
-#  define MOUSE_SCROLL_UP 4
-#  define MOUSE_SCROLL_DOWN 5
-# endif
+#if defined(__APPLE__) && defined(__MACH__)
+#define KEY_ESC 53
+#define KEY_W 13
+#define KEY_A 0
+#define KEY_S 1
+#define KEY_D 2
+#define KEY_LEFT 123
+#define KEY_RIGHT 124
+#define KEY_UP 126
+#define KEY_DOWN 125
+#define KEY_SPACE 32
+#define KEY_ENTER 65293
+#define KEY_E 14
+#define KEY_Q 12
+#define KEY_SHIFT 56
+#define KEY_CTRL_L 256
+#define KEY_CTRL_R 269
+#define MOUSE_LEFT 10000
+#define MOUSE_RIGHT 30000
+#define MOUSE_MIDDLE 2000
+#define MOUSE_SCROLL_UP 4000
+#define MOUSE_SCROLL_DOWN 5000
+#else
+#define KEY_ESC 65307
+#define KEY_W 119
+#define KEY_A 97
+#define KEY_S 115
+#define KEY_D 100
+#define KEY_LEFT 65361
+#define KEY_RIGHT 65363
+#define KEY_UP 65362
+#define KEY_DOWN 65364
+#define KEY_SPACE 32
+#define KEY_ENTER 65293
+#define KEY_E 101
+#define KEY_Q 113
+#define KEY_SHIFT 65505
+#define KEY_CTRL_L 65507
+#define KEY_CTRL_R 65508
+#define MOUSE_LEFT 1
+#define MOUSE_RIGHT 3
+#define MOUSE_MIDDLE 2
+#define MOUSE_SCROLL_UP 4
+#define MOUSE_SCROLL_DOWN 5
+#endif
 
 #endif /* KEY_VALUES_H */

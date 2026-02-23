@@ -143,14 +143,14 @@
 | Map Parsing           | ✅ Complete     | 100% |
 | Fixed-Point Math      | ✅ Complete     | 100% |
 | Basic Trigonometry    | ✅ Complete     | 100% |
-| **Enhanced Trigonometry** | ❌ Not Started | 0% |
+| **Enhanced Trigonometry** | ✅ Complete     | 100% |
 | Coordinate System     | ✅ Complete     | 100% |
 | Input System          | ✅ Complete     | 100% |
 | Mouse Controls        | ✅ Complete     | 100% |
 | 2D Rendering          | ✅ Complete     | 100% |
 | Game Loop / FPS       | ✅ Complete     | 100% |
 | Player System         | ✅ Complete     | 100% |
-| **3D Raycasting**     | ❌ Not Started  | 0% |
+| **3D Raycasting**     | 🚧 In Progress  | 50% |
 | **Textures**          | ❌ Not Started  | 0% |
 | Cross-Platform        | ✅ Complete     | 100% |
 
