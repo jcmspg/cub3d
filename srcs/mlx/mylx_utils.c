@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 18:30:16 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:17:14 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 03:46:22 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ int mylx_destroy_window(t_cub_data *data) {
     return (ERR_WINDOW_DESTROY);
   if (data && data->mlx && data->mlx->win_ptr) {
     mlx_destroy_window(data->mlx->mlx_ptr, data->mlx->win_ptr);
+    free(data->mlx->win_ptr);
     data->mlx->win_ptr = NULL;
     return (ERR_NO_ERROR);
   }

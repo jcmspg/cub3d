@@ -1,13 +1,15 @@
 # Cub3D
 
-> **🚧 Work in Progress**  
-> This project is currently under development. Some features may be incomplete or subject to change.
+> **🎮 Playable Demo Available**  
+> Core gameplay features implemented: raycasting, enemies, doors, ammo boxes, combat system.
 
+---
+![purgetheheretics](assets/textures/splash_art.png)
 ---
 
 ![42](https://img.shields.io/badge/42-joamiran-blue.svg?style=flat-square) ![42 Lisboa](https://img.shields.io/badge/42-Lisboa-blue.svg?style=flat-square) ![GitHub](https://img.shields.io/github/license/joamiran/cub3d?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/joamiran/cub3d?style=flat-square)
-![C-lang](https://img.shields.io/badge/language-C-blue.svg?style=flat-square) ![Status](https://img.shields.io/badge/status-map%20parsing%20complete-green.svg?style=flat-square)
-![Version](https://img.shields.io/badge/version-0.2.0-blue.svg?style=flat-square)
+![C-lang](https://img.shields.io/badge/language-C-blue.svg?style=flat-square) ![Status](https://img.shields.io/badge/status-combat%20system%20complete-brightgreen.svg?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.4.1-blue.svg?style=flat-square)
 ![Project](https://img.shields.io/badge/project-Cub3D-blue.svg?style=flat-square)
 
 ---
@@ -62,19 +64,19 @@ The project provides hands-on experience with low-level graphics programming and
 
 ### 🚧 In Development
 
-- [ ] Player initialization and positioning
-- [ ] Raycasting engine
+- [x] Player initialization and positioning
+- [x] Raycasting engine
 - [ ] Texture loading and mapping
-- [ ] Wall rendering
-- [ ] Player movement system
-- [ ] Collision detection
-- [ ] Input handling (WASD, mouse)
+- [x] Wall rendering
+- [x] Player movement system
+- [x] Collision detection
+- [x] Input handling (WASD, mouse)
 
 ### 🔮 Planned
 
 - [ ] Floor and ceiling rendering
 - [ ] Sprite support
-- [ ] Minimap display
+- [?] Minimap display
 - [ ] Sound effects
 - [ ] Performance optimizations
 
@@ -177,8 +179,10 @@ C 225,30,0
 - **C**: Ceiling color (R,G,B format)
 - **1**: Wall
 - **0**: Empty space
-- **2**: Sprite/Item (optional)
-- **N/S/E/W**: Player starting position and orientation
+- **D**: Door (interactive, animated)
+- **M**: Ammo pickup (ammunition sprite)
+- **X**: Enemy spawn point
+- **N/S/E/W**: Player starting position and orientation (facing North/South/East/West)
 - **Space**: Valid empty space within the map
 
 ### Map Validation
@@ -209,14 +213,24 @@ cub3d/
 │   ├── main.c                # Entry point
 │   ├── init.c                # Game initialization
 │   ├── map/                  # Map-related functions ✅
-│   │   ├── map_parse.c       # Map file parsing (COMPLETE)
+│   │   ├── map_parse.c       # Map file parsing
 │   │   ├── map_validate.c    # Map validation
 │   │   └── map_utils.c       # Map utilities
 │   ├── debugging/            # Debug tools ✅
 │   │   └── print_map.c       # Map visualization
-│   ├── render/               # Rendering engine 🚧
-│   ├── player/               # Player management 🔮
-│   ├── mlx/                  # MLX integration
+│   ├── render/               # Rendering engine ✅
+│   │   ├── render.c          # Main render loop
+│   │   ├── raycast.c         # DDA raycasting
+│   │   ├── sprites.c         # Billboard sprite rendering
+│   │   └── draw_*.c          # Drawing utilities
+│   ├── player/               # Player management ✅
+│   │   ├── movement.c        # Movement and collision
+│   │   └── shooting.c        # Combat mechanics
+│   ├── gamelogic/            # Game systems ✅
+│   │   ├── enemies_init.c    # Enemy initialization
+│   │   ├── doors.c           # Door mechanics
+│   │   └── ammo.c            # Pickup system
+│   ├── mlx/                  # MLX integration ✅
 │   │   └── mylx_utils.c      # MLX utilities
 │   └── cleanup/              # Memory management ✅
 │       └── cleanup.c         # Resource cleanup
@@ -280,21 +294,24 @@ make
 
 ## Controls
 
-### Planned Controls
+### Implemented Controls
 
-| Key   | Action        |
-| ----- | ------------- |
-| `W`   | Move forward  |
-| `S`   | Move backward |
-| `A`   | Strafe left   |
-| `D`   | Strafe right  |
-| `←`   | Turn left     |
-| `→`   | Turn right    |
-| `ESC` | Exit game     |
+| Key         | Action                    |
+| ----------- | ------------------------- |
+| `W`         | Move forward              |
+| `S`         | Move backward             |
+| `A`         | Strafe left               |
+| `D`         | Strafe right              |
+| `←`         | Turn left                 |
+| `→`         | Turn right                |
+| `Space`     | Jump                      |
+| `E`         | Interact (open doors)     |
+| `LMB/Click` | Shoot                     |
+| `ESC`       | Exit game                 |
 
 ## Development Status
 
-### Current Phase: **Map Parsing Complete** ✅
+### Current Phase: **Combat System & Enemies** ✅
 
 - [x] Project structure organized
 - [x] Makefile configured with auto-dependency management
@@ -305,34 +322,88 @@ make
 - [x] **Debug visualization tools**
 - [x] **Error handling and reporting**
 
-### Next Phase: **Raycasting Engine** 🚧
+### Raycasting Engine ✅
 
-- [ ] Implement raycasting algorithm
-- [ ] Create player initialization system
-- [ ] Add texture loading functionality
-- [ ] Develop wall rendering system
+- [x] DDA raycasting algorithm implementation
+- [x] Player initialization and positioning system
+- [x] Texture loading (XPM format)
+- [x] Textured wall rendering with proper orientation
+- [x] Floor and ceiling rendering
 
-### Future Phases: **Enhancement & Polish** 🔮
+### Player & Movement ✅
 
-- [ ] Player movement and collision detection
-- [ ] Performance optimizations
-- [ ] Advanced features (sprites, effects)
-- [ ] Documentation completion
+- [x] Player movement (WASD + arrow keys)
+- [x] Collision detection with walls
+- [x] Enemy collision blocking
+- [x] View bobbing and head movement
+- [x] Jump mechanics with view offset
 
-## Technical Details
+### Interactive Elements ✅
 
-### Map Parsing Architecture
+- [x] **Doors**: Animated opening/closing with `D` marker
+- [x] **Ammo pickups**: Collectible sprites with `M` marker
+- [x] **HUD system**: Health, ammo, and crosshair display
+
+### Sprite & Enemy System ✅
+
+- [x] Billboard sprite rendering for items and enemies
+- [x] Enemy initialization from map (`X` marker)
+- [x] Enemy collision detection
+- [x] Per-scanline door occlusion (sprites properly render behind doors)
+- [x] Sprite sorting by distance (painter's algorithm)
+- [x] View offset compensation for jumping/bobbing
+
+### Combat System ✅
+
+- [x] Shooting mechanics with click/key input
+- [x] Ammo management and pickup system
+- [x] Enemy health tracking
+- [x] Combat constants (damage, health values)
+
+### Future Phases: **Polish & Optimization** 🔮
+
+- [ ] Enemy AI and pathfinding
+- [ ] Enemy attack behavior
+- [ ] Sound effects and music
+- [ ] Additional weapon types
+- [ ] Performance profiling and optimization
+
+### Bonus: **Portal System** 🌀 (Experimental)
+
+- [ ] Portal placement (aim + click on walls)
+- [ ] Portal pair linking (blue/orange)
+- [ ] View-through rendering (see other side)
+- [ ] Teleportation mechanics
+- [ ] Momentum preservation
+
+> See [THINKING_IN_PORTALS.md](THINKING_IN_PORTALS.md) for design documentation.
+
+### Map Parsing & Rendering Architecture
 
 - **Two-pass parsing**: First pass counts dimensions, second pass populates data
 - **Memory-safe allocation**: Proper cleanup on all error paths
 - **Validation pipeline**: Multiple validation stages with detailed error reporting
 - **Line normalization**: All map lines padded to consistent width
 
+### Raycasting Engine
+
+- **DDA Algorithm**: Digital Differential Analyzer for efficient ray-wall intersection
+- **Fixed-Point Arithmetic**: 16.16 format for deterministic calculations
+- **Per-Column Rendering**: Each screen column casts one ray
+- **Texture Mapping**: Wall textures sampled based on ray hit position
+
+### Sprite Rendering System
+
+- **Billboard Rendering**: Sprites always face the player
+- **Distance Sorting**: Painter's algorithm renders far sprites first
+- **Door Occlusion**: Per-scanline calculation ensures sprites render correctly behind doors
+- **View Offset Compensation**: Sprites account for jump/bob effects
+
 ### Graphics Library
 
 - **MinilibX**: Lightweight graphics library for X11
-- **Raycasting**: Primary rendering technique (planned)
-- **Texture Mapping**: XPM format support (planned)
+- **Double Buffering**: Smooth frame rendering
+- **XPM Textures**: Support for XPM image format
 
 ### Mathematical Libraries
 
@@ -377,14 +448,24 @@ cub3d/
 │   ├── main.c                # Entry point
 │   ├── init.c                # Game initialization
 │   ├── map/                  # Map-related functions ✅
-│   │   ├── map_parse.c       # Map file parsing (COMPLETE)
+│   │   ├── map_parse.c       # Map file parsing
 │   │   ├── map_validate.c    # Map validation
 │   │   └── map_utils.c       # Map utilities
 │   ├── debugging/            # Debug tools ✅
 │   │   └── print_map.c       # Map visualization
-│   ├── render/               # Rendering engine 🚧
-│   ├── player/               # Player management 🔮
-│   ├── mlx/                  # MLX integration
+│   ├── render/               # Rendering engine ✅
+│   │   ├── render.c          # Main render loop
+│   │   ├── raycast.c         # DDA raycasting
+│   │   ├── sprites.c         # Billboard sprite rendering
+│   │   └── draw_*.c          # Drawing utilities
+│   ├── player/               # Player management ✅
+│   │   ├── movement.c        # Movement and collision
+│   │   └── shooting.c        # Combat mechanics
+│   ├── gamelogic/            # Game systems ✅
+│   │   ├── enemies_init.c    # Enemy initialization
+│   │   ├── doors.c           # Door mechanics
+│   │   └── ammo.c            # Pickup system
+│   ├── mlx/                  # MLX integration ✅
 │   │   └── mylx_utils.c      # MLX utilities
 │   └── cleanup/              # Memory management ✅
 │       └── cleanup.c         # Resource cleanup
@@ -476,6 +557,6 @@ Created for educational purposes as part of the 42 school curriculum. Please res
 
 ---
 
-**Last Updated**: July 29, 2025  
-**Version**: 0.2.0  
-**Status**: 🚧 Map Parsing Complete - Raycasting Engine Next
+**Last Updated**: February 23, 2026  
+**Version**: 0.4.1  
+**Status**: ✅ Combat System Complete - Enemy AI Next

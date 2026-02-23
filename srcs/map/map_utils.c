@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/07/29 19:32:23 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/02/23 03:32:08 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ bool is_empty_line(const char *line) {
 // Checks if a character is valid in the map
 bool is_valid_map_char(char c) {
   if (c == '0' || c == '1' || c == '2' || c == 'N' || c == 'S' || c == 'E' ||
-      c == 'W' || c == ' ' || c == 'D' || c == 'M')
+      c == 'W' || c == ' ' || c == 'D' || c == 'M' || c == 'X')
     return true;
   return false;
 }
