@@ -174,6 +174,9 @@ int	mylx_update_scene(t_cub_data *data)
 	// cleans the image
 	mylx_clear_image(data);
 	
+	// draw 3D walls if ray data is available
+	draw_walls_textured(data);
+
 	// Draw your map grid for debugging
 	draw_map_grid(data);
 	update_game_logic(data);

@@ -16,6 +16,8 @@
 
 #include "cub3d.h"
 
+int		init_textures(t_cub_data *data);
+void	draw_walls_textured(t_cub_data *data);
 
 
 #endif /* RENDER_H */

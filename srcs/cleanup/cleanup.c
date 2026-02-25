@@ -78,11 +78,15 @@ int	cleanup_graphics(t_graphics *graphics)
 	return (ERR_NO_ERROR);
 }
 
-int	cleanup_textures(t_texture *textures)
+int	cleanup_textures(t_cub_data *data)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_textures\n");
-	// * to do * //
-	(void)textures;
+	if (!data || !data->textures)
+		return (ERR_NO_ERROR);
+	if (data->mlx && data->mlx->mlx_ptr && data->textures[0].img)
+		mlx_destroy_image(data->mlx->mlx_ptr, data->textures[0].img);
+	free(data->textures);
+	data->textures = NULL;
 	return (ERR_NO_ERROR);
 }
 
@@ -140,7 +144,7 @@ int	cleanup(t_cub_data *data)
 	if (data->input)
 		cleanup_input(data->input);
 	if (data->textures)
-		cleanup_textures(data->textures);
+		cleanup_textures(data);
 	if (data->sprites)
 		cleanup_sprites(data->sprites);
 	if (data->raycasting)

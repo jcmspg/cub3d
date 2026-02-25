@@ -111,6 +111,11 @@ void	init_game_window(t_cub_data *data)
 		ft_putstr_fd("Error: MLX initialization failed.\n", STDERR_FILENO);
 		exit(ERR_MLX_INIT);
 	}
+	if (init_textures(data) != ERR_NO_ERROR)
+	{
+		ft_putstr_fd("Error: Texture loading failed.\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
 	if (mylx_create_window(data) != ERR_NO_ERROR)
 		exit(ERR_WINDOW_CREATE);
 	mylx_create_image(data);

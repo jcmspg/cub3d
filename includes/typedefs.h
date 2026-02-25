@@ -101,6 +101,17 @@ typedef struct s_image_data
 	int						endian;
 }							t_img_data;
 
+typedef struct s_texture
+{
+	void					*img;
+	char					*address;
+	int						width;
+	int						height;
+	int						bits_per_pixel;
+	int						line_length;
+	int						endian;
+} 							t_texture;
+
 typedef struct s_mlx
 {
 	int						width;
@@ -134,7 +145,6 @@ typedef struct s_fps_data
 
 // Forward declarations for types that will be defined later
 typedef struct s_map		t_map;
-typedef struct s_texture	t_texture;
 typedef struct s_sprite		t_sprite;
 
 typedef struct s_input
