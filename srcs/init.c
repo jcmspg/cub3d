@@ -88,10 +88,10 @@ void init_game_window(t_cub_data *data) {
     cleanup_and_exit(data);
   }
 
-  // Initialize textures with default colors
-  data->textures = init_textures();
+  // Textures are already initialized in main before parsing
+  // Just verify they exist
   if (!data->textures) {
-    ft_putstr_fd("Error: Textures initialization failed.\n", STDERR_FILENO);
+    ft_putstr_fd("Error: Textures not initialized.\n", STDERR_FILENO);
     cleanup_and_exit(data);
   }
 
@@ -116,6 +116,14 @@ void init_game_window(t_cub_data *data) {
   if (mylx_create_window(data) != ERR_NO_ERROR)
     exit(ERR_WINDOW_CREATE);
   mylx_create_image(data);
+  
+  // Load textures after MLX is initialized
+  ft_printf("Loading textures...\n");
+  if (load_all_textures(data) != 0)
+  {
+    ft_putstr_fd("Warning: Failed to load textures, using colors.\n", STDERR_FILENO);
+  }
+  
   // Initialize HUD after MLX is ready
   if (!init_hud(data)) {
     ft_putstr_fd("Error: HUD initialization failed.\n", STDERR_FILENO);

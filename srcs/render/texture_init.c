@@ -96,7 +96,9 @@ void free_textures(t_textures *textures) {
   while (i < 4) {
     if (textures->walls[i].path)
       free(textures->walls[i].path);
-    // Note: img and pixels will need mlx_destroy_image when implemented
+    if (textures->walls[i].pixels)
+      free(textures->walls[i].pixels);
+    // Note: img destruction should be handled by cleanup_textures_mlx
     i++;
   }
   if (textures->floor.path)
@@ -104,4 +106,35 @@ void free_textures(t_textures *textures) {
   if (textures->ceiling.path)
     free(textures->ceiling.path);
   free(textures);
+}
+
+/**
+ * Destroy MLX texture images
+ * Call this before free_textures and before destroying MLX
+ */
+void cleanup_textures_mlx(t_cub_data *data) {
+  int i;
+
+  if (!data || !data->textures || !data->mlx || !data->mlx->mlx_ptr)
+    return;
+  
+  // Destroy wall texture images
+  i = 0;
+  while (i < 4) {
+    if (data->textures->walls[i].img) {
+      mlx_destroy_image(data->mlx->mlx_ptr, data->textures->walls[i].img);
+      data->textures->walls[i].img = NULL;
+    }
+    i++;
+  }
+  
+  // Destroy floor/ceiling texture images if any
+  if (data->textures->floor.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->floor.img);
+    data->textures->floor.img = NULL;
+  }
+  if (data->textures->ceiling.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->ceiling.img);
+    data->textures->ceiling.img = NULL;
+  }
 }

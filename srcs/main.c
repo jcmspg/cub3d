@@ -27,6 +27,13 @@ int main(int argc, char **argv) {
   ft_putstr_fd(argv[1], 1);
   ft_putchar_fd('\n', 1);
 
+  // Initialize textures before parsing (needed for texture path storage)
+  data.textures = init_textures();
+  if (!data.textures) {
+    ft_putstr_fd("Error: Failed to initialize textures.\n", STDERR_FILENO);
+    return (ERR_MEMORY_ALLOCATION);
+  }
+
   if (parse_cub_file(argv[1], &data) != ERR_NO_ERROR) {
     ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
     return (ERR_FILE_NOT_FOUND);

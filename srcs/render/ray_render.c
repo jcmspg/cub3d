@@ -75,28 +75,140 @@ static int apply_shading(int color, float dist, int side) {
 }
 
 /**
- * Draw a single vertical wall slice
+ * Get the texture for this wall face based on ray direction
+ */
+static t_texture *get_wall_texture(t_ray *ray, t_textures *textures)
+{
+	if (ray->hit_content == 'D')
+		return (NULL);  // Doors handled separately
+	
+	if (ray->side == 0)
+	{
+		// Vertical wall (E/W face)
+		if (ray->step_x > 0)
+			return (&textures->walls[TEX_WEST]);
+		else
+			return (&textures->walls[TEX_EAST]);
+	}
+	else
+	{
+		// Horizontal wall (N/S face)
+		if (ray->step_y > 0)
+			return (&textures->walls[TEX_NORTH]);
+		else
+			return (&textures->walls[TEX_SOUTH]);
+	}
+}
+
+/**
+ * Calculate texture X coordinate based on where ray hit the wall
+ */
+static int calculate_texture_x(t_cub_data *data, t_ray *ray, t_texture *texture)
+{
+	float wall_x;
+	int tex_x;
+	
+	if (!texture || !texture->loaded || texture->width == 0)
+		return (0);
+	
+	// Calculate exact hit position on the wall (0.0 to 1.0)
+	if (ray->side == 0)
+		wall_x = from_fixed32(data->player->y) + from_fixed32(ray->perp_dist) * from_fixed32(ray->dir_y);
+	else
+		wall_x = from_fixed32(data->player->x) + from_fixed32(ray->perp_dist) * from_fixed32(ray->dir_x);
+	
+	// Get fractional part
+	wall_x -= floor(wall_x);
+	
+	// Convert to texture coordinate
+	tex_x = (int)(wall_x * (float)texture->width);
+	
+	// Flip texture for certain faces to maintain consistency
+	if ((ray->side == 0 && ray->dir_x > 0) || (ray->side == 1 && ray->dir_y < 0))
+		tex_x = texture->width - tex_x - 1;
+	
+	// Bounds check
+	if (tex_x < 0)
+		tex_x = 0;
+	if (tex_x >= texture->width)
+		tex_x = texture->width - 1;
+	
+	return (tex_x);
+}
+
+/**
+ * Draw a single vertical wall slice with texture mapping
  */
 static void draw_wall_slice(t_cub_data *data, int x, t_ray *ray) {
-  int draw_start;
-  int draw_end;
-  int y;
-  int wall_color;
-  int shaded_color;
-
-  if (!ray->hit)
-    return;
-  calculate_wall_slice(data, ray, &draw_start, &draw_end);
-  // Get base wall color
-  wall_color = get_wall_color(ray, data->textures);
-  shaded_color =
-      apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
-  // Draw the wall slice
-  y = draw_start;
-  while (y <= draw_end) {
-    mylx_pixel_put(data, x, y, shaded_color);
-    y++;
-  }
+	int draw_start;
+	int draw_end;
+	int y;
+	int wall_color;
+	int shaded_color;
+	t_texture *texture;
+	int tex_x;
+	int tex_y;
+	int line_height;
+	float step;
+	float tex_pos;
+	
+	if (!ray->hit)
+		return;
+	
+	line_height = calculate_wall_slice(data, ray, &draw_start, &draw_end);
+	
+	// Get the texture for this wall
+	texture = get_wall_texture(ray, data->textures);
+	
+	// If texture is loaded, use texture mapping
+	if (texture && texture->loaded && texture->pixels)
+	{
+		// Calculate texture X coordinate
+		tex_x = calculate_texture_x(data, ray, texture);
+		
+		// Calculate texture Y step per screen pixel
+		step = (float)texture->height / (float)line_height;
+		
+		// Starting texture position (accounting for y clipping)
+		tex_pos = (draw_start - (data->mlx->height - line_height) / 2 - 
+				   data->player->view_offset - data->player->bob_offset) * step;
+		
+		// Draw textured wall slice
+		y = draw_start;
+		while (y <= draw_end)
+		{
+			// Calculate texture Y coordinate
+			tex_y = (int)tex_pos;
+			if (tex_y < 0)
+				tex_y = 0;
+			if (tex_y >= texture->height)
+				tex_y = texture->height - 1;
+			
+			tex_pos += step;
+			
+			// Get pixel from texture
+			wall_color = texture->pixels[tex_y * texture->width + tex_x];
+			
+			// Apply shading
+			shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
+			
+			mylx_pixel_put(data, x, y, shaded_color);
+			y++;
+		}
+	}
+	else
+	{
+		// Fallback to solid color if texture not loaded
+		wall_color = get_wall_color(ray, data->textures);
+		shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
+		
+		y = draw_start;
+		while (y <= draw_end)
+		{
+			mylx_pixel_put(data, x, y, shaded_color);
+			y++;
+		}
+	}
 }
 
 /**

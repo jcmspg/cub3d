@@ -15,6 +15,9 @@
 
 int	cleanup_mylx(t_cub_data *data)
 {
+	// Cleanup texture images before destroying MLX
+	ft_printf_fd(STDERR_FILENO, "destroying texture images\n");
+	cleanup_textures_mlx(data);
 	ft_printf_fd(STDERR_FILENO, "destroying img\n");
 	mylx_destroy_image(data);
 	ft_printf_fd(STDERR_FILENO, "destroying window\n");
