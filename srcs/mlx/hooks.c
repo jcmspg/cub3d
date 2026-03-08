@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hooks.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:31:44 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/08 16:05:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/08 20:14:35 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ int handle_mouse_move(int x, int y, t_cub_data *data) {
 
     // Warp mouse back to center
     mouse_locked = 1;
-    mlx_mouse_move(data->mlx->win_ptr, center_x,
+    mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr, center_x,
                    data->mlx->height / 2);
   }
 

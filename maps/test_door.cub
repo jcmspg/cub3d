@@ -1,14 +1,14 @@
-NO ./textures/test/north.xpm
-SO ./textures/test/south.xpm
-WE ./textures/test/west.xpm
-EA ./textures/test/east.xpm
+NO ./assets/textures/_NORTH_.xpm
+SO ./assets/textures/_SOUTH_.xpm
+WE ./assets/textures/_WEST_.xpm
+EA ./assets/textures/_EAST_.xpm
 
-F 220,100,0
-C 225,30,0
+F 100,100,100
+C 135,206,235
 
 1111111111
-1000000001
-10X0000X01
+1000010001
+10X0110X01
 10M0D00001
-100000N001
+100010N001
 1111111111

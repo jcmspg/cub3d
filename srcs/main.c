@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2025/11/01 20:33:10 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/08 20:14:35 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static int	init_parse_map(char *filename, t_cub_data *data)
 
 static void	setup_mlx_hooks(t_cub_data *data)
 {
-	mlx_loop_hook(data->mlx->mlx_ptr, (int (*)(void *))main_render_loop, data);
+	mlx_loop_hook(data->mlx->mlx_ptr, main_render_loop, data);
 	mlx_hook(data->mlx->win_ptr, 2, 1L << 0, handle_key_press, data);
 	mlx_hook(data->mlx->win_ptr, 3, 1L << 1, handle_key_release, data);
 	mlx_hook(data->mlx->win_ptr, 17, 0L, handle_close, data);
@@ -69,9 +69,9 @@ int	main(int argc, char **argv)
 	init_game_window(&data);
 	graphics_init(&data);
 	init_fps_sync(&data.fps);
-	mlx_mouse_hide();
-	mlx_mouse_move(data.mlx->win_ptr, data.mlx->width / 2, data.mlx->height
-		/ 2);
+	mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
+	mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2,
+		data.mlx->height / 2);
 	setup_mlx_hooks(&data);
 	mlx_loop(data.mlx->mlx_ptr);
 	cleanup(&data);

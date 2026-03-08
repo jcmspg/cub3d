@@ -6,13 +6,13 @@
 #    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2026/01/24 21:35:00 by joamiran         ###   ########.fr        #
+#    Updated: 2026/03/08 20:14:35 by joamiran         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = cuboid
 CC = cc
-CFLAGS = -Wall -Wextra -Werror 
+CFLAGS = -Wall -Wextra -Werror -std=gnu99
 
 SRC_DIR = ./srcs
 OBJ_DIR = ./obj

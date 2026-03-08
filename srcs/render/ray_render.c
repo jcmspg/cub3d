@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:11:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/08 20:18:38 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,16 +106,23 @@ static t_texture *get_wall_texture(t_ray *ray, t_textures *textures)
 static int calculate_texture_x(t_cub_data *data, t_ray *ray, t_texture *texture)
 {
 	float wall_x;
+	float raw_dist;
 	int tex_x;
 	
 	if (!texture || !texture->loaded || texture->width == 0)
 		return (0);
 	
-	// Calculate exact hit position on the wall (0.0 to 1.0)
+	// Use raw DDA distance (before fisheye correction) to find wall hit point
 	if (ray->side == 0)
-		wall_x = from_fixed32(data->player->y) + from_fixed32(ray->perp_dist) * from_fixed32(ray->dir_y);
+	{
+		raw_dist = from_fixed32(fixed32_sub(ray->side_dist_x, ray->delta_dist_x));
+		wall_x = from_fixed32(data->player->y) + raw_dist * from_fixed32(ray->dir_y);
+	}
 	else
-		wall_x = from_fixed32(data->player->x) + from_fixed32(ray->perp_dist) * from_fixed32(ray->dir_x);
+	{
+		raw_dist = from_fixed32(fixed32_sub(ray->side_dist_y, ray->delta_dist_y));
+		wall_x = from_fixed32(data->player->x) + raw_dist * from_fixed32(ray->dir_x);
+	}
 	
 	// Get fractional part
 	wall_x -= floor(wall_x);
