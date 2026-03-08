@@ -62,7 +62,9 @@
 #define FIXED_HALF_PI to_fixed32(3.14159265f / 2.0f)
 #define FIXED_TWO_PI to_fixed32(6.28318530f)
 
-#define M_PI 3.14159265358979323846
+#ifndef M_PI
+	#define M_PI 3.14159265358979323846
+#endif
 
 enum e_error {
   ERR_NO_ERROR,
@@ -97,6 +99,7 @@ enum e_error {
   ERR_UNKNOWN,
   ERR_CLEAN_UP,
 };
+
 
 typedef struct s_trig {
   t_fixed32 *sin; // 0-90 degrees inclusive
@@ -196,7 +199,6 @@ typedef struct s_textures {
 } t_textures;
 
 // Forward declarations for types that will be defined later
-typedef struct s_map t_map;
 typedef struct s_sprite t_sprite;
 
 typedef struct s_door {

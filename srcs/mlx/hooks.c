@@ -35,7 +35,7 @@ int handle_key_press(int keycode, t_cub_data *data) {
     data->input->jump_start_time = get_time_ms();
   }
   if (data->input->exit)
-    mlx_loop_end(data->mlx->mlx_ptr);
+    exit(0);
   return (ERR_NO_ERROR);
 }
 
@@ -118,7 +118,7 @@ int handle_mouse_move(int x, int y, t_cub_data *data) {
 
     // Warp mouse back to center
     mouse_locked = 1;
-    mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr, center_x,
+    mlx_mouse_move(data->mlx->win_ptr, center_x,
                    data->mlx->height / 2);
   }
 
@@ -131,6 +131,7 @@ int handle_mouse_move(int x, int y, t_cub_data *data) {
 }
 
 int handle_close(t_cub_data *data) {
-  mlx_loop_end(data->mlx->mlx_ptr);
+	(void)data;
+  exit(0);
   return (ERR_NO_ERROR);
 }

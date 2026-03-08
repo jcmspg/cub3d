@@ -58,8 +58,9 @@ int main(int argc, char **argv) {
   // init_dynamic_map_test(&data);
 
   // hide mouse and center it so i can look freely and smoothly
-  mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
-  mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2,
+  //mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
+  mlx_mouse_hide();
+  mlx_mouse_move(data.mlx->win_ptr, data.mlx->width / 2,
                  data.mlx->height / 2);
 
   // register the renderer loop within the mlx_loop

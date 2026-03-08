@@ -12,7 +12,7 @@
 
 NAME = cuboid
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -std=gnu99
+CFLAGS = -Wall -Wextra -Werror 
 
 SRC_DIR = ./srcs
 OBJ_DIR = ./obj
