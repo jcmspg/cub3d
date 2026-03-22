@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 17:15:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 18:18:22 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,10 @@
  * 3. Fire ray (center of screen)
  * 4. Check intersection with enemies (placeholder)
  */
+void	player_shoot(t_cub_data *data)
+{
+	static bool	was_shooting = false;
+	int			center_idx;
 void	player_shoot(t_cub_data *data)
 {
 	static bool	was_shooting = false;

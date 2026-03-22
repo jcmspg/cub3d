@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:29:58 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 18:21:57 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,75 @@ static int calculate_texture_x(t_cub_data *data, t_ray *ray, t_texture *texture)
  * Draw a single vertical wall slice with texture mapping
  */
 static void draw_wall_slice(t_cub_data *data, int x, t_ray *ray) {
+	int draw_start;
+	int draw_end;
+	int y;
+	int wall_color;
+	int shaded_color;
+	t_texture *texture;
+	int tex_x;
+	int tex_y;
+	int line_height;
+	float step;
+	float tex_pos;
+	
+	if (!ray->hit)
+		return;
+	
+	line_height = calculate_wall_slice(data, ray, &draw_start, &draw_end);
+	
+	// Get the texture for this wall
+	texture = get_wall_texture(ray, data->textures);
+	
+	// If texture is loaded, use texture mapping
+	if (texture && texture->loaded && texture->pixels)
+	{
+		// Calculate texture X coordinate
+		tex_x = calculate_texture_x(data, ray, texture);
+		
+		// Calculate texture Y step per screen pixel
+		step = (float)texture->height / (float)line_height;
+		
+		// Starting texture position (accounting for y clipping)
+		tex_pos = (draw_start - (data->mlx->height - line_height) / 2 - 
+				   data->player->view_offset - data->player->bob_offset) * step;
+		
+		// Draw textured wall slice
+		y = draw_start;
+		while (y <= draw_end)
+		{
+			// Calculate texture Y coordinate
+			tex_y = (int)tex_pos;
+			if (tex_y < 0)
+				tex_y = 0;
+			if (tex_y >= texture->height)
+				tex_y = texture->height - 1;
+			
+			tex_pos += step;
+			
+			// Get pixel from texture
+			wall_color = texture->pixels[tex_y * texture->width + tex_x];
+			
+			// Apply shading
+			shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
+			
+			mylx_pixel_put(data, x, y, shaded_color);
+			y++;
+		}
+	}
+	else
+	{
+		// Fallback to solid color if texture not loaded
+		wall_color = get_wall_color(ray, data->textures);
+		shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
+		
+		y = draw_start;
+		while (y <= draw_end)
+		{
+			mylx_pixel_put(data, x, y, shaded_color);
+			y++;
+		}
+	}
 	int draw_start;
 	int draw_end;
 	int y;

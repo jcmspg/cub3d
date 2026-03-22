@@ -118,7 +118,7 @@ int handle_mouse_move(int x, int y, t_cub_data *data) {
 
     // Warp mouse back to center
     mouse_locked = 1;
-    mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr, center_x,
+    mlx_mouse_move(data->mlx->win_ptr, center_x,
                    data->mlx->height / 2);
   }
 

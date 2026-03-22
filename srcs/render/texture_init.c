@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:17:01 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 18:22:17 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,9 @@ void free_textures(t_textures *textures) {
   while (i < 4) {
     if (textures->walls[i].path)
       free(textures->walls[i].path);
+    if (textures->walls[i].pixels)
+      free(textures->walls[i].pixels);
+    // Note: img destruction should be handled by cleanup_textures_mlx
     if (textures->walls[i].pixels)
       free(textures->walls[i].pixels);
     // Note: img destruction should be handled by cleanup_textures_mlx
