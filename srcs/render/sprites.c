@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 16:30:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 19:36:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,15 +292,24 @@ static void render_enemies(t_cub_data *data) {
       continue;
     }
     if (enemy->state == ENEMY_HIT) {
-      // Flicker for 1s, then erase
+      // Blinking logic: each blink lasts 150ms (on), 150ms (off)
       uint64_t elapsed = now - enemy->hit_time;
-      if (elapsed > 1000) {
-        enemy->state = ENEMY_DEAD;
+      int blink_period = 300; // ms for one blink (on+off)
+      int total_blink_time = enemy->blink_count * blink_period;
+      if ((int)elapsed >= total_blink_time) {
+        if (enemy->blink_count == 2) {
+          // Death: after 2 blinks, destroy
+          enemy->state = ENEMY_DEAD;
+        } else {
+          // Hit: after 1 blink, return to idle
+          enemy->state = ENEMY_IDLE;
+        }
         i++;
         continue;
       }
-      // Flicker: visible 50% of the time (every 100ms)
-      if (((elapsed / 100) % 2) == 0) {
+      // Determine if visible (blink on or off)
+      int blink_on = (((int)elapsed % blink_period) < (blink_period / 2));
+      if (blink_on) {
         render_billboard(data, from_fixed32(enemy->x),
                          from_fixed32(enemy->y), 0xFF0000, 2,
                          demon_texture);

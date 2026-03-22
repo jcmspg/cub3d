@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 19:36:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,22 +41,22 @@ static bool check_collision(t_cub_data *data, int x, int y) {
   return (false);
 }
 
+
 static bool is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y) {
-  float pos_x;
-  float pos_y;
+  t_fixed32 pos_x;
+  t_fixed32 pos_y;
   int map_x;
   int map_y;
+  const t_fixed32 buffer = to_fixed32(0.2f); // Fixed-point buffer
 
   if (!data || !data->map || !data->map->map_array)
     return (false);
-  // Define a buffer zone to avoid touching walls
-  const float buffer = 0.2f; // Increased slightly for safety
   // Calculate the player's position with the buffer
-  pos_x = from_fixed32(new_x);
-  pos_y = from_fixed32(new_y);
+  pos_x = new_x;
+  pos_y = new_y;
   // Calculate the grid cell the player is in
-  map_x = (int)(pos_x);
-  map_y = (int)(pos_y);
+  map_x = fixed32_to_int(pos_x);
+  map_y = fixed32_to_int(pos_y);
   // Ensure the position is within map bounds
   if (map_x < 0 || map_x >= data->map->width || map_y < 0 ||
       map_y >= data->map->height)
@@ -66,15 +66,14 @@ static bool is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y) {
   if (check_collision(data, map_x, map_y))
     return (false);
 
-  // Check corners/buffer points
-  // We need to check the grid cells that the buffer zone extends into
-  if (check_collision(data, (int)(pos_x - buffer), (int)pos_y))
+  // Check corners/buffer points (fixed-point math)
+  if (check_collision(data, fixed32_to_int(fixed32_sub(pos_x, buffer)), fixed32_to_int(pos_y)))
     return false;
-  if (check_collision(data, (int)(pos_x + buffer), (int)pos_y))
+  if (check_collision(data, fixed32_to_int(fixed32_add(pos_x, buffer)), fixed32_to_int(pos_y)))
     return false;
-  if (check_collision(data, (int)pos_x, (int)(pos_y - buffer)))
+  if (check_collision(data, fixed32_to_int(pos_x), fixed32_to_int(fixed32_sub(pos_y, buffer))))
     return false;
-  if (check_collision(data, (int)pos_x, (int)(pos_y + buffer)))
+  if (check_collision(data, fixed32_to_int(pos_x), fixed32_to_int(fixed32_add(pos_y, buffer))))
     return false;
 
   return (true);

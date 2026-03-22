@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 17:15:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 19:36:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,20 +76,20 @@ void	player_shoot(t_cub_data *data)
 					       // Optional: check if enemy is closer than wall
 					       float enemy_dist = sqrtf(spriteX * spriteX + spriteY * spriteY);
 					       float wall_dist = from_fixed32(data->raycasting->rays[center_idx].perp_dist);
-					       if (enemy_dist < wall_dist) {
-						       enemy->stats.health -= BULLET_DMG;
-						       printf("Enemy %d hit! HP: %d\n", enemy->id, enemy->stats.health);
+						       if (enemy_dist < wall_dist) {
+							       enemy->stats.health -= BULLET_DMG;
+							       printf("Enemy %d hit! HP: %d\n", enemy->id, enemy->stats.health);
+							       enemy->state = ENEMY_HIT;
+							       enemy->hit_time = data->fps.last_frame_time;
 							       if (enemy->stats.health <= 0) {
-								       enemy->state = ENEMY_HIT;
-								       enemy->hit_time = data->fps.last_frame_time;
+								       enemy->blink_count = 2; // death: blink twice
 								       printf("Enemy %d killed!\n", enemy->id);
 							       } else {
-								       enemy->state = ENEMY_HIT;
-								       enemy->hit_time = data->fps.last_frame_time;
+								       enemy->blink_count = 1; // hit: blink once
 							       }
-						       // Only hit one enemy per shot
-						       break;
-					       }
+							       enemy->blink_phase = 1; // not used in render, but kept for future
+							       break;
+						       }
 				       }
 			       }
 		       }

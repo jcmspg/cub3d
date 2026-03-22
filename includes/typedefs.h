@@ -6,12 +6,15 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 19:36:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
+
+
+#include "../extLibs/poormanfixedpoint/includes/poormansfixed.h"
 
 #define CYAN 0x00FFFF
 #define RED 0xFF0000
@@ -32,7 +35,7 @@
 #define JUMP_HEIGHT 100    // pixels to offset view
 #define JUMP_DURATION 500  // ms for full jump arc
 #define BOB_AMPLITUDE 6    // pixels of vertical bounce
-#define BOB_FREQUENCY 2.0f // oscillations per second
+#define BOB_FREQUENCY 1.0f // oscillations per second
 #define HEAD_BOB_ENABLED 1 // 1 = on, 0 = off
 #define AMMO_PICKUP_AMOUNT 42
 
@@ -242,6 +245,8 @@ typedef struct s_enemy {
   t_enemy_state state;
   int id;
   uint64_t hit_time; // Time when hit/killed (for flicker)
+  int blink_count;   // How many blinks left (1=hit, 2=death)
+  int blink_phase;   // 0=not blinking, 1=blink on, 2=blink off
 } t_enemy;
 
 typedef struct s_input {
