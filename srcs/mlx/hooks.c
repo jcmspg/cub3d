@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hooks.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:31:44 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/08 16:05:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/08 20:14:35 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int handle_key_press(int keycode, t_cub_data *data) {
     data->input->jump_start_time = get_time_ms();
   }
   if (data->input->exit)
-    mlx_loop_end(data->mlx->mlx_ptr);
+    exit(0);
   return (ERR_NO_ERROR);
 }
 
@@ -131,6 +131,7 @@ int handle_mouse_move(int x, int y, t_cub_data *data) {
 }
 
 int handle_close(t_cub_data *data) {
-  mlx_loop_end(data->mlx->mlx_ptr);
+	(void)data;
+  exit(0);
   return (ERR_NO_ERROR);
 }

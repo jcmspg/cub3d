@@ -3,14 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   weapon.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 17:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/08 17:00:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:17:01 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/render.h"
+
+static bool is_transparent_pixel(int pixel) {
+  return ((unsigned int)pixel == 0xFF000000U);
+}
 
 /**
  * Render a placeholder weapon (rectangle)
@@ -20,12 +24,27 @@ void render_weapon(t_cub_data *data) {
   int w_height;
   int x_start;
   int y_start;
-  int x, y;
+  int x;
+  int y;
   int color;
+  t_texture *weapon_texture;
+  int tex_x;
+  int tex_y;
+  int tex_color;
+
+  weapon_texture = NULL;
+  if (data->textures)
+    weapon_texture = &data->textures->gun_pov;
 
   // Dimensions relative to screen
-  w_width = data->mlx->width / 6;
-  w_height = data->mlx->height / 3;
+  if (weapon_texture && weapon_texture->loaded && weapon_texture->width > 0 &&
+      weapon_texture->height > 0) {
+    w_height = data->mlx->height / 2;
+    w_width = (w_height * weapon_texture->width) / weapon_texture->height;
+  } else {
+    w_width = data->mlx->width / 6;
+    w_height = data->mlx->height / 3;
+  }
 
   // Position: Bottom center
   x_start = (data->mlx->width / 2) - (w_width / 2);
@@ -45,13 +64,26 @@ void render_weapon(t_cub_data *data) {
 
   y_start = data->mlx->height - w_height + bob_y;
 
-  color = 0x555555; // Grey gun
+  color = 0x555555; // Grey gun fallback
 
-  // Draw rectangle
   for (y = 0; y < w_height; y++) {
     for (x = 0; x < w_width; x++) {
       int screen_x = x_start + x;
       int screen_y = y_start + y;
+
+      if (screen_x < 0 || screen_x >= data->mlx->width || screen_y < 0 ||
+          screen_y >= data->mlx->height)
+        continue;
+
+      if (weapon_texture && weapon_texture->loaded && weapon_texture->width > 0 &&
+          weapon_texture->height > 0) {
+        tex_x = (x * weapon_texture->width) / w_width;
+        tex_y = (y * weapon_texture->height) / w_height;
+        tex_color = get_texture_pixel(weapon_texture, tex_x, tex_y);
+        if (!is_transparent_pixel(tex_color))
+          mylx_pixel_put(data, screen_x, screen_y, tex_color);
+        continue;
+      }
 
       // Simple border check
       if (x == 0 || x == w_width - 1 || y == 0)
@@ -60,7 +92,4 @@ void render_weapon(t_cub_data *data) {
         mylx_pixel_put(data, screen_x, screen_y, color);
     }
   }
-
-  // Draw "muzzle" or something to distinguish front?
-  // Nah, just a box as requested.
 }

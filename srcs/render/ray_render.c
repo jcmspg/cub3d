@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 20:11:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:29:58 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,28 +75,147 @@ static int apply_shading(int color, float dist, int side) {
 }
 
 /**
- * Draw a single vertical wall slice
+ * Get the texture for this wall face based on ray direction
+ */
+static t_texture *get_wall_texture(t_ray *ray, t_textures *textures)
+{
+	if (ray->hit_content == 'D')
+		return (NULL);  // Doors handled separately
+	
+	if (ray->side == 0)
+	{
+		// Vertical wall (E/W face)
+		if (ray->step_x > 0)
+			return (&textures->walls[TEX_WEST]);
+		else
+			return (&textures->walls[TEX_EAST]);
+	}
+	else
+	{
+		// Horizontal wall (N/S face)
+		if (ray->step_y > 0)
+			return (&textures->walls[TEX_NORTH]);
+		else
+			return (&textures->walls[TEX_SOUTH]);
+	}
+}
+
+/**
+ * Calculate texture X coordinate based on where ray hit the wall
+ */
+static int calculate_texture_x(t_cub_data *data, t_ray *ray, t_texture *texture)
+{
+	float wall_x;
+	float raw_dist;
+	int tex_x;
+	
+	if (!texture || !texture->loaded || texture->width == 0)
+		return (0);
+	
+	// Use raw DDA distance (before fisheye correction) to find wall hit point
+	if (ray->side == 0)
+	{
+		raw_dist = from_fixed32(fixed32_sub(ray->side_dist_x, ray->delta_dist_x));
+		wall_x = from_fixed32(data->player->y) + raw_dist * from_fixed32(ray->dir_y);
+	}
+	else
+	{
+		raw_dist = from_fixed32(fixed32_sub(ray->side_dist_y, ray->delta_dist_y));
+		wall_x = from_fixed32(data->player->x) + raw_dist * from_fixed32(ray->dir_x);
+	}
+	
+	// Get fractional part
+	wall_x -= floor(wall_x);
+	
+	// Convert to texture coordinate
+	tex_x = (int)(wall_x * (float)texture->width);
+	
+	// Flip texture for certain faces to maintain consistency
+	if ((ray->side == 0 && ray->dir_x > 0) || (ray->side == 1 && ray->dir_y < 0))
+		tex_x = texture->width - tex_x - 1;
+	
+	// Bounds check
+	if (tex_x < 0)
+		tex_x = 0;
+	if (tex_x >= texture->width)
+		tex_x = texture->width - 1;
+	
+	return (tex_x);
+}
+
+/**
+ * Draw a single vertical wall slice with texture mapping
  */
 static void draw_wall_slice(t_cub_data *data, int x, t_ray *ray) {
-  int draw_start;
-  int draw_end;
-  int y;
-  int wall_color;
-  int shaded_color;
-
-  if (!ray->hit)
-    return;
-  calculate_wall_slice(data, ray, &draw_start, &draw_end);
-  // Get base wall color
-  wall_color = get_wall_color(ray, data->textures);
-  shaded_color =
-      apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
-  // Draw the wall slice
-  y = draw_start;
-  while (y <= draw_end) {
-    mylx_pixel_put(data, x, y, shaded_color);
-    y++;
-  }
+	int draw_start;
+	int draw_end;
+	int y;
+	int wall_color;
+	int shaded_color;
+	t_texture *texture;
+	int tex_x;
+	int tex_y;
+	int line_height;
+	float step;
+	float tex_pos;
+	
+	if (!ray->hit)
+		return;
+	
+	line_height = calculate_wall_slice(data, ray, &draw_start, &draw_end);
+	
+	// Get the texture for this wall
+	texture = get_wall_texture(ray, data->textures);
+	
+	// If texture is loaded, use texture mapping
+	if (texture && texture->loaded && texture->pixels)
+	{
+		// Calculate texture X coordinate
+		tex_x = calculate_texture_x(data, ray, texture);
+		
+		// Calculate texture Y step per screen pixel
+		step = (float)texture->height / (float)line_height;
+		
+		// Starting texture position (accounting for y clipping)
+		tex_pos = (draw_start - (data->mlx->height - line_height) / 2 - 
+				   data->player->view_offset - data->player->bob_offset) * step;
+		
+		// Draw textured wall slice
+		y = draw_start;
+		while (y <= draw_end)
+		{
+			// Calculate texture Y coordinate
+			tex_y = (int)tex_pos;
+			if (tex_y < 0)
+				tex_y = 0;
+			if (tex_y >= texture->height)
+				tex_y = texture->height - 1;
+			
+			tex_pos += step;
+			
+			// Get pixel from texture
+			wall_color = texture->pixels[tex_y * texture->width + tex_x];
+			
+			// Apply shading
+			shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
+			
+			mylx_pixel_put(data, x, y, shaded_color);
+			y++;
+		}
+	}
+	else
+	{
+		// Fallback to solid color if texture not loaded
+		wall_color = get_wall_color(ray, data->textures);
+		shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist), ray->side);
+		
+		y = draw_start;
+		while (y <= draw_end)
+		{
+			mylx_pixel_put(data, x, y, shaded_color);
+			y++;
+		}
+	}
 }
 
 /**
@@ -140,11 +259,12 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
   int render_bottom;
   int view_offset;
   int y;
+  int tex_x;
+  int tex_y;
+  int tex_color;
   t_door *door;
   int door_color;
 
-  if (!ray->door_hit)
-    return;
 
   // 1. Calculate the static door frame dimensions (where a closed door would
   // be)
@@ -232,6 +352,27 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
   if (draw_start > draw_end)
     return;
 
+  // Texture X coordinate from exact hit point on door plane
+  float wall_x;
+  if (ray->door_side == 0)
+    wall_x = from_fixed32(data->player->y) + euclidean_dist * r_dir_y;
+  else
+    wall_x = from_fixed32(data->player->x) + euclidean_dist * r_dir_x;
+  wall_x -= floor(wall_x);
+
+  tex_x = 0;
+  if (data->textures && data->textures->door.loaded &&
+      data->textures->door.width > 0) {
+    tex_x = (int)(wall_x * (float)data->textures->door.width);
+    if ((ray->door_side == 0 && r_dir_x > 0) ||
+        (ray->door_side == 1 && r_dir_y < 0))
+      tex_x = data->textures->door.width - tex_x - 1;
+    if (tex_x < 0)
+      tex_x = 0;
+    if (tex_x >= data->textures->door.width)
+      tex_x = data->textures->door.width - 1;
+  }
+
   // 4. Draw
   door_color = 0x8B4513; // SaddleBrown
   door_color =
@@ -239,7 +380,28 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
 
   y = draw_start;
   while (y <= draw_end) {
-    mylx_pixel_put(data, x, y, door_color);
+    int draw_fallback = 0;
+    if (data->textures && data->textures->door.loaded &&
+        data->textures->door.width > 0 && data->textures->door.height > 0) {
+      tex_y = ((y - render_top) * data->textures->door.height) / line_height;
+      if (tex_y < 0)
+        tex_y = 0;
+      if (tex_y >= data->textures->door.height)
+        tex_y = data->textures->door.height - 1;
+      tex_color = get_texture_pixel(&data->textures->door, tex_x, tex_y);
+      // If pixel is fully transparent, use fallback color
+      if ((unsigned int)tex_color == 0xFF000000U)
+        draw_fallback = 1;
+      else {
+        tex_color = apply_shading(tex_color, from_fixed32(ray->door_dist), ray->door_side);
+        mylx_pixel_put(data, x, y, tex_color);
+      }
+    } else {
+      draw_fallback = 1;
+    }
+    if (draw_fallback) {
+      mylx_pixel_put(data, x, y, door_color);
+    }
     y++;
   }
 }
@@ -258,14 +420,18 @@ static void render_column(t_cub_data *data, int x, t_ray *ray) {
     calculate_wall_slice(data, ray, &draw_start, &draw_end);
   // Draw ceiling above the wall
   draw_ceiling_slice(data, x, draw_start);
-  // Draw the wall (background)
-  if (ray->hit)
-    draw_wall_slice(data, x, ray);
+  // Draw the wall or door
+  if (ray->hit) {
+    if (ray->hit_content == 'D')
+      draw_door_slice(data, x, ray);
+    else
+      draw_wall_slice(data, x, ray);
+  }
   // Draw floor below the wall
   draw_floor_slice(data, x, draw_end);
 
-  // OVERLAY: Draw door if we hit one
-  if (ray->door_hit)
+  // OVERLAY: Draw door if we hit one and it's not the main hit (i.e., animating/partially open)
+  if (ray->door_hit && ray->hit_content != 'D')
     draw_door_slice(data, x, ray);
 }
 

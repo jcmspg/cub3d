@@ -15,6 +15,9 @@
 
 int	cleanup_mylx(t_cub_data *data)
 {
+	// Cleanup texture images before destroying MLX
+	ft_printf_fd(STDERR_FILENO, "destroying texture images\n");
+	cleanup_textures_mlx(data);
 	ft_printf_fd(STDERR_FILENO, "destroying img\n");
 	mylx_destroy_image(data);
 	ft_printf_fd(STDERR_FILENO, "destroying window\n");
@@ -127,13 +130,13 @@ int	cleanup_mlx_struct(t_mlx *mlx)
 	return (ERR_NO_ERROR);
 }
 
-int cleanup_input(t_input *input)
+int	cleanup_input(t_input *input)
 {
-    if (!input)
-        return ERR_NO_ERROR;
-  ft_printf_fd(STDERR_FILENO, "cleaning t_input\n");
-  free(input);
-  return (ERR_NO_ERROR);
+	if (!input)
+		return (ERR_NO_ERROR);
+	ft_printf_fd(STDERR_FILENO, "cleaning t_input\n");
+	free(input);
+	return (ERR_NO_ERROR);
 }
 
 int	cleanup(t_cub_data *data)

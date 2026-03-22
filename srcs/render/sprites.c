@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 16:30:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/23 03:37:55 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,40 @@ static void draw_sprite_stripe_occluded(t_cub_data *data, int stripe,
   }
 }
 
+static bool is_transparent_pixel(int pixel) {
+  return ((unsigned int)pixel == 0xFF000000U);
+}
+
+static void draw_sprite_textured_stripe(t_cub_data *data, int stripe,
+                                        int draw_start, int draw_end,
+                                        int tex_x, t_texture *texture,
+                                        int door_top, int door_bottom) {
+  int y;
+  int tex_y;
+  int tex_color;
+
+  if (!texture || draw_end <= draw_start)
+    return;
+  y = draw_start;
+  while (y < draw_end) {
+    if (y >= 0 && y < data->mlx->height) {
+      if (door_top >= 0 && y >= door_top && y <= door_bottom) {
+        y++;
+        continue;
+      }
+      tex_y = ((y - draw_start) * texture->height) / (draw_end - draw_start);
+      if (tex_y < 0)
+        tex_y = 0;
+      if (tex_y >= texture->height)
+        tex_y = texture->height - 1;
+      tex_color = get_texture_pixel(texture, tex_x, tex_y);
+      if (!is_transparent_pixel(tex_color))
+        mylx_pixel_put(data, stripe, y, tex_color);
+    }
+    y++;
+  }
+}
+
 /**
  * Render a single ammo box at (mx, my) formatted specifically as a small
  * rectangle
@@ -134,11 +168,15 @@ static void render_ammo_sprite(t_cub_data *data, float sx, float sy) {
   if (draw_end_x >= data->mlx->width)
     draw_end_x = data->mlx->width - 1;
 
-  // Golden color for ammo
-  int color = 0xFFD700;
+  t_texture *ammo_texture;
+
+  ammo_texture = NULL;
+  if (data->textures)
+    ammo_texture = &data->textures->ammo;
 
   // Loop through every vertical stripe of the sprite on screen
   for (int stripe = draw_start_x; stripe < draw_end_x; stripe++) {
+    int tex_x;
     float wall_dist = from_fixed32(data->raycasting->rays[stripe].perp_dist);
     int door_top = -1;
     int door_bottom = -1;
@@ -147,9 +185,20 @@ static void render_ammo_sprite(t_cub_data *data, float sx, float sy) {
       continue;
     // Get door coverage for this stripe
     get_door_coverage(data, stripe, transformY, &door_top, &door_bottom);
-    // Draw sprite with door occlusion
-    draw_sprite_stripe_occluded(data, stripe, draw_start_y, draw_end_y, color,
-                                door_top, door_bottom);
+    if (ammo_texture && ammo_texture->loaded && ammo_texture->width > 0 &&
+        ammo_texture->height > 0 && draw_end_x > draw_start_x) {
+      tex_x = ((stripe - draw_start_x) * ammo_texture->width) /
+              (draw_end_x - draw_start_x);
+      if (tex_x < 0)
+        tex_x = 0;
+      if (tex_x >= ammo_texture->width)
+        tex_x = ammo_texture->width - 1;
+      draw_sprite_textured_stripe(data, stripe, draw_start_y, draw_end_y, tex_x,
+                                  ammo_texture, door_top, door_bottom);
+    } else {
+      draw_sprite_stripe_occluded(data, stripe, draw_start_y, draw_end_y,
+                                  0xFFD700, door_top, door_bottom);
+    }
   }
 }
 
@@ -157,7 +206,7 @@ static void render_ammo_sprite(t_cub_data *data, float sx, float sy) {
  * Generic billboard renderer with configurable color and scale
  */
 static void render_billboard(t_cub_data *data, float sx, float sy, int color,
-                             int scale_div) {
+                             int scale_div, t_texture *texture) {
   float spriteX = sx - from_fixed32(data->player->x);
   float spriteY = sy - from_fixed32(data->player->y);
   int view_offset = data->player->view_offset + data->player->bob_offset;
@@ -196,6 +245,7 @@ static void render_billboard(t_cub_data *data, float sx, float sy, int color,
     draw_end_x = data->mlx->width - 1;
 
   for (int stripe = draw_start_x; stripe < draw_end_x; stripe++) {
+    int tex_x;
     float wall_dist = from_fixed32(data->raycasting->rays[stripe].perp_dist);
     int door_top = -1;
     int door_bottom = -1;
@@ -204,9 +254,20 @@ static void render_billboard(t_cub_data *data, float sx, float sy, int color,
       continue;
     // Get door coverage for this stripe
     get_door_coverage(data, stripe, transformY, &door_top, &door_bottom);
-    // Draw sprite with door occlusion
-    draw_sprite_stripe_occluded(data, stripe, draw_start_y, draw_end_y, color,
-                                door_top, door_bottom);
+    if (texture && texture->loaded && texture->width > 0 && texture->height > 0 &&
+        draw_end_x > draw_start_x) {
+      tex_x = ((stripe - draw_start_x) * texture->width) /
+              (draw_end_x - draw_start_x);
+      if (tex_x < 0)
+        tex_x = 0;
+      if (tex_x >= texture->width)
+        tex_x = texture->width - 1;
+      draw_sprite_textured_stripe(data, stripe, draw_start_y, draw_end_y, tex_x,
+                                  texture, door_top, door_bottom);
+    } else {
+      draw_sprite_stripe_occluded(data, stripe, draw_start_y, draw_end_y, color,
+                                  door_top, door_bottom);
+    }
   }
 }
 
@@ -215,14 +276,39 @@ static void render_billboard(t_cub_data *data, float sx, float sy, int color,
  */
 static void render_enemies(t_cub_data *data) {
   int i;
+  t_texture *demon_texture;
 
   if (!data->game || !data->game->enemies)
     return;
+  demon_texture = NULL;
+  if (data->textures)
+    demon_texture = &data->textures->demon;
   i = 0;
+  uint64_t now = data->fps.last_frame_time;
   while (i < data->game->enemy_count) {
-    if (data->game->enemies[i].state != ENEMY_DEAD) {
-      render_billboard(data, from_fixed32(data->game->enemies[i].x),
-                       from_fixed32(data->game->enemies[i].y), 0xFF0000, 2);
+    t_enemy *enemy = &data->game->enemies[i];
+    if (enemy->state == ENEMY_DEAD) {
+      i++;
+      continue;
+    }
+    if (enemy->state == ENEMY_HIT) {
+      // Flicker for 1s, then erase
+      uint64_t elapsed = now - enemy->hit_time;
+      if (elapsed > 1000) {
+        enemy->state = ENEMY_DEAD;
+        i++;
+        continue;
+      }
+      // Flicker: visible 50% of the time (every 100ms)
+      if (((elapsed / 100) % 2) == 0) {
+        render_billboard(data, from_fixed32(enemy->x),
+                         from_fixed32(enemy->y), 0xFF0000, 2,
+                         demon_texture);
+      }
+    } else {
+      render_billboard(data, from_fixed32(enemy->x),
+                       from_fixed32(enemy->y), 0xFF0000, 2,
+                       demon_texture);
     }
     i++;
   }

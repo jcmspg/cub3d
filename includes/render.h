@@ -93,6 +93,24 @@ int get_wall_color(t_ray *ray, t_textures *textures);
 // Free all texture resources
 void free_textures(t_textures *textures);
 
+// Cleanup texture MLX images
+void cleanup_textures_mlx(t_cub_data *data);
+
+/*
+** =============================================================================
+** TEXTURE LOADING (textures.c)
+** =============================================================================
+*/
+
+// Load a texture from an XPM file
+int load_texture_from_file(void *mlx_ptr, t_texture *texture, char *path);
+
+// Get a pixel color from a texture
+int get_texture_pixel(t_texture *texture, int x, int y);
+
+// Load all wall textures
+int load_all_textures(t_cub_data *data);
+
 /*
 ** =============================================================================
 ** WALL RENDERING (ray_render.c)

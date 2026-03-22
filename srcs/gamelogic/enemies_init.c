@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 12:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:51:07 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ static void	init_enemy_stats(t_enemy *enemy, int id)
 	enemy->dir_x = to_fixed32(1.0f);
 	enemy->dir_y = to_fixed32(0.0f);
 	enemy->id = id;
+	enemy->hit_time = 0;
 }
 
 static void	fill_enemies_array(t_cub_data *data)

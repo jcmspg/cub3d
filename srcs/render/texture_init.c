@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:48:31 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:17:01 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,11 @@ t_textures *init_textures(void) {
   // Initialize floor and ceiling
   init_single_texture(&textures->floor, COLOR_FLOOR);
   init_single_texture(&textures->ceiling, COLOR_CEILING);
+  // Entity and weapon textures
+  init_single_texture(&textures->door, 0x8B4513);
+  init_single_texture(&textures->ammo, 0xFFD700);
+  init_single_texture(&textures->demon, 0xFF0000);
+  init_single_texture(&textures->gun_pov, 0x555555);
   // Default parsed colors (can be overridden by .cub file)
   textures->floor_color = COLOR_FLOOR;
   textures->ceiling_color = COLOR_CEILING;
@@ -96,12 +101,81 @@ void free_textures(t_textures *textures) {
   while (i < 4) {
     if (textures->walls[i].path)
       free(textures->walls[i].path);
-    // Note: img and pixels will need mlx_destroy_image when implemented
+    if (textures->walls[i].pixels)
+      free(textures->walls[i].pixels);
+    // Note: img destruction should be handled by cleanup_textures_mlx
     i++;
   }
   if (textures->floor.path)
     free(textures->floor.path);
   if (textures->ceiling.path)
     free(textures->ceiling.path);
+  if (textures->floor.pixels)
+    free(textures->floor.pixels);
+  if (textures->ceiling.pixels)
+    free(textures->ceiling.pixels);
+  if (textures->door.path)
+    free(textures->door.path);
+  if (textures->ammo.path)
+    free(textures->ammo.path);
+  if (textures->demon.path)
+    free(textures->demon.path);
+  if (textures->gun_pov.path)
+    free(textures->gun_pov.path);
+  if (textures->door.pixels)
+    free(textures->door.pixels);
+  if (textures->ammo.pixels)
+    free(textures->ammo.pixels);
+  if (textures->demon.pixels)
+    free(textures->demon.pixels);
+  if (textures->gun_pov.pixels)
+    free(textures->gun_pov.pixels);
   free(textures);
+}
+
+/**
+ * Destroy MLX texture images
+ * Call this before free_textures and before destroying MLX
+ */
+void cleanup_textures_mlx(t_cub_data *data) {
+  int i;
+
+  if (!data || !data->textures || !data->mlx || !data->mlx->mlx_ptr)
+    return;
+  
+  // Destroy wall texture images
+  i = 0;
+  while (i < 4) {
+    if (data->textures->walls[i].img) {
+      mlx_destroy_image(data->mlx->mlx_ptr, data->textures->walls[i].img);
+      data->textures->walls[i].img = NULL;
+    }
+    i++;
+  }
+  
+  // Destroy floor/ceiling texture images if any
+  if (data->textures->floor.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->floor.img);
+    data->textures->floor.img = NULL;
+  }
+  if (data->textures->ceiling.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->ceiling.img);
+    data->textures->ceiling.img = NULL;
+  }
+  if (data->textures->door.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->door.img);
+    data->textures->door.img = NULL;
+  }
+  if (data->textures->ammo.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->ammo.img);
+    data->textures->ammo.img = NULL;
+  }
+  if (data->textures->demon.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->demon.img);
+    data->textures->demon.img = NULL;
+  }
+  if (data->textures->gun_pov.img) {
+    mlx_destroy_image(data->mlx->mlx_ptr, data->textures->gun_pov.img);
+    data->textures->gun_pov.img = NULL;
+  }
 }

@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@
 #define ENEMY_DAMAGE 10
 #define ENEMY_AMMO 0
 
+// Combat
+#define BULLET_DMG 20
+
 // HUD settings
 #define HUD_HEIGHT 100            // height of HUD bar at bottom
 #define HUD_BG_COLOR 0x2A2A2A     // dark gray background
@@ -62,7 +65,9 @@
 #define FIXED_HALF_PI to_fixed32(3.14159265f / 2.0f)
 #define FIXED_TWO_PI to_fixed32(6.28318530f)
 
-#define M_PI 3.14159265358979323846
+#ifndef M_PI
+	#define M_PI 3.14159265358979323846
+#endif
 
 enum e_error {
   ERR_NO_ERROR,
@@ -97,6 +102,7 @@ enum e_error {
   ERR_UNKNOWN,
   ERR_CLEAN_UP,
 };
+
 
 typedef struct s_trig {
   t_fixed32 *sin; // 0-90 degrees inclusive
@@ -191,12 +197,15 @@ typedef struct s_textures {
   t_texture walls[4]; // N, S, E, W
   t_texture floor;
   t_texture ceiling;
+  t_texture door;
+  t_texture ammo;
+  t_texture demon;
+  t_texture gun_pov;
   int floor_color;   // Parsed from .cub file (F line)
   int ceiling_color; // Parsed from .cub file (C line)
 } t_textures;
 
 // Forward declarations for types that will be defined later
-typedef struct s_map t_map;
 typedef struct s_sprite t_sprite;
 
 typedef struct s_door {
@@ -232,6 +241,7 @@ typedef struct s_enemy {
   t_character stats;
   t_enemy_state state;
   int id;
+  uint64_t hit_time; // Time when hit/killed (for flicker)
 } t_enemy;
 
 typedef struct s_input {

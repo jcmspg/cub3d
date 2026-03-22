@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 19:30:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:59:18 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:31:48 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,15 @@ int perform_dda(t_cub_data *data, t_ray *ray) {
         if (door->open_amount < 0.01f) {
           ray->hit = 1;
           ray->hit_content = 'D';
+          ray->door_hit = 1;
+          ray->door_map_x = ray->map_x;
+          ray->door_map_y = ray->map_y;
+          ray->door_side = ray->side;
+          // Calculate distance to the door (same as wall hit)
+          if (ray->side == 0)
+            ray->door_dist = fixed32_sub(ray->side_dist_x, ray->delta_dist_x);
+          else
+            ray->door_dist = fixed32_sub(ray->side_dist_y, ray->delta_dist_y);
           return (1);
         }
         // If animating (0 < open_amount < 1), record it but CONTINUE.
