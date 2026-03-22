@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/08 20:18:38 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:29:58 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,11 +259,12 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
   int render_bottom;
   int view_offset;
   int y;
+  int tex_x;
+  int tex_y;
+  int tex_color;
   t_door *door;
   int door_color;
 
-  if (!ray->door_hit)
-    return;
 
   // 1. Calculate the static door frame dimensions (where a closed door would
   // be)
@@ -351,6 +352,27 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
   if (draw_start > draw_end)
     return;
 
+  // Texture X coordinate from exact hit point on door plane
+  float wall_x;
+  if (ray->door_side == 0)
+    wall_x = from_fixed32(data->player->y) + euclidean_dist * r_dir_y;
+  else
+    wall_x = from_fixed32(data->player->x) + euclidean_dist * r_dir_x;
+  wall_x -= floor(wall_x);
+
+  tex_x = 0;
+  if (data->textures && data->textures->door.loaded &&
+      data->textures->door.width > 0) {
+    tex_x = (int)(wall_x * (float)data->textures->door.width);
+    if ((ray->door_side == 0 && r_dir_x > 0) ||
+        (ray->door_side == 1 && r_dir_y < 0))
+      tex_x = data->textures->door.width - tex_x - 1;
+    if (tex_x < 0)
+      tex_x = 0;
+    if (tex_x >= data->textures->door.width)
+      tex_x = data->textures->door.width - 1;
+  }
+
   // 4. Draw
   door_color = 0x8B4513; // SaddleBrown
   door_color =
@@ -358,7 +380,28 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
 
   y = draw_start;
   while (y <= draw_end) {
-    mylx_pixel_put(data, x, y, door_color);
+    int draw_fallback = 0;
+    if (data->textures && data->textures->door.loaded &&
+        data->textures->door.width > 0 && data->textures->door.height > 0) {
+      tex_y = ((y - render_top) * data->textures->door.height) / line_height;
+      if (tex_y < 0)
+        tex_y = 0;
+      if (tex_y >= data->textures->door.height)
+        tex_y = data->textures->door.height - 1;
+      tex_color = get_texture_pixel(&data->textures->door, tex_x, tex_y);
+      // If pixel is fully transparent, use fallback color
+      if ((unsigned int)tex_color == 0xFF000000U)
+        draw_fallback = 1;
+      else {
+        tex_color = apply_shading(tex_color, from_fixed32(ray->door_dist), ray->door_side);
+        mylx_pixel_put(data, x, y, tex_color);
+      }
+    } else {
+      draw_fallback = 1;
+    }
+    if (draw_fallback) {
+      mylx_pixel_put(data, x, y, door_color);
+    }
     y++;
   }
 }
@@ -377,14 +420,18 @@ static void render_column(t_cub_data *data, int x, t_ray *ray) {
     calculate_wall_slice(data, ray, &draw_start, &draw_end);
   // Draw ceiling above the wall
   draw_ceiling_slice(data, x, draw_start);
-  // Draw the wall (background)
-  if (ray->hit)
-    draw_wall_slice(data, x, ray);
+  // Draw the wall or door
+  if (ray->hit) {
+    if (ray->hit_content == 'D')
+      draw_door_slice(data, x, ray);
+    else
+      draw_wall_slice(data, x, ray);
+  }
   // Draw floor below the wall
   draw_floor_slice(data, x, draw_end);
 
-  // OVERLAY: Draw door if we hit one
-  if (ray->door_hit)
+  // OVERLAY: Draw door if we hit one and it's not the main hit (i.e., animating/partially open)
+  if (ray->door_hit && ray->hit_content != 'D')
     draw_door_slice(data, x, ray);
 }
 

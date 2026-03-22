@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   textures.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joao <joao@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2026/03/08 00:00:00 by joao             ###   ########.fr       */
+/*   Updated: 2026/03/22 17:17:01 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,23 @@ int	load_all_textures(t_cub_data *data)
 		}
 		i++;
 	}
+
+	if (load_texture_from_file(data->mlx->mlx_ptr, &data->textures->door,
+			"./assets/textures/_DOOR_.xpm") != 0)
+		ft_printf_fd(STDERR_FILENO,
+			"Warning: Failed to load ./assets/textures/_DOOR_.xpm\n");
+	if (load_texture_from_file(data->mlx->mlx_ptr, &data->textures->ammo,
+			"./assets/textures/_AMMO_.xpm") != 0)
+		ft_printf_fd(STDERR_FILENO,
+			"Warning: Failed to load ./assets/textures/_AMMO_.xpm\n");
+	if (load_texture_from_file(data->mlx->mlx_ptr, &data->textures->demon,
+			"./assets/textures/_DEMON_.xpm") != 0)
+		ft_printf_fd(STDERR_FILENO,
+			"Warning: Failed to load ./assets/textures/_DEMON_.xpm\n");
+	if (load_texture_from_file(data->mlx->mlx_ptr, &data->textures->gun_pov,
+			"./assets/textures/_GUN_POV_.xpm") != 0)
+		ft_printf_fd(STDERR_FILENO,
+			"Warning: Failed to load ./assets/textures/_GUN_POV_.xpm\n");
 	
 	ft_printf("All textures loaded successfully!\n");
 	return (0);

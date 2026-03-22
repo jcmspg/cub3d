@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   combat.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 17:15:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/08 16:07:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,51 @@ void	player_shoot(t_cub_data *data)
 		// We can reuse the raycasting result from `render_walls` which populated
 		// `data->raycasting->rays`
 		center_idx = data->mlx->width / 2;
-		if (center_idx >= 0 && center_idx < data->raycasting->num_rays)
-		{
-			// t_ray *center_ray = &data->raycasting->rays[center_idx];
-			// This gives us the wall distance
-			// printf("Hit wall at distance: %.2f\n",
-			// from_fixed32(center_ray->perp_dist));
-			// TODO: Check against enemies
-			// Iterate through enemy list (when we have one)
-			// Check if enemy is within the "center 1/3" cone AND closer than the
-			// wall. float enemy_angle = atan2(enemy.y - player.y, enemy.x
-			// float diff = angle_diff(player_angle, enemy_angle)
-			// if (abs(diff) < threshold && enemy_dist < center_ray->perp_dist)
-		}
+		       if (center_idx >= 0 && center_idx < data->raycasting->num_rays)
+		       {
+			       int screen_width = data->mlx->width;
+			       int center_min = screen_width / 2 - screen_width / 10;
+			       int center_max = screen_width / 2 + screen_width / 10;
+			       int i;
+			       for (i = 0; i < data->game->enemy_count; i++) {
+				       t_enemy *enemy = &data->game->enemies[i];
+				       if (enemy->state == ENEMY_DEAD)
+					       continue;
+				       // Project enemy position to screen X (reuse billboard logic)
+				       float spriteX = from_fixed32(enemy->x) - from_fixed32(data->player->x);
+				       float spriteY = from_fixed32(enemy->y) - from_fixed32(data->player->y);
+				       float dirX = from_fixed32(data->player->dir_x);
+				       float dirY = from_fixed32(data->player->dir_y);
+				       float planeX = from_fixed32(data->player->plane_x);
+				       float planeY = from_fixed32(data->player->plane_y);
+				       float invDet = 1.0f / (planeX * dirY - dirX * planeY);
+				       float transformX = invDet * (dirY * spriteX - dirX * spriteY);
+				       float transformY = invDet * (-planeY * spriteX + planeX * spriteY);
+				       if (transformY <= 0.1f)
+					       continue; // Behind player
+				       int spriteScreenX = (int)((screen_width / 2) * (1 + transformX / transformY));
+				       // Check if enemy is in the center 1/5th of the screen
+				       if (spriteScreenX >= center_min && spriteScreenX <= center_max) {
+					       // Optional: check if enemy is closer than wall
+					       float enemy_dist = sqrtf(spriteX * spriteX + spriteY * spriteY);
+					       float wall_dist = from_fixed32(data->raycasting->rays[center_idx].perp_dist);
+					       if (enemy_dist < wall_dist) {
+						       enemy->stats.health -= BULLET_DMG;
+						       printf("Enemy %d hit! HP: %d\n", enemy->id, enemy->stats.health);
+							       if (enemy->stats.health <= 0) {
+								       enemy->state = ENEMY_HIT;
+								       enemy->hit_time = data->fps.last_frame_time;
+								       printf("Enemy %d killed!\n", enemy->id);
+							       } else {
+								       enemy->state = ENEMY_HIT;
+								       enemy->hit_time = data->fps.last_frame_time;
+							       }
+						       // Only hit one enemy per shot
+						       break;
+					       }
+				       }
+			       }
+		       }
 	}
 	// Remember previous state for edge detection
 	was_shooting = data->input->shoot;

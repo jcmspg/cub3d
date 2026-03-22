@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/02/23 03:30:08 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/03/22 17:44:28 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@
 #define ENEMY_MAX_HEALTH 50
 #define ENEMY_DAMAGE 10
 #define ENEMY_AMMO 0
+
+// Combat
+#define BULLET_DMG 20
 
 // HUD settings
 #define HUD_HEIGHT 100            // height of HUD bar at bottom
@@ -194,6 +197,10 @@ typedef struct s_textures {
   t_texture walls[4]; // N, S, E, W
   t_texture floor;
   t_texture ceiling;
+  t_texture door;
+  t_texture ammo;
+  t_texture demon;
+  t_texture gun_pov;
   int floor_color;   // Parsed from .cub file (F line)
   int ceiling_color; // Parsed from .cub file (C line)
 } t_textures;
@@ -234,6 +241,7 @@ typedef struct s_enemy {
   t_character stats;
   t_enemy_state state;
   int id;
+  uint64_t hit_time; // Time when hit/killed (for flicker)
 } t_enemy;
 
 typedef struct s_input {
