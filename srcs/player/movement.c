@@ -55,8 +55,8 @@ static bool is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y) {
   pos_x = new_x;
   pos_y = new_y;
   // Calculate the grid cell the player is in
-  map_x = fixed32_to_int(pos_x);
-  map_y = fixed32_to_int(pos_y);
+  map_x = (int)from_fixed32(pos_x);
+  map_y = (int)from_fixed32(pos_y);
   // Ensure the position is within map bounds
   if (map_x < 0 || map_x >= data->map->width || map_y < 0 ||
       map_y >= data->map->height)
@@ -67,13 +67,13 @@ static bool is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y) {
     return (false);
 
   // Check corners/buffer points (fixed-point math)
-  if (check_collision(data, fixed32_to_int(fixed32_sub(pos_x, buffer)), fixed32_to_int(pos_y)))
+  if (check_collision(data, (int)from_fixed32(fixed32_sub(pos_x, buffer)), (int)from_fixed32(pos_y)))
     return false;
-  if (check_collision(data, fixed32_to_int(fixed32_add(pos_x, buffer)), fixed32_to_int(pos_y)))
+  if (check_collision(data, (int)from_fixed32(fixed32_add(pos_x, buffer)), (int)from_fixed32(pos_y)))
     return false;
-  if (check_collision(data, fixed32_to_int(pos_x), fixed32_to_int(fixed32_sub(pos_y, buffer))))
+  if (check_collision(data, (int)from_fixed32(pos_x), (int)from_fixed32(fixed32_sub(pos_y, buffer))))
     return false;
-  if (check_collision(data, fixed32_to_int(pos_x), fixed32_to_int(fixed32_add(pos_y, buffer))))
+  if (check_collision(data, (int)from_fixed32(pos_x), (int)from_fixed32(fixed32_add(pos_y, buffer))))
     return false;
 
   return (true);

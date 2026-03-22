@@ -33,7 +33,7 @@ static int calculate_wall_slice(t_cub_data *data, t_ray *ray, int *draw_start,
   if (perp_dist < to_fixed32(0.001f))
     perp_dist = to_fixed32(0.001f);
   // Calculate height of wall slice on screen (fixed-point division)
-  line_height = (int)fixed32_to_int(fixed32_div(to_fixed32(data->mlx->height), perp_dist));
+  line_height = (int)from_fixed32(fixed32_div(to_fixed32(data->mlx->height), perp_dist));
   // Combine jump offset + head bob offset
   view_offset = data->player->view_offset + data->player->bob_offset;
 
@@ -123,10 +123,10 @@ static int calculate_texture_x(t_cub_data *data, t_ray *ray, t_texture *texture)
   }
 
   // Get fractional part (wall_x - floor(wall_x))
-  wall_x = fixed32_sub(wall_x, to_fixed32((float)fixed32_to_int(wall_x)));
+  wall_x = fixed32_sub(wall_x, to_fixed32((float)(int)from_fixed32(wall_x)));
 
   // Convert to texture coordinate
-  tex_x = fixed32_to_int(fixed32_mul(wall_x, to_fixed32(texture->width)));
+  tex_x = (int)from_fixed32(fixed32_mul(wall_x, to_fixed32(texture->width)));
 
   // Flip texture for certain faces to maintain consistency
   if ((ray->side == 0 && ray->dir_x > 0) || (ray->side == 1 && ray->dir_y < 0))
@@ -182,7 +182,7 @@ static void draw_wall_slice(t_cub_data *data, int x, t_ray *ray) {
     while (y <= draw_end)
     {
       // Calculate texture Y coordinate
-      tex_y = fixed32_to_int(tex_pos);
+      tex_y = (int)from_fixed32(tex_pos);
       if (tex_y < 0)
         tex_y = 0;
       if (tex_y >= texture->height)
@@ -314,7 +314,7 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
 
   t_fixed32 dist = perp_dist;
 
-  line_height = fixed32_to_int(fixed32_div(to_fixed32(data->mlx->height), dist));
+  line_height = (int)from_fixed32(fixed32_div(to_fixed32(data->mlx->height), dist));
   view_offset = data->player->view_offset + data->player->bob_offset;
 
   frame_top = (data->mlx->height - line_height) / 2 + view_offset;
@@ -347,9 +347,9 @@ static void draw_door_slice(t_cub_data *data, int x, t_ray *ray) {
     wall_x = fixed32_add(data->player->y, fixed32_mul(euclidean_dist, r_dir_y));
   else
     wall_x = fixed32_add(data->player->x, fixed32_mul(euclidean_dist, r_dir_x));
-  wall_x = fixed32_sub(wall_x, to_fixed32((float)fixed32_to_int(wall_x)));
+  wall_x = fixed32_sub(wall_x, to_fixed32((float)(int)from_fixed32(wall_x)));
 
-  tex_x = fixed32_to_int(fixed32_mul(wall_x, to_fixed32(data->textures->door.width)));
+  tex_x = (int)from_fixed32(fixed32_mul(wall_x, to_fixed32(data->textures->door.width)));
   if ((ray->door_side == 0 && r_dir_x > 0) || (ray->door_side == 1 && r_dir_y < 0))
     tex_x = data->textures->door.width - tex_x - 1;
   if (tex_x < 0)
