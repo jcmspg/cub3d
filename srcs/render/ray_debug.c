@@ -16,19 +16,19 @@
 ** Minimap configuration - MUST MATCH draw_map_grid() settings!
 ** draw_map_grid() uses cell_size=12, start_x=10, start_y=10
 */
-# define MINIMAP_CELL_SIZE	12
-# define MINIMAP_OFFSET_X	10
-# define MINIMAP_OFFSET_Y	10
-# define RAY_COLOR			0xFFFF00
-# define RAY_EDGE_COLOR		0x00FFFF
-# define RAY_CENTER_COLOR	0xFFFFFF
+#define MINIMAP_CELL_SIZE 12
+#define MINIMAP_OFFSET_X 10
+#define MINIMAP_OFFSET_Y 10
+#define RAY_COLOR 0xFFFF00
+#define RAY_EDGE_COLOR 0x00FFFF
+#define RAY_CENTER_COLOR 0xFFFFFF
 
 /**
  * Convert world coordinates to minimap pixel coordinates
  * Player position is in map units (e.g., 5.5 means middle of cell 5)
  */
 static void	world_to_minimap(t_fixed32 world_x, t_fixed32 world_y,
-							int *screen_x, int *screen_y)
+		int *screen_x, int *screen_y)
 {
 	float	wx;
 	float	wy;
@@ -44,7 +44,7 @@ static void	world_to_minimap(t_fixed32 world_x, t_fixed32 world_y,
  * Used for drawing rays on the minimap
  */
 static void	draw_line(t_cub_data *data, int x0, int y0, int x1, int y1,
-						int color)
+		int color)
 {
 	int	dx;
 	int	dy;
@@ -60,8 +60,8 @@ static void	draw_line(t_cub_data *data, int x0, int y0, int x1, int y1,
 	err = dx - dy;
 	while (1)
 	{
-		if (x0 >= 0 && x0 < data->mlx->width
-			&& y0 >= 0 && y0 < data->mlx->height)
+		if (x0 >= 0 && x0 < data->mlx->width && y0 >= 0
+			&& y0 < data->mlx->height)
 			mylx_pixel_put(data, x0, y0, color);
 		if (x0 == x1 && y0 == y1)
 			break ;
@@ -93,10 +93,10 @@ static void	draw_ray_on_minimap(t_cub_data *data, t_ray *ray, int color)
 
 	world_to_minimap(data->player->x, data->player->y, &start_x, &start_y);
 	// Calculate hit point: player_pos + ray_dir * perp_dist
-	hit_x = fixed32_add(data->player->x,
-			fixed32_mul(ray->dir_x, ray->perp_dist));
-	hit_y = fixed32_add(data->player->y,
-			fixed32_mul(ray->dir_y, ray->perp_dist));
+	hit_x = fixed32_add(data->player->x, fixed32_mul(ray->dir_x,
+				ray->perp_dist));
+	hit_y = fixed32_add(data->player->y, fixed32_mul(ray->dir_y,
+				ray->perp_dist));
 	world_to_minimap(hit_x, hit_y, &end_x, &end_y);
 	draw_line(data, start_x, start_y, end_x, end_y, color);
 }

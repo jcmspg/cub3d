@@ -75,7 +75,6 @@ static void	toggle_door(t_cub_data *data, t_door *door)
 	player_map_y = from_fixed32(data->player->y);
 	if (door->is_open || door->is_opening)
 	{
-		// Safety check: Don't close if player is in the door tile!
 		if (player_map_x == door->x && player_map_y == door->y)
 		{
 			printf("DEBUG: Cannot close door - player inside!\n");
@@ -84,7 +83,6 @@ static void	toggle_door(t_cub_data *data, t_door *door)
 		door->is_closing = true;
 		door->is_opening = false;
 		door->is_open = false;
-			// Immediately treat as solid for collision? Maybe wait.
 	}
 	else
 	{
@@ -102,8 +100,6 @@ void	interact_doors(t_cub_data *data)
 	t_door		*door;
 	float		dist;
 
-	// Check at incremental distances to avoid overshooting
-	// Check at 0.5, 1.0, 1.5 units
 	for (dist = 0.5f; dist <= 1.5f; dist += 0.5f)
 	{
 		check_x = fixed32_add(data->player->x, fixed32_mul(data->player->dir_x,
@@ -112,7 +108,6 @@ void	interact_doors(t_cub_data *data)
 					to_fixed32(dist)));
 		map_x = from_fixed32(check_x);
 		map_y = from_fixed32(check_y);
-		// If we found a door, toggle it and stop (don't toggle multiple doors)
 		door = get_door_at(data, map_x, map_y);
 		if (door)
 		{

@@ -15,7 +15,6 @@
 
 int	cleanup_mylx(t_cub_data *data)
 {
-	// Cleanup texture images before destroying MLX
 	ft_printf_fd(STDERR_FILENO, "destroying texture images\n");
 	cleanup_textures_mlx(data);
 	ft_printf_fd(STDERR_FILENO, "destroying img\n");
@@ -63,7 +62,6 @@ int	cleanup_map(t_map *map)
 			}
 			free(map->map_lines);
 		}
-		// Free any other allocated fields in t_map
 		free(map);
 	}
 	return (ERR_NO_ERROR);
@@ -165,7 +163,6 @@ int	cleanup(t_cub_data *data)
 	if (data->hud)
 		cleanup_hud(data->hud);
 	cleanup_fps(data->fps);
-	// free(data);
 	return (ERR_NO_ERROR);
 }
 

@@ -44,11 +44,7 @@ int	main_render_loop(t_cub_data *data)
         update_game_logic(data);
         data->fps.accumulator -= FIXED_STEP_MS;
     }
-    
-    // Use your existing mylx_update_scene function
     mylx_update_scene(data);
-    
-    // fps overlay
     fps = 1000.0f / data->fps.delta_time;
     display_fps(data, fps);
     print_movements(data);
