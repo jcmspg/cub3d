@@ -12,8 +12,7 @@
 
 NAME = cuboid
 CC = cc
-#CFLAGS = -Wall -Wextra -Werror -std=gnu99
-CFLAGS = -std=gnu99
+CFLAGS = -Wall -Wextra -Werror -std=gnu99
 
 # MLX behavior flags
 # MLX_COMPAT_FIX=1 applies local header prototype fixes for stricter compilers.

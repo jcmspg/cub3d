@@ -32,6 +32,8 @@ struct s_ray_line
 	int	color;
 };
 
+static void	step_line(struct s_ray_line *line, int *err, int dx, int dy);
+
 /**
  * Convert world coordinates to minimap pixel coordinates
  * Player position is in map units (e.g., 5.5 means middle of cell 5)

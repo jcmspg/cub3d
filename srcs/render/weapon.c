@@ -91,7 +91,7 @@ static void	draw_weapon_texture_pixel(t_cub_data *data, t_texture *tex,
 		{
 			tx = (x * tex->width) / c->w_width;
 			ty = (y * tex->height) / c->w_height;
-			pixel = get_texture_pixel(tex, tx, tty);
+			pixel = get_texture_pixel(tex, tx, ty);
 			if (!is_transparent_pixel(pixel))
 				mylx_pixel_put(data, xs, ys, pixel);
 		}
