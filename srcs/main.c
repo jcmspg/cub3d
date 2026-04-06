@@ -48,6 +48,25 @@ static void	setup_mlx_hooks(t_cub_data *data)
 	mlx_hook(data->mlx->win_ptr, 5, 1L << 3, handle_mouse_release, data);
 }
 
+static void	print_game_init_message(char *map_file)
+{
+	ft_putstr_fd("Game initialized with map: ", 1);
+	ft_putstr_fd(map_file, 1);
+	ft_putchar_fd('\n', 1);
+}
+
+static void	start_game_loop(t_cub_data *data)
+{
+	init_game_window(data);
+	graphics_init(data);
+	init_fps_sync(&data->fps);
+	mlx_mouse_hide(data->mlx->mlx_ptr, data->mlx->win_ptr);
+	mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr,
+		data->mlx->width / 2, data->mlx->height / 2);
+	setup_mlx_hooks(data);
+	mlx_loop(data->mlx->mlx_ptr);
+}
+
 int	main(int argc, char **argv)
 {
 	t_cub_data	data;
@@ -60,20 +79,11 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("Usage: ./cub3d <map_file>\n", 2);
 		return (ERR_INVALID_ARG);
 	}
-	ft_putstr_fd("Game initialized with map: ", 1);
-	ft_putstr_fd(argv[1], 1);
-	ft_putchar_fd('\n', 1);
+	print_game_init_message(argv[1]);
 	err = init_parse_map(argv[1], &data);
 	if (err != ERR_NO_ERROR)
 		return (err);
-	init_game_window(&data);
-	graphics_init(&data);
-	init_fps_sync(&data.fps);
-	mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
-	mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2,
-		data.mlx->height / 2);
-	setup_mlx_hooks(&data);
-	mlx_loop(data.mlx->mlx_ptr);
+	start_game_loop(&data);
 	cleanup(&data);
 	return (ERR_NO_ERROR);
 }
