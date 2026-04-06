@@ -42,6 +42,15 @@ void	init_fps_sync(t_fps_data *fps)
 	fps->frame_count = 0;
 }
 
+static void	set_default_player_stats(t_player *player)
+{
+	player->stats.max_health = 100;
+	player->stats.health = 100;
+	player->stats.max_ammo = 200;
+	player->stats.ammo = 20;
+	player->stats.damage = 10;
+}
+
 static void	init_game_state(t_cub_data *data)
 {
 	data->player = init_player(data);
@@ -50,11 +59,7 @@ static void	init_game_state(t_cub_data *data)
 		ft_putstr_fd("Error: Player initialization failed.\n", STDERR_FILENO);
 		cleanup_and_exit(data);
 	}
-	data->player->stats.max_health = 100;
-	data->player->stats.health = 100;
-	data->player->stats.max_ammo = 200;
-	data->player->stats.ammo = 20;
-	data->player->stats.damage = 10;
+	set_default_player_stats(data->player);
 	data->game = ft_calloc(1, sizeof(t_game));
 	if (!data->game)
 	{

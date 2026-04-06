@@ -6,22 +6,62 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 20:36:49 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/06 18:35:00 by copilot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cub3d.h"
 #include "../../includes/gamelogic.h"
 
-/**
- * Calculate wall slice dimensions for a given ray
- *
- * @param data       Game data
- * @param ray        The ray to calculate for
- * @param draw_start Output: Y coordinate to start drawing
- * @param draw_end   Output: Y coordinate to stop drawing
- * @return           Height of the wall slice in pixels
- */
+struct				s_wall_ctx
+{
+	int				line_height;
+	int				draw_start;
+	int				draw_end;
+	int				y;
+	int				wall_color;
+	int				shaded_color;
+	int				tex_x;
+	int				tex_y;
+	t_texture		*texture;
+	t_fixed32		step;
+	t_fixed32		tex_pos;
+};
+
+struct				s_door_ctx
+{
+	int				line_height;
+	int				frame_top;
+	int				frame_bottom;
+	int				render_top;
+	int				render_bottom;
+	int				view_offset;
+	int				offset;
+	int				draw_start;
+	int				draw_end;
+	int				tex_x;
+	int				tex_y;
+	int				tex_color;
+	int				door_color;
+	int				draw_fallback;
+	t_door			*door;
+	t_fixed32		player_pos;
+	t_fixed32		map_pos;
+	t_fixed32		step_val;
+	t_fixed32		dir_val;
+	t_fixed32		euclidean_dist;
+	t_fixed32		p_dir_x;
+	t_fixed32		p_dir_y;
+	t_fixed32		r_dir_x;
+	t_fixed32		r_dir_y;
+	t_fixed32		dot_prod;
+	t_fixed32		perp_dist;
+	t_fixed32		dist;
+	t_fixed32		wall_x;
+	t_fixed32		door_dist;
+	int				door_side;
+};
+
 static int	calculate_wall_slice(t_cub_data *data, t_ray *ray, int *draw_start,
 		int *draw_end)
 {
@@ -44,15 +84,13 @@ static int	calculate_wall_slice(t_cub_data *data, t_ray *ray, int *draw_start,
 	return (line_height);
 }
 
-/**
- * Apply shading based on distance and wall side
- * Makes distant walls darker and adds depth
- */
 static int	apply_shading(int color, float dist, int side)
 {
 	t_fixed32	shade;
+	int			r;
+	int			g;
+	int			b;
 
-	int r, g, b;
 	shade = fixed32_sub(to_fixed32(1.0f), fixed32_div(to_fixed32(dist),
 				to_fixed32(20.0f)));
 	if (shade < to_fixed32(0.3f))
@@ -67,9 +105,6 @@ static int	apply_shading(int color, float dist, int side)
 	return ((r << 16) | (g << 8) | b);
 }
 
-/**
- * Get the texture for this wall face based on ray direction
- */
 static t_texture	*get_wall_texture(t_ray *ray, t_textures *textures)
 {
 	if (ray->hit_content == 'D')
@@ -80,17 +115,11 @@ static t_texture	*get_wall_texture(t_ray *ray, t_textures *textures)
 			return (&textures->walls[TEX_WEST]);
 		return (&textures->walls[TEX_EAST]);
 	}
-	else
-	{
-		if (ray->step_y > 0)
-			return (&textures->walls[TEX_NORTH]);
-		return (&textures->walls[TEX_SOUTH]);
-	}
+	if (ray->step_y > 0)
+		return (&textures->walls[TEX_NORTH]);
+	return (&textures->walls[TEX_SOUTH]);
 }
 
-/**
- * Calculate texture X coordinate based on where ray hit the wall
- */
 static int	calculate_texture_x(t_cub_data *data, t_ray *ray,
 		t_texture *texture)
 {
@@ -100,7 +129,6 @@ static int	calculate_texture_x(t_cub_data *data, t_ray *ray,
 
 	if (!texture || !texture->loaded || texture->width == 0)
 		return (0);
-	// Use raw DDA distance (before fisheye correction) to find wall hit point
 	if (ray->side == 0)
 	{
 		raw_dist = fixed32_sub(ray->side_dist_x, ray->delta_dist_x);
@@ -113,15 +141,11 @@ static int	calculate_texture_x(t_cub_data *data, t_ray *ray,
 		wall_x = fixed32_add(data->player->x, fixed32_mul(raw_dist,
 					ray->dir_x));
 	}
-	// Get fractional part (wall_x - floor(wall_x))
 	wall_x = fixed32_sub(wall_x, to_fixed32((float)(int)from_fixed32(wall_x)));
-	// Convert to texture coordinate
 	tex_x = (int)from_fixed32(fixed32_mul(wall_x, to_fixed32(texture->width)));
-	// Flip texture for certain faces to maintain consistency
 	if ((ray->side == 0 && ray->dir_x > 0) || (ray->side == 1
 			&& ray->dir_y < 0))
 		tex_x = texture->width - tex_x - 1;
-	// Bounds check
 	if (tex_x < 0)
 		tex_x = 0;
 	if (tex_x >= texture->width)
@@ -129,78 +153,67 @@ static int	calculate_texture_x(t_cub_data *data, t_ray *ray,
 	return (tex_x);
 }
 
-/**
- * Draw a single vertical wall slice with texture mapping
- */
-static void	draw_wall_slice(t_cub_data *data, int x, t_ray *ray)
+static void	init_wall_ctx(t_cub_data *data, t_ray *ray, struct s_wall_ctx *ctx)
 {
-	int			draw_start;
-	int			draw_end;
-	int			y;
-	int			wall_color;
-	int			shaded_color;
-	t_texture	*texture;
-	int			tex_x;
-	int			tex_y;
-	int			line_height;
-	t_fixed32	step;
-	t_fixed32	tex_pos;
+	ctx->line_height = calculate_wall_slice(data, ray, &ctx->draw_start,
+			&ctx->draw_end);
+	ctx->texture = get_wall_texture(ray, data->textures);
+}
 
-	if (!ray->hit)
-		return ;
-	line_height = calculate_wall_slice(data, ray, &draw_start, &draw_end);
-	// Get the texture for this wall
-	texture = get_wall_texture(ray, data->textures);
-	// If texture is loaded, use texture mapping
-	if (texture && texture->loaded && texture->pixels)
+static void	draw_textured_wall(t_cub_data *data, int x, t_ray *ray,
+		struct s_wall_ctx *ctx)
+{
+	ctx->tex_x = calculate_texture_x(data, ray, ctx->texture);
+	ctx->step = fixed32_div(to_fixed32(ctx->texture->height),
+			to_fixed32(ctx->line_height));
+	ctx->tex_pos = fixed32_mul(to_fixed32(ctx->draw_start - (data->mlx->height
+					- ctx->line_height) / 2 - data->player->view_offset
+				- data->player->bob_offset), ctx->step);
+	ctx->y = ctx->draw_start;
+	while (ctx->y <= ctx->draw_end)
 	{
-		// Calculate texture X coordinate
-		tex_x = calculate_texture_x(data, ray, texture);
-		// Calculate texture Y step per screen pixel (fixed-point)
-		step = fixed32_div(to_fixed32(texture->height),
-				to_fixed32(line_height));
-		// Starting texture position (accounting for y clipping)
-		tex_pos = fixed32_mul(to_fixed32(draw_start - (data->mlx->height
-						- line_height) / 2 - data->player->view_offset
-					- data->player->bob_offset), step);
-		// Draw textured wall slice
-		y = draw_start;
-		while (y <= draw_end)
-		{
-			// Calculate texture Y coordinate
-			tex_y = (int)from_fixed32(tex_pos);
-			if (tex_y < 0)
-				tex_y = 0;
-			if (tex_y >= texture->height)
-				tex_y = texture->height - 1;
-			tex_pos = fixed32_add(tex_pos, step);
-			// Get pixel from texture
-			wall_color = texture->pixels[tex_y * texture->width + tex_x];
-			// Apply shading
-			shaded_color = apply_shading(wall_color,
-					from_fixed32(ray->perp_dist), ray->side);
-			mylx_pixel_put(data, x, y, shaded_color);
-			y++;
-		}
-	}
-	else
-	{
-		// Fallback to solid color if texture not loaded
-		wall_color = get_wall_color(ray, data->textures);
-		shaded_color = apply_shading(wall_color, from_fixed32(ray->perp_dist),
-				ray->side);
-		y = draw_start;
-		while (y <= draw_end)
-		{
-			mylx_pixel_put(data, x, y, shaded_color);
-			y++;
-		}
+		ctx->tex_y = (int)from_fixed32(ctx->tex_pos);
+		if (ctx->tex_y < 0)
+			ctx->tex_y = 0;
+		if (ctx->tex_y >= ctx->texture->height)
+			ctx->tex_y = ctx->texture->height - 1;
+		ctx->tex_pos = fixed32_add(ctx->tex_pos, ctx->step);
+		ctx->wall_color = ctx->texture->pixels[ctx->tex_y * ctx->texture->width
+			+ ctx->tex_x];
+		ctx->shaded_color = apply_shading(ctx->wall_color,
+				from_fixed32(ray->perp_dist), ray->side);
+		mylx_pixel_put(data, x, ctx->y, ctx->shaded_color);
+		ctx->y++;
 	}
 }
 
-/**
- * Draw ceiling for a column
- */
+static void	draw_flat_wall(t_cub_data *data, int x, t_ray *ray,
+		struct s_wall_ctx *ctx)
+{
+	ctx->wall_color = get_wall_color(ray, data->textures);
+	ctx->shaded_color = apply_shading(ctx->wall_color,
+			from_fixed32(ray->perp_dist), ray->side);
+	ctx->y = ctx->draw_start;
+	while (ctx->y <= ctx->draw_end)
+	{
+		mylx_pixel_put(data, x, ctx->y, ctx->shaded_color);
+		ctx->y++;
+	}
+}
+
+static void	draw_wall_slice(t_cub_data *data, int x, t_ray *ray)
+{
+	struct s_wall_ctx	ctx;
+
+	if (!ray->hit)
+		return ;
+	init_wall_ctx(data, ray, &ctx);
+	if (ctx.texture && ctx.texture->loaded && ctx.texture->pixels)
+		draw_textured_wall(data, x, ray, &ctx);
+	else
+		draw_flat_wall(data, x, ray, &ctx);
+}
+
 static void	draw_ceiling_slice(t_cub_data *data, int x, int wall_start)
 {
 	int	y;
@@ -215,9 +228,6 @@ static void	draw_ceiling_slice(t_cub_data *data, int x, int wall_start)
 	}
 }
 
-/**
- * Draw floor for a column
- */
 static void	draw_floor_slice(t_cub_data *data, int x, int wall_end)
 {
 	int	y;
@@ -232,162 +242,153 @@ static void	draw_floor_slice(t_cub_data *data, int x, int wall_end)
 	}
 }
 
-/**
- * Draw the door slice (transparent/animating)
- */
-static void	draw_door_slice(t_cub_data *data, int x, t_ray *ray)
+static void	set_door_axis_values(t_cub_data *data, t_ray *ray,
+		struct s_door_ctx *ctx)
 {
-	int			line_height;
-	int			frame_top;
-	int			frame_bottom;
-	int			render_top;
-	int			render_bottom;
-	int			view_offset;
-	int			y;
-	int			tex_x;
-	int			tex_y;
-	int			tex_color;
-	t_door		*door;
-	int			door_color;
-	t_fixed32	player_pos;
-	t_fixed32	map_pos;
-	t_fixed32	step_val;
-	t_fixed32	dir_val;
-	t_fixed32	euclidean_dist;
-	t_fixed32	p_dir_x;
-	t_fixed32	p_dir_y;
-	t_fixed32	r_dir_x;
-	t_fixed32	r_dir_y;
-	t_fixed32	dot_prod;
-	t_fixed32	perp_dist;
-	t_fixed32	dist;
-	int			offset;
-	int			draw_start;
-	int			draw_end;
-	t_fixed32	wall_x;
-	int			draw_fallback;
+	if (ray->door_side == 0)
+	{
+		ctx->player_pos = data->player->x;
+		ctx->map_pos = to_fixed32(ray->door_map_x);
+		ctx->step_val = to_fixed32(ray->step_x);
+		ctx->dir_val = ray->dir_x;
+	}
+	else
+	{
+		ctx->player_pos = data->player->y;
+		ctx->map_pos = to_fixed32(ray->door_map_y);
+		ctx->step_val = to_fixed32(ray->step_y);
+		ctx->dir_val = ray->dir_y;
+	}
+	if (ctx->dir_val == 0)
+		ctx->dir_val = 1;
+}
 
-	// 1. Calculate the static door frame dimensions (where a closed door would
-	// be)
-	// 1. Calculate relative geometrical distance to the door plane
-	// This avoids reliance on DDA accumulators which might drift or have
-	// precision issues Formula: (map - pos + (1 - step)/2) / dir
+static void	set_door_distance_data(t_cub_data *data, t_ray *ray,
+		struct s_door_ctx *ctx)
+{
+	set_door_axis_values(data, ray, ctx);
+	ctx->euclidean_dist = fixed32_div(fixed32_add(fixed32_sub(ctx->map_pos,
+					ctx->player_pos), fixed32_div(fixed32_sub(to_fixed32(1.0f),
+						ctx->step_val), to_fixed32(2.0f))), ctx->dir_val);
+	ctx->p_dir_x = data->player->dir_x;
+	ctx->p_dir_y = data->player->dir_y;
+	ctx->r_dir_x = ray->dir_x;
+	ctx->r_dir_y = ray->dir_y;
+	ctx->dot_prod = fixed32_add(fixed32_mul(ctx->r_dir_x, ctx->p_dir_x),
+			fixed32_mul(ctx->r_dir_y, ctx->p_dir_y));
+	ctx->perp_dist = fixed32_mul(ctx->euclidean_dist, ctx->dot_prod);
+	if (ctx->perp_dist < to_fixed32(0.1f))
+		ctx->perp_dist = to_fixed32(0.1f);
+	ctx->dist = ctx->perp_dist;
+	ctx->door_dist = ray->door_dist;
+	ctx->door_side = ray->door_side;
+}
+
+static void	set_door_screen_bounds(t_cub_data *data, t_ray *ray,
+		struct s_door_ctx *ctx)
+{
+	ctx->line_height = (int)from_fixed32(fixed32_div(to_fixed32(data->mlx->height),
+				ctx->dist));
+	ctx->view_offset = data->player->view_offset + data->player->bob_offset;
+	ctx->frame_top = (data->mlx->height - ctx->line_height) / 2
+		+ ctx->view_offset;
+	ctx->frame_bottom = (data->mlx->height + ctx->line_height) / 2
+		+ ctx->view_offset;
+	ctx->door = get_door_at(data, ray->door_map_x, ray->door_map_y);
+	ctx->offset = 0;
+	if (ctx->door)
+		ctx->offset = (int)(ctx->line_height * ctx->door->open_amount);
+	ctx->render_bottom = ctx->frame_bottom - ctx->offset;
+	ctx->render_top = ctx->frame_top - ctx->offset;
+	ctx->draw_start = ctx->render_top;
+	ctx->draw_end = ctx->render_bottom;
+	if (ctx->draw_start < ctx->frame_top)
+		ctx->draw_start = ctx->frame_top;
+	if (ctx->draw_start < 0)
+		ctx->draw_start = 0;
+	if (ctx->draw_end >= data->mlx->height)
+		ctx->draw_end = data->mlx->height - 1;
+}
+
+static void	set_door_texture_x(t_cub_data *data, t_ray *ray,
+		struct s_door_ctx *ctx)
+{
 	if (ray->door_side == 0)
-	{
-		player_pos = data->player->x;
-		map_pos = to_fixed32(ray->door_map_x);
-		step_val = to_fixed32(ray->step_x);
-		dir_val = ray->dir_x;
-	}
+		ctx->wall_x = fixed32_add(data->player->y,
+				fixed32_mul(ctx->euclidean_dist, ctx->r_dir_y));
 	else
-	{
-		player_pos = data->player->y;
-		map_pos = to_fixed32(ray->door_map_y);
-		step_val = to_fixed32(ray->step_y);
-		dir_val = ray->dir_y;
-	}
-	// Avoid div by zero
-	if (dir_val == 0)
-		dir_val = 1;
-	// (map - pos + (1 - step)/2) / dir
-	euclidean_dist = fixed32_div(fixed32_add(fixed32_sub(map_pos, player_pos),
-				fixed32_div(fixed32_sub(to_fixed32(1.0f), step_val),
-					to_fixed32(2.0f))), dir_val);
-	// Fisheye Correction: dist * cos(angle_diff)
-	p_dir_x = data->player->dir_x;
-	p_dir_y = data->player->dir_y;
-	r_dir_x = ray->dir_x;
-	r_dir_y = ray->dir_y;
-	dot_prod = fixed32_add(fixed32_mul(r_dir_x, p_dir_x), fixed32_mul(r_dir_y,
-				p_dir_y));
-	perp_dist = fixed32_mul(euclidean_dist, dot_prod);
-	// Near clipping
-	if (perp_dist < to_fixed32(0.1f))
-		perp_dist = to_fixed32(0.1f);
-	dist = perp_dist;
-	line_height = (int)from_fixed32(fixed32_div(to_fixed32(data->mlx->height),
-				dist));
-	view_offset = data->player->view_offset + data->player->bob_offset;
-	frame_top = (data->mlx->height - line_height) / 2 + view_offset;
-	frame_bottom = (data->mlx->height + line_height) / 2 + view_offset;
-	// Apply offset based on open_amount
-	door = get_door_at(data, ray->door_map_x, ray->door_map_y);
-	offset = 0;
-	if (door)
-		offset = (int)(line_height * door->open_amount); // Shift UP
-	render_bottom = frame_bottom - offset;
-	render_top = frame_top - offset;
-	draw_start = render_top;
-	draw_end = render_bottom;
-	if (draw_start < frame_top)
-		draw_start = frame_top;
-	if (draw_start < 0)
-		draw_start = 0;
-	if (draw_end >= data->mlx->height)
-		draw_end = data->mlx->height - 1;
-	if (draw_start > draw_end)
-		return ;
-	// Texture X coordinate from exact hit point on door plane
-	if (ray->door_side == 0)
-		wall_x = fixed32_add(data->player->y, fixed32_mul(euclidean_dist,
-					r_dir_y));
-	else
-		wall_x = fixed32_add(data->player->x, fixed32_mul(euclidean_dist,
-					r_dir_x));
-	wall_x = fixed32_sub(wall_x, to_fixed32((float)(int)from_fixed32(wall_x)));
-	tex_x = (int)from_fixed32(fixed32_mul(wall_x,
+		ctx->wall_x = fixed32_add(data->player->x,
+				fixed32_mul(ctx->euclidean_dist, ctx->r_dir_x));
+	ctx->wall_x = fixed32_sub(ctx->wall_x,
+			to_fixed32((float)(int)from_fixed32(ctx->wall_x)));
+	ctx->tex_x = (int)from_fixed32(fixed32_mul(ctx->wall_x,
 				to_fixed32(data->textures->door.width)));
-	if ((ray->door_side == 0 && r_dir_x > 0) || (ray->door_side == 1
-			&& r_dir_y < 0))
-		tex_x = data->textures->door.width - tex_x - 1;
-	if (tex_x < 0)
-		tex_x = 0;
-	if (tex_x >= data->textures->door.width)
-		tex_x = data->textures->door.width - 1;
-	// 4. Draw
-	door_color = 0x8B4513; // SaddleBrown
-	door_color = apply_shading(door_color, from_fixed32(ray->door_dist),
-			ray->door_side);
-	y = draw_start;
-	while (y <= draw_end)
+	if ((ray->door_side == 0 && ctx->r_dir_x > 0) || (ray->door_side == 1
+			&& ctx->r_dir_y < 0))
+		ctx->tex_x = data->textures->door.width - ctx->tex_x - 1;
+	if (ctx->tex_x < 0)
+		ctx->tex_x = 0;
+	if (ctx->tex_x >= data->textures->door.width)
+		ctx->tex_x = data->textures->door.width - 1;
+}
+
+static void	draw_door_pixel(t_cub_data *data, int x, int y,
+		struct s_door_ctx *ctx)
+{
+	ctx->draw_fallback = 0;
+	if (data->textures && data->textures->door.loaded
+		&& data->textures->door.width > 0 && data->textures->door.height > 0)
 	{
-		draw_fallback = 0;
-		if (data->textures && data->textures->door.loaded
-			&& data->textures->door.width > 0
-			&& data->textures->door.height > 0)
-		{
-			tex_y = ((y - render_top) * data->textures->door.height)
-				/ line_height;
-			if (tex_y < 0)
-				tex_y = 0;
-			if (tex_y >= data->textures->door.height)
-				tex_y = data->textures->door.height - 1;
-			tex_color = get_texture_pixel(&data->textures->door, tex_x, tex_y);
-			// If pixel is fully transparent, use fallback color
-			if ((unsigned int)tex_color == 0xFF000000U)
-				draw_fallback = 1;
-			else
-			{
-				tex_color = apply_shading(tex_color,
-						from_fixed32(ray->door_dist), ray->door_side);
-				mylx_pixel_put(data, x, y, tex_color);
-			}
-		}
+		ctx->tex_y = ((y - ctx->render_top) * data->textures->door.height)
+			/ ctx->line_height;
+		if (ctx->tex_y < 0)
+			ctx->tex_y = 0;
+		if (ctx->tex_y >= data->textures->door.height)
+			ctx->tex_y = data->textures->door.height - 1;
+		ctx->tex_color = get_texture_pixel(&data->textures->door, ctx->tex_x,
+				ctx->tex_y);
+		if ((unsigned int)ctx->tex_color == 0xFF000000U)
+			ctx->draw_fallback = 1;
 		else
 		{
-			draw_fallback = 1;
+			ctx->tex_color = apply_shading(ctx->tex_color,
+					from_fixed32(ctx->door_dist), ctx->door_side);
+			mylx_pixel_put(data, x, y, ctx->tex_color);
 		}
-		if (draw_fallback)
-		{
-			mylx_pixel_put(data, x, y, door_color);
-		}
+	}
+	else
+		ctx->draw_fallback = 1;
+	if (ctx->draw_fallback)
+		mylx_pixel_put(data, x, y, ctx->door_color);
+}
+
+static void	draw_door_column(t_cub_data *data, int x, t_ray *ray,
+		struct s_door_ctx *ctx)
+{
+	int	y;
+
+	y = ctx->draw_start;
+	while (y <= ctx->draw_end)
+	{
+		draw_door_pixel(data, x, y, ctx);
 		y++;
 	}
 }
 
-/**
- * Render a complete column (ceiling + wall + floor)
- */
+static void	draw_door_slice(t_cub_data *data, int x, t_ray *ray)
+{
+	struct s_door_ctx	ctx;
+
+	set_door_distance_data(data, ray, &ctx);
+	set_door_screen_bounds(data, ray, &ctx);
+	if (ctx.draw_start > ctx.draw_end)
+		return ;
+	set_door_texture_x(data, ray, &ctx);
+	ctx.door_color = apply_shading(0x8B4513, from_fixed32(ctx.door_dist),
+			ctx.door_side);
+	draw_door_column(data, x, ray, &ctx);
+}
+
 static void	render_column(t_cub_data *data, int x, t_ray *ray)
 {
 	int	draw_start;
@@ -400,9 +401,7 @@ static void	render_column(t_cub_data *data, int x, t_ray *ray)
 	}
 	else
 		calculate_wall_slice(data, ray, &draw_start, &draw_end);
-	// Draw ceiling above the wall
 	draw_ceiling_slice(data, x, draw_start);
-	// Draw the wall or door
 	if (ray->hit)
 	{
 		if (ray->hit_content == 'D')
@@ -410,18 +409,11 @@ static void	render_column(t_cub_data *data, int x, t_ray *ray)
 		else
 			draw_wall_slice(data, x, ray);
 	}
-	// Draw floor below the wall
 	draw_floor_slice(data, x, draw_end);
-	// OVERLAY: Draw door if we hit one and it's not the main hit (i.e.,
-		animating/partially open)
 	if (ray->door_hit && ray->hit_content != 'D')
 		draw_door_slice(data, x, ray);
 }
 
-/**
- * Render all walls based on raycasting data
- * Call this after cast_all_rays()
- */
 void	render_walls(t_cub_data *data)
 {
 	int	x;
