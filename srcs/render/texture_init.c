@@ -125,30 +125,19 @@ t_textures	*init_textures(void)
  */
 int	get_wall_color(t_ray *ray, t_textures *textures)
 {
-	// side == 0 means we hit a vertical wall (E/W face)
-	// side == 1 means we hit a horizontal wall (N/S face)
 	if (ray->hit_content == 'D')
-		return (0x8B4513); // Door color (SaddleBrown)
+		return (0x8B4513);
 	if (ray->side == 0)
 	{
-		// Hit vertical wall - ray going East sees West face,
-			ray going West sees
-		// East face
 		if (ray->step_x > 0)
 			return (textures->walls[TEX_WEST].color);
-		else
-			return (textures->walls[TEX_EAST].color);
+		return (textures->walls[TEX_EAST].color);
 	}
-	else
+	if (ray->step_y > 0)
 	{
-		// Hit horizontal wall - ray going South sees North face,
-			ray going North
-		// sees South face
-		if (ray->step_y > 0)
-			return (textures->walls[TEX_NORTH].color);
-		else
-			return (textures->walls[TEX_SOUTH].color);
+		return (textures->walls[TEX_NORTH].color);
 	}
+	return (textures->walls[TEX_SOUTH].color);
 }
 
 /**

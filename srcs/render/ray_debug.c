@@ -56,15 +56,10 @@ static void	draw_line(t_cub_data *data, struct s_ray_line *line)
 {
 	int	dx;
 	int	dy;
-	int	sx;
-	int	sy;
 	int	err;
-	int	e2;
 
 	dx = abs(line->x1 - line->x0);
 	dy = abs(line->y1 - line->y0);
-	sx = (line->x0 < line->x1) ? 1 : -1;
-	sy = (line->y0 < line->y1) ? 1 : -1;
 	err = dx - dy;
 	while (1)
 	{
@@ -73,17 +68,28 @@ static void	draw_line(t_cub_data *data, struct s_ray_line *line)
 			mylx_pixel_put(data, line->x0, line->y0, line->color);
 		if (line->x0 == line->x1 && line->y0 == line->y1)
 			break ;
-		e2 = 2 * err;
-		if (e2 > -dy)
-		{
-			err -= dy;
-			line->x0 += sx;
-		}
-		if (e2 < dx)
-		{
-			err += dx;
-			line->y0 += sy;
-		}
+		step_line(line, &err, dx, dy);
+	}
+}
+
+static void	step_line(struct s_ray_line *line, int *err, int dx, int dy)
+{
+	int	e2;
+	int	sx;
+	int	sy;
+
+	sx = (line->x0 < line->x1) ? 1 : -1;
+	sy = (line->y0 < line->y1) ? 1 : -1;
+	e2 = 2 * (*err);
+	if (e2 > -dy)
+	{
+		*err -= dy;
+		line->x0 += sx;
+	}
+	if (e2 < dx)
+	{
+		*err += dx;
+		line->y0 += sy;
 	}
 }
 

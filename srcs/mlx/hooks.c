@@ -28,11 +28,9 @@ static void	apply_mouse_rotation(t_cub_data *data, int delta_x)
 	calc_player_dirs(data);
 }
 
-int	handle_key_press(int keycode, t_cub_data *data)
+static void	set_key_press_state(int keycode, t_cub_data *data)
 {
-	if (keycode == KEY_ESC)
-		data->input->exit = true;
-	else if (keycode == KEY_W || keycode == KEY_UP)
+	if (keycode == KEY_W || keycode == KEY_UP)
 		data->input->forward = true;
 	else if (keycode == KEY_S || keycode == KEY_DOWN)
 		data->input->backward = true;
@@ -46,11 +44,19 @@ int	handle_key_press(int keycode, t_cub_data *data)
 		data->input->turn_right = true;
 	else if (keycode == KEY_SHIFT)
 		data->input->sprint = true;
+}
+
+int	handle_key_press(int keycode, t_cub_data *data)
+{
+	if (keycode == KEY_ESC)
+		data->input->exit = true;
 	else if (keycode == KEY_SPACE && !data->input->jumping)
 	{
 		data->input->jumping = true;
 		data->input->jump_start_time = get_time_ms();
 	}
+	else
+		set_key_press_state(keycode, data);
 	if (data->input->exit)
 		exit(0);
 	return (ERR_NO_ERROR);

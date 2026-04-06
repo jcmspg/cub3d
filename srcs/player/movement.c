@@ -77,6 +77,24 @@ static bool	is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y)
 	return (true);
 }
 
+static void	apply_strafe(t_cub_data *data, t_fixed32 strafe_speed,
+		t_fixed32 perp_x, t_fixed32 perp_y)
+{
+	t_fixed32	new_x;
+	t_fixed32	new_y;
+	t_fixed32	newX;
+	t_fixed32	newY;
+
+	new_x = fixed32_mul(strafe_speed, perp_x);
+	new_y = fixed32_mul(strafe_speed, perp_y);
+	newX = fixed32_add(data->player->x, new_x);
+	newY = fixed32_add(data->player->y, new_y);
+	if (!is_valid_move(data, newX, newY))
+		return ;
+	data->player->x = newX;
+	data->player->y = newY;
+}
+
 /**
  * Handle forward movement
  */
@@ -138,10 +156,6 @@ void	move_player(t_cub_data *data, t_fixed32 move_speed)
 // Strafe player left or right
 void	strafe_player(t_cub_data *data, t_fixed32 strafe_speed)
 {
-	t_fixed32	new_x;
-	t_fixed32	new_y;
-	t_fixed32	newX;
-	t_fixed32	newY;
 	t_fixed32	perp_x;
 	t_fixed32	perp_y;
 
@@ -154,14 +168,7 @@ void	strafe_player(t_cub_data *data, t_fixed32 strafe_speed)
 	}
 	perp_x = -data->player->dir_y;
 	perp_y = data->player->dir_x;
-	new_x = fixed32_mul(strafe_speed, perp_x);
-	new_y = fixed32_mul(strafe_speed, perp_y);
-	newX = fixed32_add(data->player->x, new_x);
-	newY = fixed32_add(data->player->y, new_y);
-	if (!is_valid_move(data, newX, newY))
-		return ;
-	data->player->x = newX;
-	data->player->y = newY;
+	apply_strafe(data, strafe_speed, perp_x, perp_y);
 }
 
 static t_fixed32	normalize_angle_fixed(t_fixed32 angle)

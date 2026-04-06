@@ -134,34 +134,38 @@ static void	draw_minimap_cell_screen(t_cub_data *data, int map_x, int map_y,
 	fill_minimap_cell(data, cell);
 }
 
+static void	draw_minimap_visible_cell(t_cub_data *data,
+		struct s_minimap_view *view, int x, int y)
+{
+	int				map_x;
+	int				map_y;
+	struct s_cell_draw	cell;
+
+	cell.x = view->minimap_x + x * view->cell_size - view->offset_x;
+	cell.y = view->minimap_y + y * view->cell_size - view->offset_y;
+	cell.size = view->cell_size;
+	if (cell.x < view->minimap_x + view->minimap_size && cell.x
+		+ view->cell_size > view->minimap_x && cell.y < view->minimap_y
+		+ view->minimap_size && cell.y + view->cell_size > view->minimap_y)
+	{
+		map_x = view->start_cell_x + x;
+		map_y = view->start_cell_y + y;
+		draw_minimap_cell_screen(data, map_x, map_y, &cell);
+	}
+}
+
 static void	draw_visible_minimap_cells(t_cub_data *data,
 		struct s_minimap_view *view)
 {
-	int					x;
-	int					y;
-	int					map_x;
-	int					map_y;
-	struct s_cell_draw	cell;
+	int	x;
+	int	y;
 
 	y = -1;
 	while (++y < view->view_cells + 2)
 	{
 		x = -1;
 		while (++x < view->view_cells + 2)
-		{
-			cell.x = view->minimap_x + x * view->cell_size - view->offset_x;
-			cell.y = view->minimap_y + y * view->cell_size - view->offset_y;
-			cell.size = view->cell_size;
-			if (cell.x < view->minimap_x + view->minimap_size && cell.x
-				+ view->cell_size > view->minimap_x && cell.y < view->minimap_y
-				+ view->minimap_size && cell.y
-				+ view->cell_size > view->minimap_y)
-			{
-				map_x = view->start_cell_x + x;
-				map_y = view->start_cell_y + y;
-				draw_minimap_cell_screen(data, map_x, map_y, &cell);
-			}
-		}
+			draw_minimap_visible_cell(data, view, x, y);
 	}
 }
 

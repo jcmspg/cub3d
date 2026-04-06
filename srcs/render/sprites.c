@@ -13,68 +13,82 @@
 #include "../../includes/render.h"
 #include <math.h>
 
-/**
- * Calculate where a door covers on screen for a given stripe
- * Returns the Y range that the door occupies (door_top to door_bottom)
- * If no door or sprite is in front, returns -1 for both
- */
+struct s_door_clip
+{
+	int	top;
+	int	bottom;
+};
+
+struct s_billboard
+{
+	float	sx;
+	float	sy;
+	int		color;
+	int		scale_div;
+	t_texture	*texture;
+};
+
+struct s_draw_span
+{
+	int	start_x;
+	int	end_x;
+	int	start_y;
+	int	end_y;
+	float	transform_y;
+};
+
+static bool	is_transparent_pixel(int pixel)
+{
+	return ((unsigned int)pixel == 0xFF000000U);
+}
+
 static void	get_door_coverage(t_cub_data *data, int stripe, float sprite_dist,
-		int *door_top, int *door_bottom)
+		struct s_door_clip *clip)
 {
 	t_ray	*ray;
 	t_door	*door;
 	float	door_dist;
 	int		line_height;
 	int		frame_top;
-	int		frame_bottom;
 	int		offset;
 	int		view_offset;
 
-	*door_top = -1;
-	*door_bottom = -1;
+	clip->top = -1;
+	clip->bottom = -1;
 	ray = &data->raycasting->rays[stripe];
 	if (!ray->door_hit)
 		return ;
 	door_dist = from_fixed32(ray->door_dist);
-	// Sprite is in front of door - no occlusion needed
 	if (sprite_dist < door_dist)
 		return ;
 	door = get_door_at(data, ray->door_map_x, ray->door_map_y);
 	if (!door)
 		return ;
-	// Calculate door screen position (same logic as ray_render.c)
 	line_height = (int)(data->mlx->height / door_dist);
 	view_offset = data->player->view_offset + data->player->bob_offset;
 	frame_top = (data->mlx->height - line_height) / 2 + view_offset;
-	frame_bottom = (data->mlx->height + line_height) / 2 + view_offset;
-	// Door slides up based on open_amount
 	offset = (int)(line_height * door->open_amount);
-	*door_top = frame_top - offset;
-	*door_bottom = frame_bottom - offset;
-	// Clip to frame
-	if (*door_top < frame_top)
-		*door_top = frame_top;
-	if (*door_top < 0)
-		*door_top = 0;
-	if (*door_bottom >= data->mlx->height)
-		*door_bottom = data->mlx->height - 1;
+	clip->top = frame_top - offset;
+	clip->bottom = (data->mlx->height + line_height) / 2 + view_offset - offset;
+	if (clip->top < frame_top)
+		clip->top = frame_top;
+	if (clip->top < 0)
+		clip->top = 0;
+	if (clip->bottom >= data->mlx->height)
+		clip->bottom = data->mlx->height - 1;
 }
 
-/**
- * Draw a single sprite stripe, respecting door occlusion
- */
-static void	draw_sprite_stripe_occluded(t_cub_data *data, int stripe,
-		int draw_start, int draw_end, int color, int door_top, int door_bottom)
+static void	draw_sprite_stripe_color(t_cub_data *data, int stripe,
+		struct s_draw_span *span, struct s_door_clip *clip, int color)
 {
 	int	y;
 
-	y = draw_start;
-	while (y < draw_end)
+	y = span->start_y;
+	while (y < span->end_y)
 	{
 		if (y >= 0 && y < data->mlx->height)
 		{
-			// Skip pixels covered by door
-			if (door_top >= 0 && y >= door_top && y <= door_bottom)
+			if (clip->top >= 0 && y >= clip->top && y <= clip->bottom)
 			{
 				y++;
 				continue ;
@@ -85,317 +99,198 @@ static void	draw_sprite_stripe_occluded(t_cub_data *data, int stripe,
 	}
 }
 
-static bool	is_transparent_pixel(int pixel)
-{
-	return ((unsigned int)pixel == 0xFF000000U);
-}
-
-static void	draw_sprite_textured_stripe(t_cub_data *data, int stripe,
-		int draw_start, int draw_end, int tex_x, t_texture *texture,
-		int door_top, int door_bottom)
+static void	draw_sprite_stripe_tex(t_cub_data *data, int stripe,
+		struct s_draw_span *span, struct s_door_clip *clip, t_texture *texture)
 {
 	int	y;
-	int	tex_y;
-	int	tex_color;
+	int	tx;
+	int	ty;
+	int	pixel;
 
-	if (!texture || draw_end <= draw_start)
-		return ;
-	y = draw_start;
-	while (y < draw_end)
+	tx = ((stripe - span->start_x) * texture->width) / (span->end_x
+			- span->start_x);
+	y = span->start_y;
+	while (y < span->end_y)
 	{
-		if (y >= 0 && y < data->mlx->height)
+		if (y >= 0 && y < data->mlx->height && !(clip->top >= 0
+				&& y >= clip->top && y <= clip->bottom))
 		{
-			if (door_top >= 0 && y >= door_top && y <= door_bottom)
-			{
-				y++;
-				continue ;
-			}
-			tex_y = ((y - draw_start) * texture->height) / (draw_end
-					- draw_start);
-			if (tex_y < 0)
-				tex_y = 0;
-			if (tex_y >= texture->height)
-				tex_y = texture->height - 1;
-			tex_color = get_texture_pixel(texture, tex_x, tex_y);
-			if (!is_transparent_pixel(tex_color))
-				mylx_pixel_put(data, stripe, y, tex_color);
+			ty = ((y - span->start_y) * texture->height) / (span->end_y
+					- span->start_y);
+			if (ty < 0)
+				ty = 0;
+			if (ty >= texture->height)
+				ty = texture->height - 1;
+			pixel = get_texture_pixel(texture, tx, ty);
+			if (!is_transparent_pixel(pixel))
+				mylx_pixel_put(data, stripe, y, pixel);
 		}
 		y++;
 	}
 }
 
-/**
- * Render a single ammo box at (mx, my) formatted specifically as a small
- * rectangle
- */
+static bool	compute_billboard_span(t_cub_data *data, struct s_billboard *bb,
+		struct s_draw_span *span)
+{
+	float	sx;
+	float	sy;
+	float	dir_x;
+	float	dir_y;
+	float	pl_x;
+	float	pl_y;
+	float	inv;
+	int		size;
+
+	sx = bb->sx - from_fixed32(data->player->x);
+	sy = bb->sy - from_fixed32(data->player->y);
+	dir_x = from_fixed32(data->player->dir_x);
+	dir_y = from_fixed32(data->player->dir_y);
+	pl_x = from_fixed32(data->player->plane_x);
+	pl_y = from_fixed32(data->player->plane_y);
+	inv = 1.0f / (pl_x * dir_y - dir_x * pl_y);
+	span->transform_y = inv * (-pl_y * sx + pl_x * sy);
+	if (span->transform_y <= 0.1f)
+		return (false);
+	size = abs((int)(data->mlx->height / span->transform_y)) / bb->scale_div;
+	span->start_x = -(size / 2) + (int)((data->mlx->width / 2) * (1 + inv
+					* (dir_y * sx - dir_x * sy) / span->transform_y));
+	span->end_x = (size / 2) + (int)((data->mlx->width / 2) * (1 + inv
+					* (dir_y * sx - dir_x * sy) / span->transform_y));
+	span->start_y = -size / 2 + data->mlx->height / 2
+		+ data->player->view_offset + data->player->bob_offset
+		+ (int)(data->mlx->height / (4 * span->transform_y));
+	span->end_y = size / 2 + data->mlx->height / 2
+		+ data->player->view_offset + data->player->bob_offset
+		+ (int)(data->mlx->height / (4 * span->transform_y));
+	if (span->start_x < 0)
+		span->start_x = 0;
+	if (span->end_x >= data->mlx->width)
+		span->end_x = data->mlx->width - 1;
+	if (span->start_y < 0)
+		span->start_y = 0;
+	if (span->end_y >= data->mlx->height)
+		span->end_y = data->mlx->height - 1;
+	return (span->end_x > span->start_x && span->end_y > span->start_y);
+}
+
+static void	render_billboard(t_cub_data *data, struct s_billboard *bb)
+{
+	int				stripe;
+	float			wall_dist;
+	struct s_door_clip	clip;
+	struct s_draw_span	span;
+
+	if (!compute_billboard_span(data, bb, &span))
+		return ;
+	stripe = span.start_x;
+	while (stripe < span.end_x)
+	{
+		wall_dist = from_fixed32(data->raycasting->rays[stripe].perp_dist);
+		if (span.transform_y < wall_dist)
+		{
+			get_door_coverage(data, stripe, span.transform_y, &clip);
+			if (bb->texture && bb->texture->loaded && bb->texture->width > 0
+				&& bb->texture->height > 0)
+				draw_sprite_stripe_tex(data, stripe, &span, &clip, bb->texture);
+			else
+				draw_sprite_stripe_color(data, stripe, &span, &clip, bb->color);
+		}
+		stripe++;
+	}
+}
+
 static void	render_ammo_sprite(t_cub_data *data, float sx, float sy)
 {
-	float		spriteX;
-	float		spriteY;
-	int			view_offset;
-	float		dirX;
-	float		dirY;
-	float		planeX;
-	float		planeY;
-	float		invDet;
-	float		transformX;
-	float		transformY;
-	int			spriteScreenX;
-	int			spriteHeight;
-	int			draw_start_y;
-	int			draw_end_y;
-	int			draw_start_x;
-	int			draw_end_x;
-	t_texture	*ammo_texture;
-		int tex_x;
-	float		wall_dist;
-	int			door_top;
-	int			door_bottom;
+	struct s_billboard	bb;
 
-	spriteX = sx - from_fixed32(data->player->x);
-	spriteY = sy - from_fixed32(data->player->y);
-	view_offset = data->player->view_offset + data->player->bob_offset;
-	// Transform sprite with inverse camera matrix
-	// [ planeX   dirX ] -1                                       [ dirY -dirX ]
-	// [ planeY   dirY ]       =  1/(planeX*dirY-dirX*planeY) *   [
-		-planeY planeX
-	// ]
-	dirX = from_fixed32(data->player->dir_x);
-	dirY = from_fixed32(data->player->dir_y);
-	planeX = from_fixed32(data->player->plane_x);
-	planeY = from_fixed32(data->player->plane_y);
-	invDet = 1.0 / (planeX * dirY - dirX * planeY);
-	transformX = invDet * (dirY * spriteX - dirX * spriteY);
-	transformY = invDet * (-planeY * spriteX + planeX * spriteY);
-	if (transformY <= 0.1f) // Behind player or too close
-		return ;
-	spriteScreenX = (int)((data->mlx->width / 2) * (1 + transformX
-				/ transformY));
-	// Calculate height of the sprite on screen
-	// Using 0.2f as a scale factor for "small rectangle"
-	spriteHeight = abs((int)(data->mlx->height / transformY)) / 4;
-	int spriteWidth = spriteHeight; // Square for now
-	draw_start_y = -spriteHeight / 2 + data->mlx->height / 2 + view_offset;
-	// Lower it towards the ground
-	draw_start_y += (int)(data->mlx->height / (4 * transformY));
-	if (draw_start_y < 0)
-		draw_start_y = 0;
-	draw_end_y = spriteHeight / 2 + data->mlx->height / 2 + view_offset;
-	draw_end_y += (int)(data->mlx->height / (4 * transformY));
-	if (draw_end_y >= data->mlx->height)
-		draw_end_y = data->mlx->height - 1;
-	draw_start_x = -spriteWidth / 2 + spriteScreenX;
-	if (draw_start_x < 0)
-		draw_start_x = 0;
-	draw_end_x = spriteWidth / 2 + spriteScreenX;
-	if (draw_end_x >= data->mlx->width)
-		draw_end_x = data->mlx->width - 1;
-	ammo_texture = NULL;
+	bb.sx = sx;
+	bb.sy = sy;
+	bb.color = 0xFFD700;
+	bb.scale_div = 4;
+	bb.texture = NULL;
 	if (data->textures)
-		ammo_texture = &data->textures->ammo;
-	// Loop through every vertical stripe of the sprite on screen
-	for (int stripe = draw_start_x; stripe < draw_end_x; stripe++)
-	{
-		wall_dist = from_fixed32(data->raycasting->rays[stripe].perp_dist);
-		door_top = -1;
-		door_bottom = -1;
-		// Sprite must be in front of wall
-		if (transformY >= wall_dist)
-			continue ;
-		// Get door coverage for this stripe
-		get_door_coverage(data, stripe, transformY, &door_top, &door_bottom);
-		if (ammo_texture && ammo_texture->loaded && ammo_texture->width > 0
-			&& ammo_texture->height > 0 && draw_end_x > draw_start_x)
-		{
-			tex_x = ((stripe - draw_start_x) * ammo_texture->width)
-				/ (draw_end_x - draw_start_x);
-			if (tex_x < 0)
-				tex_x = 0;
-			if (tex_x >= ammo_texture->width)
-				tex_x = ammo_texture->width - 1;
-			draw_sprite_textured_stripe(data, stripe, draw_start_y, draw_end_y,
-				tex_x, ammo_texture, door_top, door_bottom);
-		}
-		else
-		{
-			draw_sprite_stripe_occluded(data, stripe, draw_start_y, draw_end_y,
-				0xFFD700, door_top, door_bottom);
-		}
-	}
+		bb.texture = &data->textures->ammo;
+	render_billboard(data, &bb);
 }
 
-/**
- * Generic billboard renderer with configurable color and scale
- */
-static void	render_billboard(t_cub_data *data, float sx, float sy, int color,
-		int scale_div, t_texture *texture)
+static void	render_enemy_sprite(t_cub_data *data, t_enemy *enemy,
+		t_texture *demon_texture)
 {
-	float	spriteX;
-	float	spriteY;
-	int		view_offset;
-	float	dirX;
-	float	dirY;
-	float	planeX;
-	float	planeY;
-	float	invDet;
-	float	transformX;
-	float	transformY;
-	int		spriteScreenX;
-	int		spriteHeight;
-	int		spriteWidth;
-	int		draw_start_y;
-	int		draw_end_y;
-	int		draw_start_x;
-	int		draw_end_x;
-		int tex_x;
-	float	wall_dist;
-	int		door_top;
-	int		door_bottom;
+	struct s_billboard	bb;
 
-	spriteX = sx - from_fixed32(data->player->x);
-	spriteY = sy - from_fixed32(data->player->y);
-	view_offset = data->player->view_offset + data->player->bob_offset;
-	dirX = from_fixed32(data->player->dir_x);
-	dirY = from_fixed32(data->player->dir_y);
-	planeX = from_fixed32(data->player->plane_x);
-	planeY = from_fixed32(data->player->plane_y);
-	invDet = 1.0 / (planeX * dirY - dirX * planeY);
-	transformX = invDet * (dirY * spriteX - dirX * spriteY);
-	transformY = invDet * (-planeY * spriteX + planeX * spriteY);
-	if (transformY <= 0.1f)
-		return ;
-	spriteScreenX = (int)((data->mlx->width / 2) * (1 + transformX
-				/ transformY));
-	spriteHeight = abs((int)(data->mlx->height / transformY)) / scale_div;
-	spriteWidth = spriteHeight;
-	draw_start_y = -spriteHeight / 2 + data->mlx->height / 2 + view_offset;
-	draw_start_y += (int)(data->mlx->height / (4 * transformY));
-	if (draw_start_y < 0)
-		draw_start_y = 0;
-	draw_end_y = spriteHeight / 2 + data->mlx->height / 2 + view_offset;
-	draw_end_y += (int)(data->mlx->height / (4 * transformY));
-	if (draw_end_y >= data->mlx->height)
-		draw_end_y = data->mlx->height - 1;
-	draw_start_x = -spriteWidth / 2 + spriteScreenX;
-	if (draw_start_x < 0)
-		draw_start_x = 0;
-	draw_end_x = spriteWidth / 2 + spriteScreenX;
-	if (draw_end_x >= data->mlx->width)
-		draw_end_x = data->mlx->width - 1;
-	for (int stripe = draw_start_x; stripe < draw_end_x; stripe++)
-	{
-		wall_dist = from_fixed32(data->raycasting->rays[stripe].perp_dist);
-		door_top = -1;
-		door_bottom = -1;
-		// Sprite must be in front of wall
-		if (transformY >= wall_dist)
-			continue ;
-		// Get door coverage for this stripe
-		get_door_coverage(data, stripe, transformY, &door_top, &door_bottom);
-		if (texture && texture->loaded && texture->width > 0
-			&& texture->height > 0 && draw_end_x > draw_start_x)
-		{
-			tex_x = ((stripe - draw_start_x) * texture->width) / (draw_end_x
-					- draw_start_x);
-			if (tex_x < 0)
-				tex_x = 0;
-			if (tex_x >= texture->width)
-				tex_x = texture->width - 1;
-			draw_sprite_textured_stripe(data, stripe, draw_start_y, draw_end_y,
-				tex_x, texture, door_top, door_bottom);
-		}
-		else
-		{
-			draw_sprite_stripe_occluded(data, stripe, draw_start_y, draw_end_y,
-				color, door_top, door_bottom);
-		}
-	}
+	bb.sx = from_fixed32(enemy->x);
+	bb.sy = from_fixed32(enemy->y);
+	bb.color = 0xFF0000;
+	bb.scale_div = 2;
+	bb.texture = demon_texture;
+	render_billboard(data, &bb);
 }
 
-/**
- * Render enemies as red billboards
- */
+static bool	enemy_should_draw(t_enemy *enemy, uint64_t now)
+{
+	uint64_t	elapsed;
+	int			period;
+	int			total;
+
+	if (enemy->state == ENEMY_DEAD)
+		return (false);
+	if (enemy->state != ENEMY_HIT)
+		return (true);
+	elapsed = now - enemy->hit_time;
+	period = 300;
+	total = enemy->blink_count * period;
+	if ((int)elapsed >= total)
+	{
+		if (enemy->blink_count == 2)
+			enemy->state = ENEMY_DEAD;
+		else
+			enemy->state = ENEMY_IDLE;
+		return (false);
+	}
+	return (((int)elapsed % period) < (period / 2));
+}
+
 static void	render_enemies(t_cub_data *data)
 {
-	int			i;
-	t_texture	*demon_texture;
-	uint64_t	now;
-	t_enemy		*enemy;
-	uint64_t	elapsed;
-	int			total_blink_time;
-	int			blink_on;
+	int				i;
+	t_texture		*demon_texture;
+	uint64_t		now;
+	t_enemy			*enemy;
 
 	if (!data->game || !data->game->enemies)
 		return ;
 	demon_texture = NULL;
 	if (data->textures)
 		demon_texture = &data->textures->demon;
-	i = 0;
 	now = data->fps.last_frame_time;
+	i = 0;
 	while (i < data->game->enemy_count)
 	{
 		enemy = &data->game->enemies[i];
-		if (enemy->state == ENEMY_DEAD)
-		{
-			i++;
-			continue ;
-		}
-		if (enemy->state == ENEMY_HIT)
-		{
-			// Blinking logic: each blink lasts 150ms (on), 150ms (off)
-			elapsed = now - enemy->hit_time;
-			int blink_period = 300; // ms for one blink (on+off)
-			total_blink_time = enemy->blink_count * blink_period;
-			if ((int)elapsed >= total_blink_time)
-			{
-				if (enemy->blink_count == 2)
-				{
-					// Death: after 2 blinks, destroy
-					enemy->state = ENEMY_DEAD;
-				}
-				else
-				{
-					// Hit: after 1 blink, return to idle
-					enemy->state = ENEMY_IDLE;
-				}
-				i++;
-				continue ;
-			}
-			// Determine if visible (blink on or off)
-			blink_on = (((int)elapsed % blink_period) < (blink_period / 2));
-			if (blink_on)
-			{
-				render_billboard(data, from_fixed32(enemy->x),
-					from_fixed32(enemy->y), 0xFF0000, 2, demon_texture);
-			}
-		}
-		else
-		{
-			render_billboard(data, from_fixed32(enemy->x),
-				from_fixed32(enemy->y), 0xFF0000, 2, demon_texture);
-		}
+		if (enemy_should_draw(enemy, now))
+			render_enemy_sprite(data, enemy, demon_texture);
 		i++;
 	}
 }
 
-/**
- * Scan map for 'M' and render them as billboards, then render enemies
- */
 void	render_sprites(t_cub_data *data)
 {
+	int	x;
+	int	y;
+
 	if (!data || !data->map || !data->raycasting)
 		return ;
-	// Render ammo pickups
-	for (int y = 0; y < data->map->height; y++)
+	y = 0;
+	while (y < data->map->height)
 	{
-		for (int x = 0; x < data->map->width; x++)
+		x = 0;
+		while (x < data->map->width)
 		{
 			if (data->map->map_array[y * data->map->width + x] == 'M')
-			{
 				render_ammo_sprite(data, (float)x + 0.5f, (float)y + 0.5f);
-			}
+			x++;
 		}
+		y++;
 	}
-	// Render enemies
 	render_enemies(data);
 }

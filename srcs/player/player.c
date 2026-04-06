@@ -36,13 +36,23 @@ static t_fixed32	cached_plane_length = 0;
 static t_fixed32	last_angle = 999 << 16;
 // Invalid initial value (raw fixed32)
 
+static void	init_cached_plane_length(t_cub_data *data)
+{
+	t_fixed32	sin_33;
+	t_fixed32	cos_33;
+
+	if (cached_plane_length != 0)
+		return ;
+	sin_33 = fast_sin(&data->trig, to_fixed32(33.0f));
+	cos_33 = fast_cos(&data->trig, to_fixed32(33.0f));
+	cached_plane_length = fixed32_div(sin_33, cos_33);
+}
+
 // player direction math and vectors - SUPER OPTIMIZED (FIXED)
 void	calc_player_dirs(t_cub_data *data)
 {
 	t_fixed32	angle_degrees;
 	t_fixed32	angle_diff;
-	t_fixed32	sin_33;
-	t_fixed32	cos_33;
 
 	if (!data || !data->player)
 		return ;
@@ -50,12 +60,7 @@ void	calc_player_dirs(t_cub_data *data)
 	angle_diff = angle_degrees - last_angle;
 	if (angle_diff < to_fixed32(0.01f) && angle_diff > to_fixed32(-0.01f))
 		return ;
-	if (cached_plane_length == 0)
-	{
-		sin_33 = fast_sin(&data->trig, to_fixed32(33.0f));
-		cos_33 = fast_cos(&data->trig, to_fixed32(33.0f));
-		cached_plane_length = fixed32_div(sin_33, cos_33);
-	}
+	init_cached_plane_length(data);
 	data->player->dir_x = fast_cos(&data->trig, angle_degrees);
 	data->player->dir_y = fast_sin(&data->trig, angle_degrees);
 	last_angle = angle_degrees;

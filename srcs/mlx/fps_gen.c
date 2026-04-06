@@ -33,10 +33,11 @@ static void	fps_wait_frame(t_cub_data *data, uint64_t *current_time,
     }
 }
 
-static void	fps_update_logic(t_cub_data *data, uint64_t elapsed)
+static void	fps_update_logic(t_cub_data *data, uint64_t elapsed,
+        uint64_t current_time)
 {
     data->fps.delta_time = elapsed;
-    data->fps.last_frame_time = get_time_ms();
+    data->fps.last_frame_time = current_time;
     data->fps.accumulator += elapsed;
     while (data->fps.accumulator >= FIXED_STEP_MS)
     {
@@ -53,7 +54,7 @@ int	main_render_loop(t_cub_data *data)
 
     current_time = get_time_ms();
 	fps_wait_frame(data, &current_time, &elapsed);
-	fps_update_logic(data, elapsed);
+    fps_update_logic(data, elapsed, current_time);
     mylx_update_scene(data);
     fps = 1000.0f / data->fps.delta_time;
     display_fps(data, fps);

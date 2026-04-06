@@ -160,6 +160,22 @@ static void	init_wall_ctx(t_cub_data *data, t_ray *ray, struct s_wall_ctx *ctx)
 	ctx->texture = get_wall_texture(ray, data->textures);
 }
 
+static void	draw_textured_pixel(t_cub_data *data, int x, t_ray *ray,
+		struct s_wall_ctx *ctx)
+{
+	ctx->tex_y = (int)from_fixed32(ctx->tex_pos);
+	if (ctx->tex_y < 0)
+		ctx->tex_y = 0;
+	if (ctx->tex_y >= ctx->texture->height)
+		ctx->tex_y = ctx->texture->height - 1;
+	ctx->tex_pos = fixed32_add(ctx->tex_pos, ctx->step);
+	ctx->wall_color = ctx->texture->pixels[ctx->tex_y * ctx->texture->width
+		+ ctx->tex_x];
+	ctx->shaded_color = apply_shading(ctx->wall_color,
+			from_fixed32(ray->perp_dist), ray->side);
+	mylx_pixel_put(data, x, ctx->y, ctx->shaded_color);
+}
+
 static void	draw_textured_wall(t_cub_data *data, int x, t_ray *ray,
 		struct s_wall_ctx *ctx)
 {
@@ -172,17 +188,7 @@ static void	draw_textured_wall(t_cub_data *data, int x, t_ray *ray,
 	ctx->y = ctx->draw_start;
 	while (ctx->y <= ctx->draw_end)
 	{
-		ctx->tex_y = (int)from_fixed32(ctx->tex_pos);
-		if (ctx->tex_y < 0)
-			ctx->tex_y = 0;
-		if (ctx->tex_y >= ctx->texture->height)
-			ctx->tex_y = ctx->texture->height - 1;
-		ctx->tex_pos = fixed32_add(ctx->tex_pos, ctx->step);
-		ctx->wall_color = ctx->texture->pixels[ctx->tex_y * ctx->texture->width
-			+ ctx->tex_x];
-		ctx->shaded_color = apply_shading(ctx->wall_color,
-				from_fixed32(ray->perp_dist), ray->side);
-		mylx_pixel_put(data, x, ctx->y, ctx->shaded_color);
+		draw_textured_pixel(data, x, ray, ctx);
 		ctx->y++;
 	}
 }
