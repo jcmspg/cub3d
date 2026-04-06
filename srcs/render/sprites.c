@@ -107,16 +107,16 @@ static void	draw_sprite_stripe_tex(t_cub_data *data, int stripe,
 	int	ty;
 	int	pixel;
 
-	tx = ((stripe - span->start_x) * texture->width) / (span->end_x
-			- span->start_x);
+	tx = ((stripe - span->start_x) * texture->width)
+		/ (span->end_x - span->start_x);
 	y = span->start_y;
 	while (y < span->end_y)
 	{
 		if (y >= 0 && y < data->mlx->height && !(clip->top >= 0
 				&& y >= clip->top && y <= clip->bottom))
 		{
-			ty = ((y - span->start_y) * texture->height) / (span->end_y
-					- span->start_y);
+			ty = ((y - span->start_y) * texture->height)
+				/ (span->end_y - span->start_y);
 			if (ty < 0)
 				ty = 0;
 			if (ty >= texture->height)
@@ -152,16 +152,18 @@ static bool	compute_billboard_span(t_cub_data *data, struct s_billboard *bb,
 	if (span->transform_y <= 0.1f)
 		return (false);
 	size = abs((int)(data->mlx->height / span->transform_y)) / bb->scale_div;
-	span->start_x = -(size / 2) + (int)((data->mlx->width / 2) * (1 + inv
-					* (dir_y * sx - dir_x * sy) / span->transform_y));
-	span->end_x = (size / 2) + (int)((data->mlx->width / 2) * (1 + inv
-					* (dir_y * sx - dir_x * sy) / span->transform_y));
-	span->start_y = -size / 2 + data->mlx->height / 2
-		+ data->player->view_offset + data->player->bob_offset
-		+ (int)(data->mlx->height / (4 * span->transform_y));
-	span->end_y = size / 2 + data->mlx->height / 2
-		+ data->player->view_offset + data->player->bob_offset
-		+ (int)(data->mlx->height / (4 * span->transform_y));
+	span->start_x = -(size / 2)
+		+ (int)((data->mlx->width / 2) * (1 + inv * (dir_y * sx - dir_x * sy)
+				/ span->transform_y));
+	span->end_x = (size / 2)
+		+ (int)((data->mlx->width / 2) * (1 + inv * (dir_y * sx - dir_x * sy)
+				/ span->transform_y));
+	span->start_y = -size / 2 + data->mlx->height / 2 + data->player->view_offset
+		+ data->player->bob_offset + (int)(data->mlx->height
+		/ (4 * span->transform_y));
+	span->end_y = size / 2 + data->mlx->height / 2 + data->player->view_offset
+		+ data->player->bob_offset + (int)(data->mlx->height
+		/ (4 * span->transform_y));
 	if (span->start_x < 0)
 		span->start_x = 0;
 	if (span->end_x >= data->mlx->width)
