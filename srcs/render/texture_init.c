@@ -12,6 +12,63 @@
 
 #include "../../includes/cub3d.h"
 
+static void	free_texture_paths(t_textures *textures)
+{
+	if (textures->floor.path)
+		free(textures->floor.path);
+	if (textures->ceiling.path)
+		free(textures->ceiling.path);
+	if (textures->door.path)
+		free(textures->door.path);
+	if (textures->ammo.path)
+		free(textures->ammo.path);
+	if (textures->demon.path)
+		free(textures->demon.path);
+	if (textures->gun_pov.path)
+		free(textures->gun_pov.path);
+}
+
+static void	free_texture_pixels(t_textures *textures)
+{
+	if (textures->floor.pixels)
+		free(textures->floor.pixels);
+	if (textures->ceiling.pixels)
+		free(textures->ceiling.pixels);
+	if (textures->door.pixels)
+		free(textures->door.pixels);
+	if (textures->ammo.pixels)
+		free(textures->ammo.pixels);
+	if (textures->demon.pixels)
+		free(textures->demon.pixels);
+	if (textures->gun_pov.pixels)
+		free(textures->gun_pov.pixels);
+}
+
+static void	destroy_wall_images(t_cub_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < 4)
+	{
+		if (data->textures->walls[i].img)
+		{
+			mlx_destroy_image(data->mlx->mlx_ptr, data->textures->walls[i].img);
+			data->textures->walls[i].img = NULL;
+		}
+		i++;
+	}
+}
+
+static void	destroy_texture_image(t_cub_data *data, t_texture *texture)
+{
+	if (texture->img)
+	{
+		mlx_destroy_image(data->mlx->mlx_ptr, texture->img);
+		texture->img = NULL;
+	}
+}
+
 /**
  * Initialize a single texture with default color
  */
@@ -111,33 +168,10 @@ void	free_textures(t_textures *textures)
 			free(textures->walls[i].path);
 		if (textures->walls[i].pixels)
 			free(textures->walls[i].pixels);
-		// Note: img destruction should be handled by cleanup_textures_mlx
 		i++;
 	}
-	if (textures->floor.path)
-		free(textures->floor.path);
-	if (textures->ceiling.path)
-		free(textures->ceiling.path);
-	if (textures->floor.pixels)
-		free(textures->floor.pixels);
-	if (textures->ceiling.pixels)
-		free(textures->ceiling.pixels);
-	if (textures->door.path)
-		free(textures->door.path);
-	if (textures->ammo.path)
-		free(textures->ammo.path);
-	if (textures->demon.path)
-		free(textures->demon.path);
-	if (textures->gun_pov.path)
-		free(textures->gun_pov.path);
-	if (textures->door.pixels)
-		free(textures->door.pixels);
-	if (textures->ammo.pixels)
-		free(textures->ammo.pixels);
-	if (textures->demon.pixels)
-		free(textures->demon.pixels);
-	if (textures->gun_pov.pixels)
-		free(textures->gun_pov.pixels);
+	free_texture_paths(textures);
+	free_texture_pixels(textures);
 	free(textures);
 }
 
@@ -147,50 +181,13 @@ void	free_textures(t_textures *textures)
  */
 void	cleanup_textures_mlx(t_cub_data *data)
 {
-	int	i;
-
 	if (!data || !data->textures || !data->mlx || !data->mlx->mlx_ptr)
 		return ;
-	// Destroy wall texture images
-	i = 0;
-	while (i < 4)
-	{
-		if (data->textures->walls[i].img)
-		{
-			mlx_destroy_image(data->mlx->mlx_ptr, data->textures->walls[i].img);
-			data->textures->walls[i].img = NULL;
-		}
-		i++;
-	}
-	// Destroy floor/ceiling texture images if any
-	if (data->textures->floor.img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, data->textures->floor.img);
-		data->textures->floor.img = NULL;
-	}
-	if (data->textures->ceiling.img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, data->textures->ceiling.img);
-		data->textures->ceiling.img = NULL;
-	}
-	if (data->textures->door.img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, data->textures->door.img);
-		data->textures->door.img = NULL;
-	}
-	if (data->textures->ammo.img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, data->textures->ammo.img);
-		data->textures->ammo.img = NULL;
-	}
-	if (data->textures->demon.img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, data->textures->demon.img);
-		data->textures->demon.img = NULL;
-	}
-	if (data->textures->gun_pov.img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, data->textures->gun_pov.img);
-		data->textures->gun_pov.img = NULL;
-	}
+	destroy_wall_images(data);
+	destroy_texture_image(data, &data->textures->floor);
+	destroy_texture_image(data, &data->textures->ceiling);
+	destroy_texture_image(data, &data->textures->door);
+	destroy_texture_image(data, &data->textures->ammo);
+	destroy_texture_image(data, &data->textures->demon);
+	destroy_texture_image(data, &data->textures->gun_pov);
 }

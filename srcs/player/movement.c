@@ -103,6 +103,16 @@ void	move_player_x(t_cub_data *data, t_fixed32 speed)
 	data->player->x = new_player_x;
 }
 
+static bool	dirs_are_zero(t_cub_data *data)
+{
+	if (data->player->dir_x == 0 && data->player->dir_y == 0)
+	{
+		ft_putstr_fd("Error: Direction vectors are not set\n", STDERR_FILENO);
+		return (true);
+	}
+	return (false);
+}
+
 // Move player in the direction they are facing
 void	move_player(t_cub_data *data, t_fixed32 move_speed)
 {
@@ -113,16 +123,8 @@ void	move_player(t_cub_data *data, t_fixed32 move_speed)
 
 	if (!data || !data->player)
 		return ;
-	if (data->player->dir_x == 0 && data->player->dir_y == 0)
-	{
-		printf("ERROR: Direction vectors are ZERO! dir_x=%.4f, dir_y=%.4f, "
-				"angle=%.1f\n",
-				from_fixed32(data->player->dir_x),
-				from_fixed32(data->player->dir_y),
-				from_fixed32(data->player->dir_angle));
-		ft_putstr_fd("Error: Direction vectors are not set\n", STDERR_FILENO);
+	if (dirs_are_zero(data))
 		return ;
-	}
 	new_x = fixed32_mul(move_speed, data->player->dir_x);
 	new_y = fixed32_mul(move_speed, data->player->dir_y);
 	newX = fixed32_add(data->player->x, new_x);

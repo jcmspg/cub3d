@@ -6,16 +6,15 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 19:12:19 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/29 19:14:51 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/06 19:20:00 by copilot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.h"
 
-int ft_isspace(char c)
+int	ft_isspace(char c)
 {
-    if(c == ' ')
-        return 0;
-    else
-        return 1;
+	if (c == ' ')
+		return (1);
+	return (0);
 }

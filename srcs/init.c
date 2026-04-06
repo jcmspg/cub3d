@@ -42,15 +42,6 @@ void	init_fps_sync(t_fps_data *fps)
 	fps->frame_count = 0;
 }
 
-static void	set_default_player_stats(t_player *player)
-{
-	player->stats.max_health = 100;
-	player->stats.health = 100;
-	player->stats.max_ammo = 200;
-	player->stats.ammo = 20;
-	player->stats.damage = 10;
-}
-
 static void	init_game_state(t_cub_data *data)
 {
 	data->player = init_player(data);
@@ -59,7 +50,11 @@ static void	init_game_state(t_cub_data *data)
 		ft_putstr_fd("Error: Player initialization failed.\n", STDERR_FILENO);
 		cleanup_and_exit(data);
 	}
-	set_default_player_stats(data->player);
+	data->player->stats.max_health = 100;
+	data->player->stats.health = 100;
+	data->player->stats.max_ammo = 200;
+	data->player->stats.ammo = 20;
+	data->player->stats.damage = 10;
 	data->game = ft_calloc(1, sizeof(t_game));
 	if (!data->game)
 	{
@@ -76,8 +71,11 @@ static void	init_game_state(t_cub_data *data)
 
 static void	init_mlx_runtime(t_cub_data *data)
 {
+	void	*mlx_ptr;
+
 	mylx_init(data);
-	if (!data->mlx->mlx_ptr)
+	mlx_ptr = data->mlx->mlx_ptr;
+	if (!mlx_ptr)
 	{
 		ft_putstr_fd("Error: MLX initialization failed.\n", STDERR_FILENO);
 		exit(ERR_MLX_INIT);
@@ -85,12 +83,9 @@ static void	init_mlx_runtime(t_cub_data *data)
 	if (mylx_create_window(data) != ERR_NO_ERROR)
 		exit(ERR_WINDOW_CREATE);
 	mylx_create_image(data);
-	ft_printf("Loading textures...\n");
 	if (load_all_textures(data) != 0)
-	{
 		ft_putstr_fd("Warning: Failed to load textures, using colors.\n",
 			STDERR_FILENO);
-	}
 	if (!init_hud(data))
 	{
 		ft_putstr_fd("Error: HUD initialization failed.\n", STDERR_FILENO);

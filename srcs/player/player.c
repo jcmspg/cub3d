@@ -66,6 +66,29 @@ void	calc_player_dirs(t_cub_data *data)
 }
 
 // init player
+static void	check_spawn_result(t_player *player, t_map *map, int spawn_x,
+		int spawn_y)
+{
+	if (spawn_x == -1 || spawn_y == -1)
+	{
+		free(player);
+		(void)map;
+		ft_putstr_fd("Error: No player spawn position found in map\n",
+			STDERR_FILENO);
+		exit(ERR_PLAYER_INIT);
+	}
+}
+
+static void	set_player_spawn(t_player *player, int spawn_x, int spawn_y,
+		char direction)
+{
+	player->x = to_fixed32(spawn_x + 0.5f);
+	player->y = to_fixed32(spawn_y + 0.5f);
+	player->dir_angle = direction_to_angle(direction);
+	player->move_speed = to_fixed32(PLAYER_SPEED);
+	player->rotate_speed = to_fixed32(ROTATE_SPEED);
+}
+
 t_player	*init_player(t_cub_data *data)
 {
 	t_player	*player;
@@ -93,31 +116,12 @@ t_player	*init_player(t_cub_data *data)
 	{
 		ft_putstr_fd("Error: Failed to find player spawn position\n",
 			STDERR_FILENO);
+		free(player);
 		exit(ERR_PLAYER_INIT);
 	}
-	if (spawn_x == -1 || spawn_y == -1)
-	{
-		ft_putstr_fd("Error: No player spawn position found in map\n",
-			STDERR_FILENO);
-		exit(ERR_PLAYER_INIT);
-	}
-	printf("📍 SPAWN FOUND: Grid position (%d, %d) with direction '%c'\n",
-		spawn_x, spawn_y, direction);
-	player->x = to_fixed32(spawn_x + 0.5f);
-	player->y = to_fixed32(spawn_y + 0.5f);
-	player->dir_angle = direction_to_angle(direction);
-	player->move_speed = to_fixed32(PLAYER_SPEED);
-	player->rotate_speed = to_fixed32(ROTATE_SPEED);
-	printf("🎮 PLAYER INITIALIZED:\n");
-	printf("   World Position: (%.3f, %.3f)\n", from_fixed32(player->x),
-		from_fixed32(player->y));
-	printf("   Direction Angle: %.1f degrees\n",
-		from_fixed32(player->dir_angle));
-	printf("   Move Speed: %.3f\n", from_fixed32(player->move_speed));
-	printf("   Rotate Speed: %.3f\n", from_fixed32(player->rotate_speed));
-	printf("🧮 CALCULATING INITIAL DIRECTION VECTORS...\n");
+	check_spawn_result(player, data->map, spawn_x, spawn_y);
+	set_player_spawn(player, spawn_x, spawn_y, direction);
 	calc_player_dirs(data);
-	printf("✅ PLAYER INITIALIZATION COMPLETE!\n\n");
 	return (player);
 }
 

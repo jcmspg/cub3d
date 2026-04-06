@@ -23,6 +23,15 @@
 #define RAY_EDGE_COLOR 0x00FFFF
 #define RAY_CENTER_COLOR 0xFFFFFF
 
+struct s_ray_line
+{
+	int	x0;
+	int	y0;
+	int	x1;
+	int	y1;
+	int	color;
+};
+
 /**
  * Convert world coordinates to minimap pixel coordinates
  * Player position is in map units (e.g., 5.5 means middle of cell 5)
@@ -43,8 +52,7 @@ static void	world_to_minimap(t_fixed32 world_x, t_fixed32 world_y,
  * Draw a line using Bresenham's algorithm
  * Used for drawing rays on the minimap
  */
-static void	draw_line(t_cub_data *data, int x0, int y0, int x1, int y1,
-		int color)
+static void	draw_line(t_cub_data *data, struct s_ray_line *line)
 {
 	int	dx;
 	int	dy;
@@ -53,28 +61,28 @@ static void	draw_line(t_cub_data *data, int x0, int y0, int x1, int y1,
 	int	err;
 	int	e2;
 
-	dx = abs(x1 - x0);
-	dy = abs(y1 - y0);
-	sx = (x0 < x1) ? 1 : -1;
-	sy = (y0 < y1) ? 1 : -1;
+	dx = abs(line->x1 - line->x0);
+	dy = abs(line->y1 - line->y0);
+	sx = (line->x0 < line->x1) ? 1 : -1;
+	sy = (line->y0 < line->y1) ? 1 : -1;
 	err = dx - dy;
 	while (1)
 	{
-		if (x0 >= 0 && x0 < data->mlx->width && y0 >= 0
-			&& y0 < data->mlx->height)
-			mylx_pixel_put(data, x0, y0, color);
-		if (x0 == x1 && y0 == y1)
+		if (line->x0 >= 0 && line->x0 < data->mlx->width && line->y0 >= 0
+			&& line->y0 < data->mlx->height)
+			mylx_pixel_put(data, line->x0, line->y0, line->color);
+		if (line->x0 == line->x1 && line->y0 == line->y1)
 			break ;
 		e2 = 2 * err;
 		if (e2 > -dy)
 		{
 			err -= dy;
-			x0 += sx;
+			line->x0 += sx;
 		}
 		if (e2 < dx)
 		{
 			err += dx;
-			y0 += sy;
+			line->y0 += sy;
 		}
 	}
 }
@@ -90,6 +98,7 @@ static void	draw_ray_on_minimap(t_cub_data *data, t_ray *ray, int color)
 	int			end_y;
 	t_fixed32	hit_x;
 	t_fixed32	hit_y;
+	struct s_ray_line	line;
 
 	world_to_minimap(data->player->x, data->player->y, &start_x, &start_y);
 	// Calculate hit point: player_pos + ray_dir * perp_dist
@@ -98,7 +107,21 @@ static void	draw_ray_on_minimap(t_cub_data *data, t_ray *ray, int color)
 	hit_y = fixed32_add(data->player->y, fixed32_mul(ray->dir_y,
 				ray->perp_dist));
 	world_to_minimap(hit_x, hit_y, &end_x, &end_y);
-	draw_line(data, start_x, start_y, end_x, end_y, color);
+	line.x0 = start_x;
+	line.y0 = start_y;
+	line.x1 = end_x;
+	line.y1 = end_y;
+	line.color = color;
+	draw_line(data, &line);
+}
+
+static int	ray_color(int i, int num_rays)
+{
+	if (i == 0 || i == num_rays - 1)
+		return (RAY_EDGE_COLOR);
+	if (i == num_rays / 2)
+		return (RAY_CENTER_COLOR);
+	return (RAY_COLOR);
 }
 
 /**
@@ -117,14 +140,7 @@ void	draw_rays_on_minimap(t_cub_data *data)
 	i = 0;
 	while (i < num_rays)
 	{
-		// Color coding: edges = cyan, center = white, rest = yellow
-		if (i == 0 || i == num_rays - 1)
-			color = RAY_EDGE_COLOR;
-		else if (i == num_rays / 2)
-			color = RAY_CENTER_COLOR;
-		else
-			color = RAY_COLOR;
-		// Only draw if ray hit something
+		color = ray_color(i, num_rays);
 		if (data->raycasting->rays[i].hit)
 			draw_ray_on_minimap(data, &data->raycasting->rays[i], color);
 		i++;

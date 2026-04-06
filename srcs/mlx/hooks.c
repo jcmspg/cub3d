@@ -13,6 +13,21 @@
 #include "../../includes/gamelogic.h"
 #include "../../includes/mylx_hooks.h"
 
+static void	apply_mouse_rotation(t_cub_data *data, int delta_x)
+{
+	t_fixed32	rotation;
+
+	rotation = to_fixed32((float)delta_x * 0.15f);
+	data->player->dir_angle = fixed32_add(data->player->dir_angle, rotation);
+	if (data->player->dir_angle < 0)
+		data->player->dir_angle = fixed32_add(data->player->dir_angle,
+				to_fixed32(360.0f));
+	if (data->player->dir_angle >= to_fixed32(360.0f))
+		data->player->dir_angle = fixed32_sub(data->player->dir_angle,
+				to_fixed32(360.0f));
+	calc_player_dirs(data);
+}
+
 int	handle_key_press(int keycode, t_cub_data *data)
 {
 	if (keycode == KEY_ESC)
@@ -88,7 +103,6 @@ int	handle_mouse_move(int x, int y, t_cub_data *data)
 	static int	center_x = -1;
 	static int	mouse_locked = 0;
 	int			delta_x;
-	t_fixed32	rotation;
 
 	if (center_x == -1)
 		center_x = data->mlx->width / 2;
@@ -100,16 +114,7 @@ int	handle_mouse_move(int x, int y, t_cub_data *data)
 	delta_x = x - center_x;
 	if (delta_x != 0)
 	{
-		rotation = to_fixed32((float)delta_x * 0.15f);
-		data->player->dir_angle = fixed32_add(data->player->dir_angle,
-				rotation);
-		if (data->player->dir_angle < 0)
-			data->player->dir_angle = fixed32_add(data->player->dir_angle,
-					to_fixed32(360.0f));
-		if (data->player->dir_angle >= to_fixed32(360.0f))
-			data->player->dir_angle = fixed32_sub(data->player->dir_angle,
-					to_fixed32(360.0f));
-		calc_player_dirs(data);
+		apply_mouse_rotation(data, delta_x);
 		mouse_locked = 1;
 		mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr, center_x,
 			data->mlx->height / 2);

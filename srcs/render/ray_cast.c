@@ -12,6 +12,138 @@
 
 #include "../../includes/cub3d.h"
 
+static void	set_dda_deltas(t_ray *ray)
+{
+	if (fixed32_abs(ray->dir_x) < to_fixed32(0.0001f))
+		ray->delta_dist_x = to_fixed32(10000.0f);
+	else
+		ray->delta_dist_x = fixed32_abs(fixed32_div(to_fixed32(1.0f),
+					ray->dir_x));
+	if (fixed32_abs(ray->dir_y) < to_fixed32(0.0001f))
+		ray->delta_dist_y = to_fixed32(10000.0f);
+	else
+		ray->delta_dist_y = fixed32_abs(fixed32_div(to_fixed32(1.0f),
+					ray->dir_y));
+}
+
+static void	set_dda_step_x(t_ray *ray, t_fixed32 frac_x)
+{
+	if (ray->dir_x < 0)
+	{
+		ray->step_x = -1;
+		ray->side_dist_x = fixed32_mul(frac_x, ray->delta_dist_x);
+	}
+	else
+	{
+		ray->step_x = 1;
+		ray->side_dist_x = fixed32_mul(fixed32_sub(to_fixed32(1.0f), frac_x),
+				ray->delta_dist_x);
+	}
+}
+
+static void	set_dda_step_y(t_ray *ray, t_fixed32 frac_y)
+{
+	if (ray->dir_y < 0)
+	{
+		ray->step_y = -1;
+		ray->side_dist_y = fixed32_mul(frac_y, ray->delta_dist_y);
+	}
+	else
+	{
+		ray->step_y = 1;
+		ray->side_dist_y = fixed32_mul(fixed32_sub(to_fixed32(1.0f), frac_y),
+				ray->delta_dist_y);
+	}
+}
+
+static void	step_dda_once(t_ray *ray)
+{
+	if (ray->side_dist_x < ray->side_dist_y)
+	{
+		ray->side_dist_x = fixed32_add(ray->side_dist_x, ray->delta_dist_x);
+		ray->map_x += ray->step_x;
+		ray->side = 0;
+	}
+	else
+	{
+		ray->side_dist_y = fixed32_add(ray->side_dist_y, ray->delta_dist_y);
+		ray->map_y += ray->step_y;
+		ray->side = 1;
+	}
+}
+
+static int	handle_closed_door_hit(t_ray *ray)
+{
+	ray->hit = 1;
+	ray->hit_content = 'D';
+	ray->door_hit = 1;
+	ray->door_map_x = ray->map_x;
+	ray->door_map_y = ray->map_y;
+	ray->door_side = ray->side;
+	if (ray->side == 0)
+		ray->door_dist = fixed32_sub(ray->side_dist_x, ray->delta_dist_x);
+	else
+		ray->door_dist = fixed32_sub(ray->side_dist_y, ray->delta_dist_y);
+	return (1);
+}
+
+static void	store_partial_door_hit(t_ray *ray)
+{
+	if (!ray->door_hit)
+	{
+		ray->door_hit = 1;
+		ray->door_map_x = ray->map_x;
+		ray->door_map_y = ray->map_y;
+		ray->door_side = ray->side;
+		if (ray->side == 0)
+			ray->door_dist = fixed32_sub(ray->side_dist_x, ray->delta_dist_x);
+		else
+			ray->door_dist = fixed32_sub(ray->side_dist_y, ray->delta_dist_y);
+	}
+}
+
+static int	handle_door_step(t_cub_data *data, t_ray *ray)
+{
+	t_door	*door;
+
+	door = get_door_at(data, ray->map_x, ray->map_y);
+	if (!door)
+		return (0);
+	if (door->open_amount < 0.01f)
+		return (handle_closed_door_hit(ray));
+	if (door->open_amount < 1.0f)
+		store_partial_door_hit(ray);
+	return (0);
+}
+
+static int	handle_cell_hit(t_cub_data *data, t_ray *ray, char map_char)
+{
+	if (map_char == '1' || map_char == ' ')
+	{
+		ray->hit = 1;
+		ray->hit_content = map_char;
+		return (1);
+	}
+	if (map_char == 'D')
+		return (handle_door_step(data, ray));
+	return (0);
+}
+
+static void	apply_fisheye_correction(t_cub_data *data, t_ray *ray)
+{
+	t_fixed32	dot_product;
+
+	dot_product = fixed32_add(fixed32_mul(ray->dir_x, data->player->dir_x),
+			fixed32_mul(ray->dir_y, data->player->dir_y));
+	ray->perp_dist = fixed32_mul(ray->perp_dist, dot_product);
+	if (ray->door_hit)
+	{
+		ray->door_dist = fixed32_mul(ray->door_dist, dot_product);
+		if (ray->door_dist <= 0)
+			ray->door_dist = to_fixed32(0.001f);
+	}
+}
+
 /**
  * Calculate the ray direction for a given screen column
  *
@@ -26,17 +158,13 @@ void	calculate_ray_dir(t_cub_data *data, t_ray *ray, int x)
 	t_fixed32	half_fov;
 	t_fixed32	fov_step;
 
-	// camera_x goes from -1 (left) to +1 (right)
-	// Formula: 2 * x / width - 1
 	camera_x = fixed32_sub(fixed32_div(fixed32_mul(to_fixed32(2.0f),
 					to_fixed32((float)x)), to_fixed32((float)data->mlx->width)),
 			to_fixed32(1.0f));
-	// Calculate ray angle: player_angle + (camera_x * half_fov)
 	half_fov = fixed32_div(data->game->fov, to_fixed32(2.0f));
 	fov_step = fixed32_mul(camera_x, half_fov);
 	ray_angle = fixed32_add(data->player->dir_angle, fov_step);
 	ray_angle = normalize_angle_degrees(ray_angle);
-	// Set ray direction using trig tables
 	ray->dir_x = fast_cos(&data->trig, ray_angle);
 	ray->dir_y = fast_sin(&data->trig, ray_angle);
 }
@@ -54,49 +182,13 @@ void	init_dda(t_cub_data *data, t_ray *ray)
 
 	player_x = data->player->x;
 	player_y = data->player->y;
-	// Current map cell (cast float to int to get grid cell)
 	ray->map_x = (int)from_fixed32(player_x);
 	ray->map_y = (int)from_fixed32(player_y);
-	// Delta distances: how far to travel to cross one grid cell
-	// Using absolute values to avoid issues with direction
-	// IMPORTANT: Max safe value for t_fixed32 (16.16) is ~32767
-	// Use 10000.0 as "infinity" - large enough but won't overflow
-	if (fixed32_abs(ray->dir_x) < to_fixed32(0.0001f))
-		ray->delta_dist_x = to_fixed32(10000.0f);
-	else
-		ray->delta_dist_x = fixed32_abs(fixed32_div(to_fixed32(1.0f),
-					ray->dir_x));
-	if (fixed32_abs(ray->dir_y) < to_fixed32(0.0001f))
-		ray->delta_dist_y = to_fixed32(10000.0f);
-	else
-		ray->delta_dist_y = fixed32_abs(fixed32_div(to_fixed32(1.0f),
-					ray->dir_y));
-	// Fractional position within current cell
+	set_dda_deltas(ray);
 	frac_x = fixed32_sub(player_x, to_fixed32((float)ray->map_x));
 	frac_y = fixed32_sub(player_y, to_fixed32((float)ray->map_y));
-	// Step direction and initial side distances
-	if (ray->dir_x < 0)
-	{
-		ray->step_x = -1;
-		ray->side_dist_x = fixed32_mul(frac_x, ray->delta_dist_x);
-	}
-	else
-	{
-		ray->step_x = 1;
-		ray->side_dist_x = fixed32_mul(fixed32_sub(to_fixed32(1.0f), frac_x),
-				ray->delta_dist_x);
-	}
-	if (ray->dir_y < 0)
-	{
-		ray->step_y = -1;
-		ray->side_dist_y = fixed32_mul(frac_y, ray->delta_dist_y);
-	}
-	else
-	{
-		ray->step_y = 1;
-		ray->side_dist_y = fixed32_mul(fixed32_sub(to_fixed32(1.0f), frac_y),
-				ray->delta_dist_y);
-	}
+	set_dda_step_x(ray, frac_x);
+	set_dda_step_y(ray, frac_y);
 }
 
 /**
@@ -108,88 +200,22 @@ int	perform_dda(t_cub_data *data, t_ray *ray)
 	int		max_steps;
 	int		step;
 	char	map_char;
-	t_door	*door;
 
 	max_steps = data->map->width + data->map->height;
 	step = 0;
 	while (step < max_steps)
 	{
-		// Step to the next grid cell (whichever is closer)
-		if (ray->side_dist_x < ray->side_dist_y)
-		{
-			ray->side_dist_x = fixed32_add(ray->side_dist_x, ray->delta_dist_x);
-			ray->map_x += ray->step_x;
-			ray->side = 0;
-		}
-		else
-		{
-			ray->side_dist_y = fixed32_add(ray->side_dist_y, ray->delta_dist_y);
-			ray->map_y += ray->step_y;
-			ray->side = 1;
-		}
-		// Check if out of bounds (treat as wall)
+		step_dda_once(ray);
 		if (ray->map_x < 0 || ray->map_x >= data->map->width || ray->map_y < 0
 			|| ray->map_y >= data->map->height)
 		{
 			ray->hit = 1;
 			return (1);
 		}
-		// Check if we hit a wall or void (space)
-		// '1' = wall, ' ' = void/outside map - both stop rays
-		// 'D' = door
 		map_char = data->map->map_array[ray->map_y * data->map->width
 			+ ray->map_x];
-		if (map_char == '1' || map_char == ' ')
-		{
-			ray->hit = 1;
-			ray->hit_content = map_char;
+		if (handle_cell_hit(data, ray, map_char))
 			return (1);
-		}
-		else if (map_char == 'D')
-		{
-			door = get_door_at(data, ray->map_x, ray->map_y);
-			if (door)
-			{
-				// If closed (open_amount == 0), it's a wall.
-				if (door->open_amount < 0.01f)
-				{
-					ray->hit = 1;
-					ray->hit_content = 'D';
-					ray->door_hit = 1;
-					ray->door_map_x = ray->map_x;
-					ray->door_map_y = ray->map_y;
-					ray->door_side = ray->side;
-					// Calculate distance to the door (same as wall hit)
-					if (ray->side == 0)
-						ray->door_dist = fixed32_sub(ray->side_dist_x,
-								ray->delta_dist_x);
-					else
-						ray->door_dist = fixed32_sub(ray->side_dist_y,
-								ray->delta_dist_y);
-					return (1);
-				}
-				// If animating (0 < open_amount < 1), record it but CONTINUE.
-				else if (door->open_amount < 1.0f)
-				{
-					if (!ray->door_hit)
-					{
-						ray->door_hit = 1;
-						ray->door_map_x = ray->map_x;
-						ray->door_map_y = ray->map_y;
-						ray->door_side = ray->side;
-						// Calculate distance to the door
-						if (ray->side == 0)
-							ray->door_dist = fixed32_sub(ray->side_dist_x,
-									ray->delta_dist_x);
-						else
-							ray->door_dist = fixed32_sub(ray->side_dist_y,
-									ray->delta_dist_y);
-					}
-					// CONTINUE: Ray passes through the empty part of the door frame
-				}
-				// If fully open (>= 1.0f), treat as empty space (continue)
-			}
-		}
 		step++;
 	}
 	return (0);
@@ -201,26 +227,11 @@ int	perform_dda(t_cub_data *data, t_ray *ray)
  */
 void	calculate_perp_distance(t_cub_data *data, t_ray *ray)
 {
-	t_fixed32	dot_product;
-
 	if (ray->side == 0)
 		ray->perp_dist = fixed32_sub(ray->side_dist_x, ray->delta_dist_x);
 	else
 		ray->perp_dist = fixed32_sub(ray->side_dist_y, ray->delta_dist_y);
-	// Fisheye correction: dist = euclidean_dist * cos(angle_diff)
-	// cos(angle_diff) = dot(ray_dir, player_dir)
-	// We use the dot product because both vectors are normalized
-	dot_product = fixed32_add(fixed32_mul(ray->dir_x, data->player->dir_x),
-			fixed32_mul(ray->dir_y, data->player->dir_y));
-	ray->perp_dist = fixed32_mul(ray->perp_dist, dot_product);
-	// Correct door distance if we hit one
-	if (ray->door_hit)
-	{
-		ray->door_dist = fixed32_mul(ray->door_dist, dot_product);
-		if (ray->door_dist <= 0)
-			ray->door_dist = to_fixed32(0.001f);
-	}
-	// Prevent division by zero later
+	apply_fisheye_correction(data, ray);
 	if (ray->perp_dist <= 0)
 		ray->perp_dist = to_fixed32(0.001f);
 }

@@ -6,91 +6,135 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 17:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:17:01 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/06 19:45:00 by copilot          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/render.h"
+
+struct s_weapon_ctx
+{
+	int	w_width;
+	int	w_height;
+	int	x_start;
+	int	y_start;
+	int	color;
+};
 
 static bool	is_transparent_pixel(int pixel)
 {
 	return ((unsigned int)pixel == 0xFF000000U);
 }
 
-/**
- * Render a placeholder weapon (rectangle)
- */
-void	render_weapon(t_cub_data *data)
+static t_texture	*get_weapon_texture(t_cub_data *data)
 {
-	int			w_width;
-	int			w_height;
-	int			x_start;
-	int			y_start;
-	int			x;
-	int			y;
-	int			color;
-	t_texture	*weapon_texture;
-	int			tex_x;
-	int			tex_y;
-	int			tex_color;
-	int			bob_y;
-	int			screen_x;
-	int			screen_y;
+	if (!data->textures)
+		return (NULL);
+	return (&data->textures->gun_pov);
+}
 
-	weapon_texture = NULL;
-	if (data->textures)
-		weapon_texture = &data->textures->gun_pov;
-	// Dimensions relative to screen
-	if (weapon_texture && weapon_texture->loaded && weapon_texture->width > 0
-		&& weapon_texture->height > 0)
+static void	set_weapon_dimensions(t_cub_data *data, t_texture *tex,
+		struct s_weapon_ctx *ctx)
+{
+	if (tex && tex->loaded && tex->width > 0 && tex->height > 0)
 	{
-		w_height = data->mlx->height / 2;
-		w_width = (w_height * weapon_texture->width) / weapon_texture->height;
+		ctx->w_height = data->mlx->height / 2;
+		ctx->w_width = (ctx->w_height * tex->width) / tex->height;
 	}
 	else
 	{
-		w_width = data->mlx->width / 6;
-		w_height = data->mlx->height / 3;
+		ctx->w_width = data->mlx->width / 6;
+		ctx->w_height = data->mlx->height / 3;
 	}
-	// Position: Bottom center
-	x_start = (data->mlx->width / 2) - (w_width / 2);
-	// slightly offset to right like Doom/Wolf3D often is, or just center?
-	// User asked for "weapon texture placeholder.. for now leave it as a
-	// rectangle" Let's stick to center-ish right or center. Center is classic
-	// Wolf3D. Actually Wolf3D is center. Doom is center.
-	// Let's add extensive bobbing to make it feel "alive" later,
-	// for now static or simple bob from player
-	bob_y = 0;
-	// Simple bobbing if moving
+}
+
+static int	weapon_bob_offset(t_cub_data *data)
+{
 	if (data->input->forward || data->input->backward || data->input->left
 		|| data->input->right)
-		bob_y = abs(data->player->bob_offset) * 2;
-	y_start = data->mlx->height - w_height + bob_y;
-	color = 0x555555; // Grey gun fallback
-	for (y = 0; y < w_height; y++)
+		return (abs(data->player->bob_offset) * 2);
+	return (0);
+}
+
+static void	set_weapon_position(t_cub_data *data, struct s_weapon_ctx *ctx)
+{
+	ctx->x_start = (data->mlx->width / 2) - (ctx->w_width / 2);
+	ctx->y_start = data->mlx->height - ctx->w_height + weapon_bob_offset(data);
+	ctx->color = 0x555555;
+}
+
+static void	draw_weapon_fallback_pixel(t_cub_data *data, struct s_weapon_ctx *c,
+		int x, int y)
+{
+	if (x == 0 || x == c->w_width - 1 || y == 0)
+		mylx_pixel_put(data, c->x_start + x, c->y_start + y, 0x222222);
+	else
+		mylx_pixel_put(data, c->x_start + x, c->y_start + y, c->color);
+}
+
+static void	draw_weapon_texture_pixel(t_cub_data *data, t_texture *tex,
+		struct s_weapon_ctx *c, int x)
+{
+	int	y;
+	int	xs;
+	int	ys;
+	int	tx;
+	int	ty;
+	int	pixel;
+
+	y = 0;
+	while (y < c->w_height)
 	{
-		for (x = 0; x < w_width; x++)
+		xs = c->x_start + x;
+		ys = c->y_start + y;
+		if (xs >= 0 && xs < data->mlx->width && ys >= 0 && ys < data->mlx->height)
 		{
-			screen_x = x_start + x;
-			screen_y = y_start + y;
-			if (screen_x < 0 || screen_x >= data->mlx->width || screen_y < 0
-				|| screen_y >= data->mlx->height)
-				continue ;
-			if (weapon_texture && weapon_texture->loaded
-				&& weapon_texture->width > 0 && weapon_texture->height > 0)
-			{
-				tex_x = (x * weapon_texture->width) / w_width;
-				tex_y = (y * weapon_texture->height) / w_height;
-				tex_color = get_texture_pixel(weapon_texture, tex_x, tex_y);
-				if (!is_transparent_pixel(tex_color))
-					mylx_pixel_put(data, screen_x, screen_y, tex_color);
-				continue ;
-			}
-			// Simple border check
-			if (x == 0 || x == w_width - 1 || y == 0)
-				mylx_pixel_put(data, screen_x, screen_y, 0x222222);
-			else
-				mylx_pixel_put(data, screen_x, screen_y, color);
+			tx = (x * tex->width) / c->w_width;
+			ty = (y * tex->height) / c->w_height;
+			pixel = get_texture_pixel(tex, tx, tty);
+			if (!is_transparent_pixel(pixel))
+				mylx_pixel_put(data, xs, ys, pixel);
 		}
+		y++;
+	}
+}
+
+static void	draw_weapon_column(t_cub_data *data, t_texture *tex,
+		struct s_weapon_ctx *c, int x)
+{
+	int	y;
+	int	xs;
+	int	ys;
+
+	if (tex && tex->loaded && tex->width > 0 && tex->height > 0)
+	{
+		draw_weapon_texture_pixel(data, tex, c, x);
+		return ;
+	}
+	y = 0;
+	while (y < c->w_height)
+	{
+		xs = c->x_start + x;
+		ys = c->y_start + y;
+		if (xs >= 0 && xs < data->mlx->width && ys >= 0 && ys < data->mlx->height)
+			draw_weapon_fallback_pixel(data, c, x, y);
+		y++;
+	}
+}
+
+void	render_weapon(t_cub_data *data)
+{
+	struct s_weapon_ctx	ctx;
+	t_texture			*tex;
+	int				x;
+
+	tex = get_weapon_texture(data);
+	set_weapon_dimensions(data, tex, &ctx);
+	set_weapon_position(data, &ctx);
+	x = 0;
+	while (x < ctx.w_width)
+	{
+		draw_weapon_column(data, tex, &ctx, x);
+		x++;
 	}
 }
