@@ -83,6 +83,26 @@ static void	init_single_texture(t_texture *tex, int color)
 	tex->loaded = false;
 }
 
+static void	init_wall_textures(t_textures *textures)
+{
+	init_single_texture(&textures->walls[TEX_NORTH], COLOR_NORTH);
+	init_single_texture(&textures->walls[TEX_SOUTH], COLOR_SOUTH);
+	init_single_texture(&textures->walls[TEX_EAST], COLOR_EAST);
+	init_single_texture(&textures->walls[TEX_WEST], COLOR_WEST);
+}
+
+static void	init_misc_textures(t_textures *textures)
+{
+	init_single_texture(&textures->floor, COLOR_FLOOR);
+	init_single_texture(&textures->ceiling, COLOR_CEILING);
+	init_single_texture(&textures->door, 0x8B4513);
+	init_single_texture(&textures->ammo, 0xFFD700);
+	init_single_texture(&textures->demon, 0xFF0000);
+	init_single_texture(&textures->gun_pov, 0x555555);
+	textures->floor_color = COLOR_FLOOR;
+	textures->ceiling_color = COLOR_CEILING;
+}
+
 /**
  * Initialize all textures with default colors
  * These will be replaced when actual textures are loaded from .cub file
@@ -94,22 +114,8 @@ t_textures	*init_textures(void)
 	textures = ft_calloc(1, sizeof(t_textures));
 	if (!textures)
 		return (NULL);
-	// Initialize wall textures with default colors
-	init_single_texture(&textures->walls[TEX_NORTH], COLOR_NORTH);
-	init_single_texture(&textures->walls[TEX_SOUTH], COLOR_SOUTH);
-	init_single_texture(&textures->walls[TEX_EAST], COLOR_EAST);
-	init_single_texture(&textures->walls[TEX_WEST], COLOR_WEST);
-	// Initialize floor and ceiling
-	init_single_texture(&textures->floor, COLOR_FLOOR);
-	init_single_texture(&textures->ceiling, COLOR_CEILING);
-	// Entity and weapon textures
-	init_single_texture(&textures->door, 0x8B4513);
-	init_single_texture(&textures->ammo, 0xFFD700);
-	init_single_texture(&textures->demon, 0xFF0000);
-	init_single_texture(&textures->gun_pov, 0x555555);
-	// Default parsed colors (can be overridden by .cub file)
-	textures->floor_color = COLOR_FLOOR;
-	textures->ceiling_color = COLOR_CEILING;
+	init_wall_textures(textures);
+	init_misc_textures(textures);
 	return (textures);
 }
 
@@ -149,7 +155,7 @@ void	free_textures(t_textures *textures)
 
 	if (!textures)
 		return ;
-	// Free wall texture resources
+	
 	i = 0;
 	while (i < 4)
 	{

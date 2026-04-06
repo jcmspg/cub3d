@@ -12,6 +12,36 @@
 
 #include "../../includes/cub3d.h"
 
+int	load_texture_from_file(void *mlx_ptr, t_texture *texture, char *path);
+
+static int	load_wall_textures(t_cub_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < 4)
+	{
+		if (data->textures->walls[i].path && load_texture_from_file(
+					data->mlx->mlx_ptr, &data->textures->walls[i],
+					data->textures->walls[i].path) != 0)
+			return (-1);
+		i++;
+	}
+	return (0);
+}
+
+static void	load_optional_textures(t_cub_data *data)
+{
+	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->door,
+		"./assets/textures/_DOOR_.xpm");
+	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->ammo,
+		"./assets/textures/_AMMO_.xpm");
+	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->demon,
+		"./assets/textures/_DEMON_.xpm");
+	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->gun_pov,
+		"./assets/textures/_GUN_POV_.xpm");
+}
+
 static int	copy_texture_pixels(t_texture *texture, t_img_data *img_data)
 {
 	int	x;
@@ -64,34 +94,6 @@ int	get_texture_pixel(t_texture *texture, int x, int y)
 	if (x < 0 || x >= texture->width || y < 0 || y >= texture->height)
 		return (texture->color);
 	return (texture->pixels[y * texture->width + x]);
-}
-
-static int	load_wall_textures(t_cub_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < 4)
-	{
-		if (data->textures->walls[i].path && load_texture_from_file(
-					data->mlx->mlx_ptr, &data->textures->walls[i],
-					data->textures->walls[i].path) != 0)
-			return (-1);
-		i++;
-	}
-	return (0);
-}
-
-static void	load_optional_textures(t_cub_data *data)
-{
-	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->door,
-		"./assets/textures/_DOOR_.xpm");
-	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->ammo,
-		"./assets/textures/_AMMO_.xpm");
-	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->demon,
-		"./assets/textures/_DEMON_.xpm");
-	load_texture_from_file(data->mlx->mlx_ptr, &data->textures->gun_pov,
-		"./assets/textures/_GUN_POV_.xpm");
 }
 
 int	load_all_textures(t_cub_data *data)

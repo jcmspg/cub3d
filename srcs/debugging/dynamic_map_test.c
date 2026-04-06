@@ -16,16 +16,6 @@ static uint64_t	g_last_animation_time = 0;
 static int		g_animation_phase = 0;
 static bool		g_animation_enabled = false;
 
-void	init_dynamic_map_test(t_cub_data *data)
-{
-    if (!data || !data->map)
-        return ;
-    g_animation_enabled = true;
-    g_last_animation_time = get_time_ms();
-    g_animation_phase = 0;
-    ft_putstr_fd("Dynamic map test initialized! Rapid animations!\n", 1);
-}
-
 static void	animate_wave_pattern(t_cub_data *data, int phase)
 {
     int	y;
@@ -208,6 +198,16 @@ static void	run_animation_pattern(t_cub_data *data, int pattern)
         animate_rotation_pattern(data, g_animation_phase);
     else if (pattern == 3)
         animate_plasma_pattern(data, g_animation_phase);
+}
+
+void	init_dynamic_map_test(t_cub_data *data)
+{
+    if (!data || !data->map)
+        return ;
+    g_animation_enabled = true;
+    g_last_animation_time = get_time_ms();
+    g_animation_phase = 0;
+    ft_putstr_fd("Dynamic map test initialized! Rapid animations!\n", 1);
 }
 
 void	update_dynamic_map_test(t_cub_data *data)

@@ -83,7 +83,7 @@ int	handle_key_release(int keycode, t_cub_data *data)
 	return (ERR_NO_ERROR);
 }
 
-// Mouse button handler for shooting
+
 int	handle_mouse_button(int button, int x, int y, t_cub_data *data)
 {
 	(void)x;
@@ -93,7 +93,7 @@ int	handle_mouse_button(int button, int x, int y, t_cub_data *data)
 	return (0);
 }
 
-// Mouse button release handler
+
 int	handle_mouse_release(int button, int x, int y, t_cub_data *data)
 {
 	(void)x;
@@ -103,7 +103,7 @@ int	handle_mouse_release(int button, int x, int y, t_cub_data *data)
 	return (0);
 }
 
-// mouse hooks for rotation - proportional smooth rotation
+
 int	handle_mouse_move(int x, int y, t_cub_data *data)
 {
 	static int	center_x = -1;

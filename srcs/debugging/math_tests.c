@@ -13,48 +13,11 @@
 #include "../../includes/ft_debug.h"
 #include <math.h>
 
-/**
- * Test fixed-point arithmetic accuracy
- */
-void test_fixed_point_math(void)
-{
-    printf("\n=== FIXED-POINT MATH TESTS ===\n");
-    
-    // Test basic conversions
-    printf("Testing conversions:\n");
-    t_fixed32 test1 = to_fixed32(3.14159f);
-    printf("  3.14159 -> fixed -> float: %.6f\n", from_fixed32(test1));
-    
-    t_fixed32 test2 = to_fixed32(-2.5f);
-    printf("  -2.5 -> fixed -> float: %.6f\n", from_fixed32(test2));
-    
-    // Test arithmetic operations
-    printf("\nTesting arithmetic:\n");
-    t_fixed32 a = to_fixed32(5.25f);
-    t_fixed32 b = to_fixed32(3.75f);
-    
-    t_fixed32 sum = fixed32_add(a, b);
-    printf("  5.25 + 3.75 = %.6f (expected: 9.0)\n", from_fixed32(sum));
-    
-    t_fixed32 diff = fixed32_sub(a, b);
-    printf("  5.25 - 3.75 = %.6f (expected: 1.5)\n", from_fixed32(diff));
-    
-    t_fixed32 product = fixed32_mul(a, b);
-    printf("  5.25 * 3.75 = %.6f (expected: 19.6875)\n", from_fixed32(product));
-    
-    // Test precision limits
-    printf("\nTesting precision:\n");
-    t_fixed32 small = to_fixed32(0.0000153f);  // Close to precision limit
-    printf("  Smallest representable: %.10f\n", from_fixed32(small));
-    
-    printf("=== FIXED-POINT TESTS COMPLETE ===\n\n");
-}
-
 static void	test_trig_precision(t_trig *trig)
 {
     printf("\n=== Enhanced Trigonometric Table Validation ===\n");
     
-    // Test key angles
+    
     float test_angles[] = {0.0f, 30.0f, 45.0f, 60.0f, 90.0f, 180.0f, 270.0f, 360.0f};
     int num_tests = sizeof(test_angles) / sizeof(test_angles[0]);
     
@@ -70,7 +33,7 @@ static void	test_trig_precision(t_trig *trig)
                from_fixed32(cos_result));
     }
     
-    // Test fractional angles
+    
     printf("\n--- Fractional Angle Tests ---\n");
     float fractional_angles[] = {45.01f, 45.50f, 45.99f, 89.99f};
     int num_fractional = sizeof(fractional_angles) / sizeof(fractional_angles[0]);
@@ -95,6 +58,43 @@ static void	test_trig_precision(t_trig *trig)
     printf("==============================================\n\n");
 }
 
+/**
+ * Test fixed-point arithmetic accuracy
+ */
+void test_fixed_point_math(void)
+{
+    printf("\n=== FIXED-POINT MATH TESTS ===\n");
+    
+    
+    printf("Testing conversions:\n");
+    t_fixed32 test1 = to_fixed32(3.14159f);
+    printf("  3.14159 -> fixed -> float: %.6f\n", from_fixed32(test1));
+    
+    t_fixed32 test2 = to_fixed32(-2.5f);
+    printf("  -2.5 -> fixed -> float: %.6f\n", from_fixed32(test2));
+    
+    
+    printf("\nTesting arithmetic:\n");
+    t_fixed32 a = to_fixed32(5.25f);
+    t_fixed32 b = to_fixed32(3.75f);
+    
+    t_fixed32 sum = fixed32_add(a, b);
+    printf("  5.25 + 3.75 = %.6f (expected: 9.0)\n", from_fixed32(sum));
+    
+    t_fixed32 diff = fixed32_sub(a, b);
+    printf("  5.25 - 3.75 = %.6f (expected: 1.5)\n", from_fixed32(diff));
+    
+    t_fixed32 product = fixed32_mul(a, b);
+    printf("  5.25 * 3.75 = %.6f (expected: 19.6875)\n", from_fixed32(product));
+    
+    
+    printf("\nTesting precision:\n");
+    t_fixed32 small = to_fixed32(0.0000153f);  
+    printf("  Smallest representable: %.10f\n", from_fixed32(small));
+    
+    printf("=== FIXED-POINT TESTS COMPLETE ===\n\n");
+}
+
 
 
 
@@ -113,17 +113,17 @@ void test_trig_tables(t_cub_data *data)
     
     printf("Testing specific angles:\n");
     
-    // Test known angles - FIXED: Use t_fixed32 instead of int
+    
     float test_angles[] = {0.0f, 30.0f, 45.0f, 60.0f, 90.0f, 120.0f, 135.0f, 180.0f, 270.0f, 360.0f};
     float expected_sin[] = {0.0f, 0.5f, 0.707107f, 0.866025f, 1.0f, 0.866025f, 0.707107f, 0.0f, -1.0f, 0.0f};
     float expected_cos[] = {1.0f, 0.866025f, 0.707107f, 0.5f, 0.0f, -0.5f, -0.707107f, -1.0f, 0.0f, 1.0f};
     
     for (int i = 0; i < 10; i++)
     {
-        // FIXED: Convert to t_fixed32 before calling fast_sin/fast_cos
+        
         t_fixed32 angle = to_fixed32(test_angles[i]);
-        t_fixed32 sin_result = fast_sin(&data->trig, angle);  // Now using t_fixed32
-        t_fixed32 cos_result = fast_cos(&data->trig, angle);  // Now using t_fixed32
+        t_fixed32 sin_result = fast_sin(&data->trig, angle);  
+        t_fixed32 cos_result = fast_cos(&data->trig, angle);  
         
         float sin_val = from_fixed32(sin_result);
         float cos_val = from_fixed32(cos_result);
@@ -134,11 +134,11 @@ void test_trig_tables(t_cub_data *data)
         printf("  %6.2f°: sin=%.6f (exp=%.6f, err=%.6f) cos=%.6f (exp=%.6f, err=%.6f)\n",
                test_angles[i], sin_val, expected_sin[i], sin_error, cos_val, expected_cos[i], cos_error);
         
-        if (sin_error > 0.01f || cos_error > 0.01f)  // Relaxed tolerance for 0.01° precision
+        if (sin_error > 0.01f || cos_error > 0.01f)  
             printf("           WARNING: Error exceeds tolerance!\n");
     }
     
-    // Test quadrant symmetry - FIXED: Use t_fixed32
+    
     printf("\nTesting quadrant symmetry:\n");
     for (int base_angle = 15; base_angle <= 75; base_angle += 30)
     {
@@ -174,7 +174,7 @@ void test_coordinate_conversions(t_cub_data *data)
     
     printf("Map dimensions: %d x %d\n", data->map->width, data->map->height);
     
-    // Test array index to grid coordinates
+    
     printf("\nTesting index_to_coords:\n");
     int test_indices[] = {0, 1, data->map->width, data->map->width + 1, 
                          data->map->width * data->map->height - 1};
@@ -196,10 +196,10 @@ void test_coordinate_conversions(t_cub_data *data)
             printf(" ✗ ERROR!\n");
     }
     
-    // Test world coordinate collision detection
+    
     printf("\nTesting collision detection:\n");
     
-    // Find a wall and empty space for testing
+    
     char wall_char = '1';
     char empty_char = '0';
     int wall_x = -1, wall_y = -1, empty_x = -1, empty_y = -1;

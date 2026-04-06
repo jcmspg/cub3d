@@ -18,7 +18,7 @@ static bool convert_lines_to_array(t_map *map);
 
 static char *normalize_line(const char *line, int width)
 {
-    // Remove newline first
+    
     char *clean = ft_strdup(line);
     if (!clean)
         return NULL;
@@ -27,7 +27,7 @@ static char *normalize_line(const char *line, int width)
     if (len > 0 && clean[len-1] == '\n')
         clean[len-1] = '\0';
     
-    // Now normalize the cleaned line
+    
     len = ft_strlen(clean);
     char *norm = malloc(width + 1);
     if (!norm)
@@ -37,7 +37,7 @@ static char *normalize_line(const char *line, int width)
     }
     
     ft_memcpy(norm, clean, len);
-    ft_memset(norm + len, ' ', width - len);  // Use space instead of VOID_SYMBOL
+    ft_memset(norm + len, ' ', width - len);  
     norm[width] = '\0';
     
     free(clean);
@@ -53,7 +53,7 @@ static bool process_map_line(char **line, int *count, int *max_len)
     if (is_empty_line(*line))
     {
         printf("DEBUG: Map line is empty - this might be invalid\n");
-        return false;  // Empty lines in map section are invalid
+        return false;  
     }
     
     if (!is_valid_map_line(*line))
@@ -112,17 +112,17 @@ static bool populate_line(char **line, char **dest, t_map *map)
     if (is_empty_line(*line) || !is_valid_map_line(*line))
     {
         ft_printf_fd(STDERR_FILENO, "invalid map line [%s]\n", *line);
-        // Don't free here - let main loop handle it
+        
         return false;
     }
     *dest = normalize_line(*line, map->width);
     if (!*dest)
     {
         ft_printf_fd(STDERR_FILENO, "Memory error while duplicating line [%s]\n", *line);
-        // Don't free here - let main loop handle it
+        
         return false;
     }
-    // Don't free here - let main loop handle it
+    
     return true;
 }
 
@@ -132,7 +132,7 @@ static bool populate_map_lines(char **line, bool *map_started, char **line2, t_m
     {
         if (process_pre_map_line(line, map_started, NULL))
         {
-            // If this line started the map, we need to process it as a map line too
+            
             if (*map_started)
                 return populate_line(line, line2, map);
             return true;
@@ -141,110 +141,6 @@ static bool populate_map_lines(char **line, bool *map_started, char **line2, t_m
     }
     return populate_line(line, line2, map);
 }
-
-static bool count_lines_in_file(t_map *map)
-{
-    char    *line = NULL;
-    bool    map_started = false;
-    int     line_count = 0;
-    int     max_len = 0;
-
-    printf("DEBUG: Starting first pass through file\n");
-    
-    // First pass: count height and max width
-    while ((line = get_next_line(map->fd)))
-    {
-        bool success = process_line(&line, &map_started, &line_count, &max_len);
-        free(line);
-        if (!success)
-        {
-            printf("DEBUG: First pass failed on line processing\n");
-            return false;
-        }
-    }
-    close(map->fd);
-
-    printf("DEBUG: First pass complete. Lines counted: %d, Max width: %d\n", line_count, max_len);
-
-    if (line_count == 0)
-    {
-        ft_putstr_fd("Error: No map lines found.\n", STDERR_FILENO);
-        return false;
-    }
-
-    map->height = line_count;
-    map->width = max_len;
-
-    // Allocate map_lines array BEFORE second pass
-    printf("DEBUG: Allocating map_lines array for %d lines\n", map->height);
-    map->map_lines = ft_calloc(map->height + 1, sizeof(char *));
-    if (!map->map_lines)
-    {
-        ft_putstr_fd("Error: Failed to allocate map_lines array.\n", STDERR_FILENO);
-        return false;
-    }
-
-    // Reopen file for second pass
-    printf("DEBUG: Reopening file for second pass\n");
-    map->fd = open(map->filename, O_RDONLY);
-    if (map->fd < 0)
-    {
-        ft_putstr_fd("Error: Failed to reopen map file.\n", STDERR_FILENO);
-        return false;
-    }
-
-    printf("DEBUG: Starting second pass through file\n");
-    // Second pass: populate map_lines
-    int i = 0;
-    map_started = false;
-    while ((line = get_next_line(map->fd)))
-    {
-        char *clean = NULL;
-
-        bool success = populate_map_lines(&line, &map_started, &clean, map);
-        free(line);
-        
-        if (!success)
-        {
-            printf("DEBUG: Second pass failed on line processing\n");
-            return false;
-        }
-
-        if (clean)
-        {
-            printf("DEBUG: Adding line %d to map_lines: [%s]\n", i, clean);
-            
-            if (i >= map->height)
-            {
-                ft_putstr_fd("Error: More lines than expected in map.\n", STDERR_FILENO);
-                free(clean);
-                return false;
-            }
-            
-            map->map_lines[i++] = clean;
-        }
-    }
-    
-    close(map->fd);
-    printf("DEBUG: Second pass complete. Populated %d lines\n", i);
-    
-    // FIRST: Create the array
-    if (!create_array(map))
-    {
-        printf("DEBUG: Failed to create map array\n");
-        return false;
-    }
-    
-    // THEN: Convert map_lines to map_array
-    if (!convert_lines_to_array(map))
-    {
-        printf("DEBUG: Failed to convert lines to array\n");
-        return false;
-    }
-    
-    return true;
-}
-
 
 static bool create_array(t_map *map)
 {
@@ -282,6 +178,165 @@ static bool convert_lines_to_array(t_map *map)
     
     printf("DEBUG: Successfully converted map to array\n");
     return true;
+}
+
+static bool count_lines_in_file(t_map *map)
+{
+    char    *line = NULL;
+    bool    map_started = false;
+    int     line_count = 0;
+    int     max_len = 0;
+
+    printf("DEBUG: Starting first pass through file\n");
+    
+    
+    while ((line = get_next_line(map->fd)))
+    {
+        bool success = process_line(&line, &map_started, &line_count, &max_len);
+        free(line);
+        if (!success)
+        {
+            printf("DEBUG: First pass failed on line processing\n");
+            return false;
+        }
+    }
+    close(map->fd);
+
+    printf("DEBUG: First pass complete. Lines counted: %d, Max width: %d\n", line_count, max_len);
+
+    if (line_count == 0)
+    {
+        ft_putstr_fd("Error: No map lines found.\n", STDERR_FILENO);
+        return false;
+    }
+
+    map->height = line_count;
+    map->width = max_len;
+
+    
+    printf("DEBUG: Allocating map_lines array for %d lines\n", map->height);
+    map->map_lines = ft_calloc(map->height + 1, sizeof(char *));
+    if (!map->map_lines)
+    {
+        ft_putstr_fd("Error: Failed to allocate map_lines array.\n", STDERR_FILENO);
+        return false;
+    }
+
+    
+    printf("DEBUG: Reopening file for second pass\n");
+    map->fd = open(map->filename, O_RDONLY);
+    if (map->fd < 0)
+    {
+        ft_putstr_fd("Error: Failed to reopen map file.\n", STDERR_FILENO);
+        return false;
+    }
+
+    printf("DEBUG: Starting second pass through file\n");
+    
+    int i = 0;
+    map_started = false;
+    while ((line = get_next_line(map->fd)))
+    {
+        char *clean = NULL;
+
+        bool success = populate_map_lines(&line, &map_started, &clean, map);
+        free(line);
+        
+        if (!success)
+        {
+            printf("DEBUG: Second pass failed on line processing\n");
+            return false;
+        }
+
+        if (clean)
+        {
+            printf("DEBUG: Adding line %d to map_lines: [%s]\n", i, clean);
+            
+            if (i >= map->height)
+            {
+                ft_putstr_fd("Error: More lines than expected in map.\n", STDERR_FILENO);
+                free(clean);
+                return false;
+            }
+            
+            map->map_lines[i++] = clean;
+        }
+    }
+    
+    close(map->fd);
+    printf("DEBUG: Second pass complete. Populated %d lines\n", i);
+    
+    
+    if (!create_array(map))
+    {
+        printf("DEBUG: Failed to create map array\n");
+        return false;
+    }
+    
+    
+    if (!convert_lines_to_array(map))
+    {
+        printf("DEBUG: Failed to convert lines to array\n");
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Parse texture path and store it
+ */
+static int parse_single_texture(char *line, t_texture *tex)
+{
+    char *path_start;
+    char *path_end;
+    int len;
+	
+	
+    path_start = line + 3;
+    while (*path_start == ' ' || *path_start == '\t')
+        path_start++;
+	
+	
+    path_end = path_start;
+    while (*path_end && *path_end != '\n' && *path_end != '\r')
+        path_end++;
+	
+    len = path_end - path_start;
+    if (len <= 0)
+    {
+        ft_printf_fd(STDERR_FILENO, "Error: Empty texture path\n");
+        return (-1);
+    }
+	
+	
+    tex->path = ft_calloc(len + 1, sizeof(char));
+    if (!tex->path)
+        return (-1);
+	
+    ft_memcpy(tex->path, path_start, len);
+    tex->path[len] = '\0';
+	
+    ft_printf("Parsed texture path: %s\n", tex->path);
+    return (0);
+}
+
+/**
+ * Parse a single RGB value (0-255)
+ */
+static int parse_rgb_value(char **str)
+{
+    int value;
+	
+    value = ft_atoi(*str);
+    if (value < 0 || value > 255)
+        return (-1);
+	
+	
+    while (**str && ft_isdigit(**str))
+        (*str)++;
+	
+    return (value);
 }
 
 bool create_map_array(t_cub_data *data)
@@ -336,44 +391,6 @@ bool open_map(char *filename, t_cub_data *data)
 }
 
 /**
- * Parse texture path and store it
- */
-static int parse_single_texture(char *line, t_texture *tex)
-{
-	char *path_start;
-	char *path_end;
-	int len;
-	
-	// Skip the identifier (NO, SO, WE, EA) and whitespace
-	path_start = line + 3;
-	while (*path_start == ' ' || *path_start == '\t')
-		path_start++;
-	
-	// Find end of path (before newline or end of string)
-	path_end = path_start;
-	while (*path_end && *path_end != '\n' && *path_end != '\r')
-		path_end++;
-	
-	len = path_end - path_start;
-	if (len <= 0)
-	{
-		ft_printf_fd(STDERR_FILENO, "Error: Empty texture path\n");
-		return (-1);
-	}
-	
-	// Allocate and copy path
-	tex->path = ft_calloc(len + 1, sizeof(char));
-	if (!tex->path)
-		return (-1);
-	
-	ft_memcpy(tex->path, path_start, len);
-	tex->path[len] = '\0';
-	
-	ft_printf("Parsed texture path: %s\n", tex->path);
-	return (0);
-}
-
-/**
  * Parse texture paths from .cub file
  */
 int parse_textures(char *line, t_cub_data *data)
@@ -394,24 +411,6 @@ int parse_textures(char *line, t_cub_data *data)
 }
 
 /**
- * Parse a single RGB value (0-255)
- */
-static int parse_rgb_value(char **str)
-{
-	int value;
-	
-	value = ft_atoi(*str);
-	if (value < 0 || value > 255)
-		return (-1);
-	
-	// Skip digits
-	while (**str && ft_isdigit(**str))
-		(*str)++;
-	
-	return (value);
-}
-
-/**
  * Parse color values (floor/ceiling) from .cub file
  * Format: F 220,100,0  or  C 225,30,0
  */
@@ -424,19 +423,19 @@ int parse_colors(char *line, t_cub_data *data)
 	if (!line || !data || !data->textures)
 		return (-1);
 	
-	// Skip identifier and whitespace
+	
 	ptr = line + 2;
 	while (*ptr == ' ' || *ptr == '\t')
 		ptr++;
 	
-	// Parse R,G,B values
+	
 	r = parse_rgb_value(&ptr);
 	if (r < 0 || *ptr != ',')
 	{
 		ft_printf_fd(STDERR_FILENO, "Error: Invalid color format (R)\n");
 		return (-1);
 	}
-	ptr++;  // Skip comma
+	ptr++;  
 	
 	g = parse_rgb_value(&ptr);
 	if (g < 0 || *ptr != ',')
@@ -444,7 +443,7 @@ int parse_colors(char *line, t_cub_data *data)
 		ft_printf_fd(STDERR_FILENO, "Error: Invalid color format (G)\n");
 		return (-1);
 	}
-	ptr++;  // Skip comma
+	ptr++;  
 	
 	b = parse_rgb_value(&ptr);
 	if (b < 0)
@@ -453,10 +452,10 @@ int parse_colors(char *line, t_cub_data *data)
 		return (-1);
 	}
 	
-	// Convert to color integer (RGB format)
+	
 	color = (r << 16) | (g << 8) | b;
 	
-	// Store the color
+	
 	if (ft_strncmp(line, "F ", 2) == 0)
 	{
 		data->textures->floor_color = color;
@@ -484,7 +483,7 @@ int parse_cub_file(char *filename, t_cub_data *data)
 	
 	ft_printf("DEBUG: Starting texture/color parsing...\n");
 	
-	// First parse textures and colors
+	
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
 	{
@@ -494,7 +493,7 @@ int parse_cub_file(char *filename, t_cub_data *data)
 	
 	while ((line = get_next_line(fd)))
 	{
-		// Parse textures and colors
+		
 		if (ft_strncmp(line, "NO ", 3) == 0 || ft_strncmp(line, "SO ", 3) == 0 ||
 			ft_strncmp(line, "WE ", 3) == 0 || ft_strncmp(line, "EA ", 3) == 0)
 		{
@@ -524,7 +523,7 @@ int parse_cub_file(char *filename, t_cub_data *data)
 	
 	ft_printf("DEBUG: Texture/color parsing complete. Starting map parsing...\n");
 	
-	// Then parse the map structure
+	
 	if (!open_map(filename, data))
 	{
 		ft_printf_fd(STDERR_FILENO, "Error: Failed in open_map()\n");
@@ -553,9 +552,9 @@ bool look_for_spawn(t_map *map, int *spawn_x, int *spawn_y, char *direction)
         if (map->map_array[i] == 'N' || map->map_array[i] == 'S' ||
             map->map_array[i] == 'E' || map->map_array[i] == 'W')
         {
-            // direction
+            
             *direction = map->map_array[i];
-            // Convert 1D index to 2D grid coordinates
+            
             *spawn_x = i % map->width;
             *spawn_y = i / map->width;
             printf("DEBUG: Player spawn found at grid (%d, %d)\n", *spawn_x, *spawn_y);

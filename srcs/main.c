@@ -39,13 +39,18 @@ static int	init_parse_map(char *filename, t_cub_data *data)
 
 static void	setup_mlx_hooks(t_cub_data *data)
 {
-	mlx_loop_hook(data->mlx->mlx_ptr, main_render_loop, data);
-	mlx_hook(data->mlx->win_ptr, 2, 1L << 0, handle_key_press, data);
-	mlx_hook(data->mlx->win_ptr, 3, 1L << 1, handle_key_release, data);
-	mlx_hook(data->mlx->win_ptr, 17, 0L, handle_close, data);
-	mlx_hook(data->mlx->win_ptr, 6, 1L << 6, handle_mouse_move, data);
-	mlx_hook(data->mlx->win_ptr, 4, 1L << 2, handle_mouse_button, data);
-	mlx_hook(data->mlx->win_ptr, 5, 1L << 3, handle_mouse_release, data);
+	mlx_loop_hook(data->mlx->mlx_ptr, (int (*)())main_render_loop, data);
+	mlx_hook(data->mlx->win_ptr, 2, 1L << 0, (int (*)())handle_key_press,
+		data);
+	mlx_hook(data->mlx->win_ptr, 3, 1L << 1, (int (*)())handle_key_release,
+		data);
+	mlx_hook(data->mlx->win_ptr, 17, 0L, (int (*)())handle_close, data);
+	mlx_hook(data->mlx->win_ptr, 6, 1L << 6, (int (*)())handle_mouse_move,
+		data);
+	mlx_hook(data->mlx->win_ptr, 4, 1L << 2, (int (*)())handle_mouse_button,
+		data);
+	mlx_hook(data->mlx->win_ptr, 5, 1L << 3, (int (*)())handle_mouse_release,
+		data);
 }
 
 static void	print_game_init_message(char *map_file)

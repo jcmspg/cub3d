@@ -31,10 +31,10 @@ static t_fixed32	direction_to_angle(char direction)
 	return (angle);
 }
 
-// SUPER EFFICIENT CACHING - avoid all calculations when possible
+
 static t_fixed32	cached_plane_length = 0;
 static t_fixed32	last_angle = 999 << 16;
-// Invalid initial value (raw fixed32)
+
 
 static void	init_cached_plane_length(t_cub_data *data)
 {
@@ -48,29 +48,7 @@ static void	init_cached_plane_length(t_cub_data *data)
 	cached_plane_length = fixed32_div(sin_33, cos_33);
 }
 
-// player direction math and vectors - SUPER OPTIMIZED (FIXED)
-void	calc_player_dirs(t_cub_data *data)
-{
-	t_fixed32	angle_degrees;
-	t_fixed32	angle_diff;
 
-	if (!data || !data->player)
-		return ;
-	angle_degrees = data->player->dir_angle;
-	angle_diff = angle_degrees - last_angle;
-	if (angle_diff < to_fixed32(0.01f) && angle_diff > to_fixed32(-0.01f))
-		return ;
-	init_cached_plane_length(data);
-	data->player->dir_x = fast_cos(&data->trig, angle_degrees);
-	data->player->dir_y = fast_sin(&data->trig, angle_degrees);
-	last_angle = angle_degrees;
-	data->player->plane_x = fixed32_mul(-data->player->dir_y,
-			cached_plane_length);
-	data->player->plane_y = fixed32_mul(data->player->dir_x,
-			cached_plane_length);
-}
-
-// init player
 static void	check_spawn_result(t_player *player, t_map *map, int spawn_x,
 		int spawn_y)
 {
@@ -94,38 +72,66 @@ static void	set_player_spawn(t_player *player, int spawn_x, int spawn_y,
 	player->rotate_speed = to_fixed32(ROTATE_SPEED);
 }
 
+static void	player_init_error(const char *msg, int err_code, t_player *player)
+{
+	if (msg)
+		ft_putstr_fd((char *)msg, STDERR_FILENO);
+	if (player)
+		free(player);
+	exit(err_code);
+}
+
+static void	find_player_spawn_or_exit(t_cub_data *data, t_player *player,
+		int *spawn_x, int *spawn_y)
+{
+	char	direction;
+
+	direction = 'X';
+	printf("🔍 PLAYER INIT: Searching for spawn position...\n");
+	if (!look_for_spawn(data->map, spawn_x, spawn_y, &direction))
+		player_init_error("Error: Failed to find player spawn position\n",
+			ERR_PLAYER_INIT, player);
+	check_spawn_result(player, data->map, *spawn_x, *spawn_y);
+	set_player_spawn(player, *spawn_x, *spawn_y, direction);
+}
+
+void	calc_player_dirs(t_cub_data *data)
+{
+	t_fixed32	angle_degrees;
+	t_fixed32	angle_diff;
+
+	if (!data || !data->player)
+		return ;
+	angle_degrees = data->player->dir_angle;
+	angle_diff = angle_degrees - last_angle;
+	if (angle_diff < to_fixed32(0.01f) && angle_diff > to_fixed32(-0.01f))
+		return ;
+	init_cached_plane_length(data);
+	data->player->dir_x = fast_cos(&data->trig, angle_degrees);
+	data->player->dir_y = fast_sin(&data->trig, angle_degrees);
+	last_angle = angle_degrees;
+	data->player->plane_x = fixed32_mul(-data->player->dir_y,
+			cached_plane_length);
+	data->player->plane_y = fixed32_mul(data->player->dir_x,
+			cached_plane_length);
+}
+
 t_player	*init_player(t_cub_data *data)
 {
 	t_player	*player;
 	int			spawn_x;
 	int			spawn_y;
-	char		direction;
 
 	if (!data || !data->map)
-	{
-		ft_putstr_fd("Error: Invalid data or map\n", STDERR_FILENO);
-		exit(ERR_PLAYER_INIT);
-	}
+		player_init_error("Error: Invalid data or map\n", ERR_PLAYER_INIT,
+			NULL);
 	player = ft_calloc(sizeof(t_player), 1);
 	if (!player)
-	{
-		ft_putstr_fd("Error: Memory allocation failed for player\n",
-			STDERR_FILENO);
-		exit(ERR_MEMORY_ALLOCATION);
-	}
+		player_init_error("Error: Memory allocation failed for player\n",
+			ERR_MEMORY_ALLOCATION, NULL);
 	spawn_x = -1;
 	spawn_y = -1;
-	direction = 'X';
-	printf("🔍 PLAYER INIT: Searching for spawn position...\n");
-	if (!look_for_spawn(data->map, &spawn_x, &spawn_y, &direction))
-	{
-		ft_putstr_fd("Error: Failed to find player spawn position\n",
-			STDERR_FILENO);
-		free(player);
-		exit(ERR_PLAYER_INIT);
-	}
-	check_spawn_result(player, data->map, spawn_x, spawn_y);
-	set_player_spawn(player, spawn_x, spawn_y, direction);
+	find_player_spawn_or_exit(data, player, &spawn_x, &spawn_y);
 	calc_player_dirs(data);
 	return (player);
 }

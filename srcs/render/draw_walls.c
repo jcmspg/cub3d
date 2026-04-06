@@ -17,7 +17,7 @@
  */
 void	draw_wall_line(t_game *game, int x, int start, int end)
 {
-	// TODO: Implement wall line drawing
+	
 	(void)game;
 	(void)x;
 	(void)start;
@@ -29,7 +29,7 @@ void	draw_wall_line(t_game *game, int x, int start, int end)
  */
 int	calculate_wall_height(double distance)
 {
-	// TODO: Implement wall height calculation
+	
 	(void)distance;
 	return (0);
 }
@@ -39,6 +39,6 @@ int	calculate_wall_height(double distance)
  */
 void	draw_floor_ceiling(t_game *game)
 {
-	// TODO: Implement floor/ceiling rendering
+	
 	(void)game;
 }

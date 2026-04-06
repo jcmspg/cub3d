@@ -109,7 +109,7 @@ static void	draw_ray_on_minimap(t_cub_data *data, t_ray *ray, int color)
 	struct s_ray_line	line;
 
 	world_to_minimap(data->player->x, data->player->y, &start_x, &start_y);
-	// Calculate hit point: player_pos + ray_dir * perp_dist
+	
 	hit_x = fixed32_add(data->player->x, fixed32_mul(ray->dir_x,
 				ray->perp_dist));
 	hit_y = fixed32_add(data->player->y, fixed32_mul(ray->dir_y,

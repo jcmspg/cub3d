@@ -96,7 +96,7 @@ int	cleanup_textures(t_textures *textures)
 int	cleanup_sprites(t_sprite *sprites)
 {
 	ft_printf_fd(STDERR_FILENO, "cleaning t_sprites\n");
-	// * to do * //
+	
 	(void)sprites;
 	return (ERR_NO_ERROR);
 }

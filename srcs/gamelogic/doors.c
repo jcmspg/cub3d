@@ -12,6 +12,31 @@
 
 #include "../../includes/cub3d.h"
 
+static void	toggle_door(t_cub_data *data, t_door *door)
+{
+	int	player_map_x;
+	int	player_map_y;
+
+	player_map_x = from_fixed32(data->player->x);
+	player_map_y = from_fixed32(data->player->y);
+	if (door->is_open || door->is_opening)
+	{
+		if (player_map_x == door->x && player_map_y == door->y)
+		{
+			printf("DEBUG: Cannot close door - player inside!\n");
+			return ;
+		}
+		door->is_closing = true;
+		door->is_opening = false;
+		door->is_open = false;
+	}
+	else
+	{
+		door->is_opening = true;
+		door->is_closing = false;
+	}
+}
+
 t_door	*get_door_at(t_cub_data *data, int x, int y)
 {
 	int	i;
@@ -41,7 +66,7 @@ void	update_doors(t_cub_data *data)
 		door = &data->game->doors[i];
 		if (door->is_opening)
 		{
-			door->open_amount += 0.02f; // Adjust speed as needed
+			door->open_amount += 0.02f; 
 			if (door->open_amount >= 1.0f)
 			{
 				printf("DEBUG: Door at (%d,%d) fully OPEN\n", door->x, door->y);
@@ -63,31 +88,6 @@ void	update_doors(t_cub_data *data)
 			}
 		}
 		i++;
-	}
-}
-
-static void	toggle_door(t_cub_data *data, t_door *door)
-{
-	int	player_map_x;
-	int	player_map_y;
-
-	player_map_x = from_fixed32(data->player->x);
-	player_map_y = from_fixed32(data->player->y);
-	if (door->is_open || door->is_opening)
-	{
-		if (player_map_x == door->x && player_map_y == door->y)
-		{
-			printf("DEBUG: Cannot close door - player inside!\n");
-			return ;
-		}
-		door->is_closing = true;
-		door->is_opening = false;
-		door->is_open = false;
-	}
-	else
-	{
-		door->is_opening = true;
-		door->is_closing = false;
 	}
 }
 

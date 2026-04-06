@@ -13,9 +13,24 @@
 #include "../../includes/gamelogic.h"
 #include "../../includes/movements.h"
 
-/**
- * Function to check if the move is valid based on collision detection.
- */
+static bool	dirs_are_zero(t_cub_data *data)
+{
+	if (data->player->dir_x == 0 && data->player->dir_y == 0)
+	{
+		ft_putstr_fd("Error: Direction vectors are not set\n", STDERR_FILENO);
+		return (true);
+	}
+	return (false);
+}
+
+static t_fixed32	normalize_angle_fixed(t_fixed32 angle)
+{
+	while (angle < 0)
+		angle = fixed32_add(angle, to_fixed32(360.0f));
+	while (angle >= to_fixed32(360.0f))
+		angle = fixed32_sub(angle, to_fixed32(360.0f));
+	return (angle);
+}
 
 static bool	check_collision(t_cub_data *data, int x, int y)
 {
@@ -62,19 +77,16 @@ static bool	is_valid_move(t_cub_data *data, t_fixed32 new_x, t_fixed32 new_y)
 		return (false);
 	if (check_collision(data, map_x, map_y))
 		return (false);
-	if (check_collision(data, (int)from_fixed32(fixed32_sub(pos_x, buffer)),
-			(int)from_fixed32(pos_y)))
-		return (false);
-	if (check_collision(data, (int)from_fixed32(fixed32_add(pos_x, buffer)),
-			(int)from_fixed32(pos_y)))
-		return (false);
-	if (check_collision(data, (int)from_fixed32(pos_x),
-			(int)from_fixed32(fixed32_sub(pos_y, buffer))))
-		return (false);
-	if (check_collision(data, (int)from_fixed32(pos_x),
-			(int)from_fixed32(fixed32_add(pos_y, buffer))))
-		return (false);
-	return (true);
+	return (!check_collision(data,
+			(int)from_fixed32(fixed32_sub(pos_x, buffer)),
+			(int)from_fixed32(pos_y))
+		&& !check_collision(data,
+			(int)from_fixed32(fixed32_add(pos_x, buffer)),
+			(int)from_fixed32(pos_y))
+		&& !check_collision(data, (int)from_fixed32(pos_x),
+			(int)from_fixed32(fixed32_sub(pos_y, buffer)))
+		&& !check_collision(data, (int)from_fixed32(pos_x),
+			(int)from_fixed32(fixed32_add(pos_y, buffer))));
 }
 
 static void	apply_strafe(t_cub_data *data, t_fixed32 strafe_speed,
@@ -95,9 +107,6 @@ static void	apply_strafe(t_cub_data *data, t_fixed32 strafe_speed,
 	data->player->y = newY;
 }
 
-/**
- * Handle forward movement
- */
 void	move_player_y(t_cub_data *data, t_fixed32 speed)
 {
 	t_fixed32	new_y;
@@ -121,17 +130,6 @@ void	move_player_x(t_cub_data *data, t_fixed32 speed)
 	data->player->x = new_player_x;
 }
 
-static bool	dirs_are_zero(t_cub_data *data)
-{
-	if (data->player->dir_x == 0 && data->player->dir_y == 0)
-	{
-		ft_putstr_fd("Error: Direction vectors are not set\n", STDERR_FILENO);
-		return (true);
-	}
-	return (false);
-}
-
-// Move player in the direction they are facing
 void	move_player(t_cub_data *data, t_fixed32 move_speed)
 {
 	t_fixed32	new_x;
@@ -153,7 +151,7 @@ void	move_player(t_cub_data *data, t_fixed32 move_speed)
 	data->player->y = newY;
 }
 
-// Strafe player left or right
+
 void	strafe_player(t_cub_data *data, t_fixed32 strafe_speed)
 {
 	t_fixed32	perp_x;
@@ -169,15 +167,6 @@ void	strafe_player(t_cub_data *data, t_fixed32 strafe_speed)
 	perp_x = -data->player->dir_y;
 	perp_y = data->player->dir_x;
 	apply_strafe(data, strafe_speed, perp_x, perp_y);
-}
-
-static t_fixed32	normalize_angle_fixed(t_fixed32 angle)
-{
-	while (angle < 0)
-		angle = fixed32_add(angle, to_fixed32(360.0f));
-	while (angle >= to_fixed32(360.0f))
-		angle = fixed32_sub(angle, to_fixed32(360.0f));
-	return (angle);
 }
 
 void	rotate_player(t_cub_data *data, t_fixed32 rotation_angle)

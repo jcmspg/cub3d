@@ -13,7 +13,7 @@
 #include "../../includes/hud.h"
 #include "../../includes/mylx_utils.h"
 
-// Initialize MLX
+
 int	mylx_init(t_cub_data *data)
 {
 	if (!data || !data->mlx)
@@ -27,7 +27,7 @@ int	mylx_init(t_cub_data *data)
 	return (ERR_NO_ERROR);
 }
 
-// create a new Window
+
 int	mylx_create_window(t_cub_data *data)
 {
 	data->mlx->win_ptr = mlx_new_window(data->mlx->mlx_ptr, data->mlx->width,
@@ -44,7 +44,7 @@ int	mylx_create_window(t_cub_data *data)
 	return (ERR_NO_ERROR);
 }
 
-// Create a new image
+
 int	mylx_create_image(t_cub_data *data)
 {
 	if (!data || !data->mlx)
@@ -72,7 +72,7 @@ int	mylx_create_image(t_cub_data *data)
 	return (ERR_NO_ERROR);
 }
 
-// Make the image visible in the window
+
 int	mylx_make_image(t_cub_data *data)
 {
 	if (!data || !data->mlx || !data->mlx->img || !data->mlx->img->img)
@@ -83,7 +83,7 @@ int	mylx_make_image(t_cub_data *data)
 	return (ERR_NO_ERROR);
 }
 
-// Destroy the image
+
 int	mylx_destroy_image(t_cub_data *data)
 {
 	if (!data)
@@ -99,7 +99,7 @@ int	mylx_destroy_image(t_cub_data *data)
 		ERR_IMAGE_DESTROY);
 }
 
-// Destroy the window
+
 int	mylx_destroy_window(t_cub_data *data)
 {
 	if (!data || !data->mlx || !data->mlx->win_ptr)
@@ -115,7 +115,7 @@ int	mylx_destroy_window(t_cub_data *data)
 		ERR_WINDOW_DESTROY);
 }
 
-// Destroy the MLX instance
+
 int	mylx_destroy_mlx(t_cub_data *data)
 {
 	if (data && data->mlx)
@@ -145,7 +145,7 @@ void	mylx_pixel_put(t_cub_data *data, int x, int y, int color)
 	*(unsigned int *)distance = color;
 }
 
-// Clear the image using fast memset
+
 int	mylx_clear_image(t_cub_data *data)
 {
 	int	total_bytes;
@@ -167,5 +167,4 @@ int	mylx_update_scene(t_cub_data *data)
 	render_hud_text(data);
 	return (ERR_NO_ERROR);
 }
-// End of mylx_utils.c
-// ************************************************************************** */
+
