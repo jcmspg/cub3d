@@ -3,125 +3,165 @@
 /*                                                        :::      ::::::::   */
 /*   sprites.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 16:30:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 19:36:00 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/06 21:51:42 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/render.h"
 #include <math.h>
 
-struct s_door_clip
-{
-	int	top;
-	int	bottom;
-};
-
-struct s_billboard
-{
-	float	sx;
-	float	sy;
-	int		color;
-	int		scale_div;
-	t_texture	*texture;
-};
-
-struct s_draw_span
-{
-	int	start_x;
-	int	end_x;
-	int	start_y;
-	int	end_y;
-	float	transform_y;
-};
+static int	g_clip_top;
+static int	g_clip_bottom;
+static int	g_start_x;
+static int	g_end_x;
+static int	g_start_y;
+static int	g_end_y;
+static int	g_sprite_scale_div;
+static int	g_sprite_color;
+static int	g_sprite_size;
+static float	g_sprite_x;
+static float	g_sprite_y;
+static float	g_transform_y;
+static float	g_inv;
+static float	g_dir_x;
+static float	g_dir_y;
+static float	g_plane_x;
+static float	g_plane_y;
+static t_texture	*g_sprite_texture;
 
 static bool	is_transparent_pixel(int pixel)
 {
 	return ((unsigned int)pixel == 0xFF000000U);
 }
 
-static void	get_door_coverage(t_cub_data *data, int stripe, float sprite_dist,
-		struct s_door_clip *clip)
+static void	update_billboard_camera(t_cub_data *data)
+{
+	g_dir_x = from_fixed32(data->player->dir_x);
+	g_dir_y = from_fixed32(data->player->dir_y);
+	g_plane_x = from_fixed32(data->player->plane_x);
+	g_plane_y = from_fixed32(data->player->plane_y);
+}
+
+static void	set_billboard_x_span(t_cub_data *data)
+{
+	g_start_x = -(g_sprite_size / 2) + (int)((data->mlx->width / 2)
+		* (1 + g_inv * (g_dir_y * (g_sprite_x - from_fixed32(data->player->x))
+		- g_dir_x * (g_sprite_y - from_fixed32(data->player->y)))
+		/ g_transform_y));
+	g_end_x = (g_sprite_size / 2) + (int)((data->mlx->width / 2)
+		* (1 + g_inv * (g_dir_y * (g_sprite_x - from_fixed32(data->player->x))
+		- g_dir_x * (g_sprite_y - from_fixed32(data->player->y)))
+		/ g_transform_y));
+	if (g_start_x < 0)
+		g_start_x = 0;
+	if (g_end_x >= data->mlx->width)
+		g_end_x = data->mlx->width - 1;
+}
+
+static void	set_billboard_y_span(t_cub_data *data)
+{
+	g_start_y = -g_sprite_size / 2 + data->mlx->height / 2
+		+ data->player->view_offset + data->player->bob_offset
+		+ (int)(data->mlx->height / (4 * g_transform_y));
+	g_end_y = g_sprite_size / 2 + data->mlx->height / 2
+		+ data->player->view_offset + data->player->bob_offset
+		+ (int)(data->mlx->height / (4 * g_transform_y));
+	if (g_start_y < 0)
+		g_start_y = 0;
+	if (g_end_y >= data->mlx->height)
+		g_end_y = data->mlx->height - 1;
+}
+
+static void	get_door_coverage(t_cub_data *data, int stripe)
 {
 	t_ray	*ray;
 	t_door	*door;
-	float	door_dist;
-	int		line_height;
-	int		frame_top;
-	int		offset;
-	int		view_offset;
 
-	clip->top = -1;
-	clip->bottom = -1;
+	g_clip_top = -1;
+	g_clip_bottom = -1;
 	ray = &data->raycasting->rays[stripe];
 	if (!ray->door_hit)
 		return ;
-	door_dist = from_fixed32(ray->door_dist);
-	if (sprite_dist < door_dist)
+	g_start_y = data->player->view_offset + data->player->bob_offset;
+	if (g_transform_y < from_fixed32(ray->door_dist))
 		return ;
 	door = get_door_at(data, ray->door_map_x, ray->door_map_y);
 	if (!door)
 		return ;
-	line_height = (int)(data->mlx->height / door_dist);
-	view_offset = data->player->view_offset + data->player->bob_offset;
-	frame_top = (data->mlx->height - line_height) / 2 + view_offset;
-	offset = (int)(line_height * door->open_amount);
-	clip->top = frame_top - offset;
-	clip->bottom = (data->mlx->height + line_height) / 2 + view_offset - offset;
-	if (clip->top < frame_top)
-		clip->top = frame_top;
-	if (clip->top < 0)
-		clip->top = 0;
-	if (clip->bottom >= data->mlx->height)
-		clip->bottom = data->mlx->height - 1;
+	g_sprite_size = (int)(data->mlx->height / from_fixed32(ray->door_dist));
+	g_start_y = (data->mlx->height - g_sprite_size) / 2 + g_start_y;
+	g_end_y = (data->mlx->height + g_sprite_size) / 2 + g_start_y;
+	g_sprite_size = (int)(g_sprite_size * door->open_amount);
+	g_clip_top = g_start_y - g_sprite_size;
+	g_clip_bottom = g_end_y - g_sprite_size;
+	if (g_clip_top < g_start_y)
+		g_clip_top = g_start_y;
+	if (g_clip_top < 0)
+		g_clip_top = 0;
+	if (g_clip_bottom >= data->mlx->height)
+		g_clip_bottom = data->mlx->height - 1;
 }
 
-static void	draw_sprite_stripe_color(t_cub_data *data, int stripe,
-		struct s_draw_span *span, struct s_door_clip *clip, int color)
+static bool	compute_billboard_span(t_cub_data *data)
+{
+	update_billboard_camera(data);
+	g_inv = 1.0f / (g_plane_x * g_dir_y - g_dir_x * g_plane_y);
+	g_transform_y = g_inv * (-g_plane_y * (g_sprite_x - from_fixed32(data->player->x))
+		+ g_plane_x * (g_sprite_y - from_fixed32(data->player->y)));
+	if (g_transform_y <= 0.1f)
+		return (false);
+	g_sprite_size = abs((int)(data->mlx->height / g_transform_y))
+		/ g_sprite_scale_div;
+	set_billboard_x_span(data);
+	set_billboard_y_span(data);
+	return (g_end_x > g_start_x && g_end_y > g_start_y);
+}
+
+static void	draw_sprite_stripe_color(t_cub_data *data, int stripe)
 {
 	int	y;
 
-	y = span->start_y;
-	while (y < span->end_y)
+	y = g_start_y;
+	while (y < g_end_y)
 	{
 		if (y >= 0 && y < data->mlx->height)
 		{
-			if (clip->top >= 0 && y >= clip->top && y <= clip->bottom)
+			if (g_clip_top >= 0 && y >= g_clip_top && y <= g_clip_bottom)
 			{
 				y++;
 				continue ;
 			}
-			mylx_pixel_put(data, stripe, y, color);
+			mylx_pixel_put(data, stripe, y, g_sprite_color);
 		}
 		y++;
 	}
 }
 
-static void	draw_sprite_stripe_tex(t_cub_data *data, int stripe,
-		struct s_draw_span *span, struct s_door_clip *clip, t_texture *texture)
+static void	draw_sprite_stripe_tex(t_cub_data *data, int stripe)
 {
 	int	y;
 	int	tx;
 	int	ty;
 	int	pixel;
 
-	tx = ((stripe - span->start_x) * texture->width)
-		/ (span->end_x - span->start_x);
-	y = span->start_y;
-	while (y < span->end_y)
+	tx = ((stripe - g_start_x) * g_sprite_texture->width)
+		/ (g_end_x - g_start_x);
+	y = g_start_y;
+	while (y < g_end_y)
 	{
-		if (y >= 0 && y < data->mlx->height && !(clip->top >= 0
-				&& y >= clip->top && y <= clip->bottom))
+		if (y >= 0 && y < data->mlx->height && !(g_clip_top >= 0
+				&& y >= g_clip_top && y <= g_clip_bottom))
 		{
-			ty = ((y - span->start_y) * texture->height)
-				/ (span->end_y - span->start_y);
+			ty = ((y - g_start_y) * g_sprite_texture->height)
+				/ (g_end_y - g_start_y);
 			if (ty < 0)
 				ty = 0;
-			if (ty >= texture->height)
-				ty = texture->height - 1;
-			pixel = get_texture_pixel(texture, tx, ty);
+			if (ty >= g_sprite_texture->height)
+				ty = g_sprite_texture->height - 1;
+			pixel = get_texture_pixel(g_sprite_texture, tx, ty);
 			if (!is_transparent_pixel(pixel))
 				mylx_pixel_put(data, stripe, y, pixel);
 		}
@@ -129,73 +169,25 @@ static void	draw_sprite_stripe_tex(t_cub_data *data, int stripe,
 	}
 }
 
-static bool	compute_billboard_span(t_cub_data *data, struct s_billboard *bb,
-		struct s_draw_span *span)
+static void	render_billboard(t_cub_data *data)
 {
-	float	sx;
-	float	sy;
-	float	dir_x;
-	float	dir_y;
-	float	pl_x;
-	float	pl_y;
-	float	inv;
-	int		size;
+	int	stripe;
+	float	wall_dist;
 
-	sx = bb->sx - from_fixed32(data->player->x);
-	sy = bb->sy - from_fixed32(data->player->y);
-	dir_x = from_fixed32(data->player->dir_x);
-	dir_y = from_fixed32(data->player->dir_y);
-	pl_x = from_fixed32(data->player->plane_x);
-	pl_y = from_fixed32(data->player->plane_y);
-	inv = 1.0f / (pl_x * dir_y - dir_x * pl_y);
-	span->transform_y = inv * (-pl_y * sx + pl_x * sy);
-	if (span->transform_y <= 0.1f)
-		return (false);
-	size = abs((int)(data->mlx->height / span->transform_y)) / bb->scale_div;
-	span->start_x = -(size / 2)
-		+ (int)((data->mlx->width / 2) * (1 + inv * (dir_y * sx - dir_x * sy)
-				/ span->transform_y));
-	span->end_x = (size / 2)
-		+ (int)((data->mlx->width / 2) * (1 + inv * (dir_y * sx - dir_x * sy)
-				/ span->transform_y));
-	span->start_y = -size / 2 + data->mlx->height / 2 + data->player->view_offset
-		+ data->player->bob_offset + (int)(data->mlx->height
-		/ (4 * span->transform_y));
-	span->end_y = size / 2 + data->mlx->height / 2 + data->player->view_offset
-		+ data->player->bob_offset + (int)(data->mlx->height
-		/ (4 * span->transform_y));
-	if (span->start_x < 0)
-		span->start_x = 0;
-	if (span->end_x >= data->mlx->width)
-		span->end_x = data->mlx->width - 1;
-	if (span->start_y < 0)
-		span->start_y = 0;
-	if (span->end_y >= data->mlx->height)
-		span->end_y = data->mlx->height - 1;
-	return (span->end_x > span->start_x && span->end_y > span->start_y);
-}
-
-static void	render_billboard(t_cub_data *data, struct s_billboard *bb)
-{
-	int				stripe;
-	float			wall_dist;
-	struct s_door_clip	clip;
-	struct s_draw_span	span;
-
-	if (!compute_billboard_span(data, bb, &span))
+	if (!compute_billboard_span(data))
 		return ;
-	stripe = span.start_x;
-	while (stripe < span.end_x)
+	stripe = g_start_x;
+	while (stripe < g_end_x)
 	{
 		wall_dist = from_fixed32(data->raycasting->rays[stripe].perp_dist);
-		if (span.transform_y < wall_dist)
+		if (g_transform_y < wall_dist)
 		{
-			get_door_coverage(data, stripe, span.transform_y, &clip);
-			if (bb->texture && bb->texture->loaded && bb->texture->width > 0
-				&& bb->texture->height > 0)
-				draw_sprite_stripe_tex(data, stripe, &span, &clip, bb->texture);
+			get_door_coverage(data, stripe);
+			if (g_sprite_texture && g_sprite_texture->loaded
+				&& g_sprite_texture->width > 0 && g_sprite_texture->height > 0)
+				draw_sprite_stripe_tex(data, stripe);
 			else
-				draw_sprite_stripe_color(data, stripe, &span, &clip, bb->color);
+				draw_sprite_stripe_color(data, stripe);
 		}
 		stripe++;
 	}
@@ -203,29 +195,25 @@ static void	render_billboard(t_cub_data *data, struct s_billboard *bb)
 
 static void	render_ammo_sprite(t_cub_data *data, float sx, float sy)
 {
-	struct s_billboard	bb;
-
-	bb.sx = sx;
-	bb.sy = sy;
-	bb.color = 0xFFD700;
-	bb.scale_div = 4;
-	bb.texture = NULL;
+	g_sprite_x = sx;
+	g_sprite_y = sy;
+	g_sprite_scale_div = 4;
+	g_sprite_color = 0xFFD700;
+	g_sprite_texture = NULL;
 	if (data->textures)
-		bb.texture = &data->textures->ammo;
-	render_billboard(data, &bb);
+		g_sprite_texture = &data->textures->ammo;
+	render_billboard(data);
 }
 
 static void	render_enemy_sprite(t_cub_data *data, t_enemy *enemy,
 		t_texture *demon_texture)
 {
-	struct s_billboard	bb;
-
-	bb.sx = from_fixed32(enemy->x);
-	bb.sy = from_fixed32(enemy->y);
-	bb.color = 0xFF0000;
-	bb.scale_div = 2;
-	bb.texture = demon_texture;
-	render_billboard(data, &bb);
+	g_sprite_x = from_fixed32(enemy->x);
+	g_sprite_y = from_fixed32(enemy->y);
+	g_sprite_scale_div = 2;
+	g_sprite_color = 0xFF0000;
+	g_sprite_texture = demon_texture;
+	render_billboard(data);
 }
 
 static bool	enemy_should_draw(t_enemy *enemy, uint64_t now)
