@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   draw_walls.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joao <joao@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:45:00 by joao              #+#    #+#             */
-/*   Updated: 2025/07/20 21:45:00 by joao             ###   ########.fr       */
+/*   Updated: 2026/04/07 23:43:25 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
  */
 void	draw_wall_line(t_game *game, int x, int start, int end)
 {
-	
 	(void)game;
 	(void)x;
 	(void)start;
@@ -29,7 +28,6 @@ void	draw_wall_line(t_game *game, int x, int start, int end)
  */
 int	calculate_wall_height(double distance)
 {
-	
 	(void)distance;
 	return (0);
 }
@@ -39,6 +37,5 @@ int	calculate_wall_height(double distance)
  */
 void	draw_floor_ceiling(t_game *game)
 {
-	
 	(void)game;
 }

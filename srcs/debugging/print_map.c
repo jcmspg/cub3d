@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print_map.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 19:07:59 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/27 18:25:25 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 01:49:45 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,17 +49,17 @@ void print_map_array(const t_map *map)
 }
 
 
-void draw_filled_tri(t_cub_data *data, int x, int y, int width, int height, int color)
+void draw_filled_tri(t_cub_data *data, t_draw_shape *shape)
 {
-    if (!data || !data->mlx || !data->mlx->img)
+    if (!data || !data->mlx || !data->mlx->img || !shape)
         return;
 
-    int start_x = (x);
-    int start_y = (y);
+    int start_x = shape->x;
+    int start_y = shape->y;
 
-    for (int j = 0; j < height; j++)
+    for (int j = 0; j < shape->height; j++)
     {
-        for (int i = 0; i <= (width * j) / height; i++)
+        for (int i = 0; i <= (shape->width * j) / shape->height; i++)
         {
             int pixel_x = start_x + i;
             int pixel_y = start_y + j;
@@ -68,24 +68,24 @@ void draw_filled_tri(t_cub_data *data, int x, int y, int width, int height, int 
             if (pixel_x >= 0 && pixel_x < data->mlx->width && 
                 pixel_y >= 0 && pixel_y < data->mlx->height)
             {
-                mylx_pixel_put(data, pixel_x, pixel_y, color);
+                mylx_pixel_put(data, pixel_x, pixel_y, shape->color);
             }
         }
     }
 }
 
 
-void draw_filled_rect(t_cub_data *data, int x, int y, int width, int height, int color)
+void draw_filled_rect(t_cub_data *data, t_draw_shape *shape)
 {
-    if (!data || !data->mlx || !data->mlx->img)
+    if (!data || !data->mlx || !data->mlx->img || !shape)
         return;
 
-    int start_x = (x);
-    int start_y = (y);
+    int start_x = shape->x;
+    int start_y = shape->y;
 
-    for (int j = 0; j < height; j++)
+    for (int j = 0; j < shape->height; j++)
     {
-        for (int i = 0; i < width; i++)
+        for (int i = 0; i < shape->width; i++)
         {
             int pixel_x = start_x + i;
             int pixel_y = start_y + j;
@@ -94,7 +94,7 @@ void draw_filled_rect(t_cub_data *data, int x, int y, int width, int height, int
             if (pixel_x >= 0 && pixel_x < data->mlx->width && 
                 pixel_y >= 0 && pixel_y < data->mlx->height)
             {
-                mylx_pixel_put(data, pixel_x, pixel_y, color);
+                mylx_pixel_put(data, pixel_x, pixel_y, shape->color);
             }
         }
     }

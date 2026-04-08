@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_debug.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 17:55:35 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/02 21:22:23 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 01:49:27 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,35 +15,30 @@
 
 # include "cub3d.h"
 
+typedef struct s_draw_shape
+{
+	int	x;
+	int	y;
+	int	width;
+	int	height;
+	int	color;
+}		t_draw_shape;
+
 void	display_fps(t_cub_data *data, float fps);
-
 int		test_sync(t_cub_data *data);
-
 int		graphics_init(t_cub_data *data);
-
-void print_map_array(const t_map *map);
-
-
-void draw_map_grid(t_cub_data *data);
-
-/* Math testing functions */
-void test_fixed_point_math(void);
-void test_trig_tables(t_cub_data *data);
-void test_coordinate_conversions(t_cub_data *data);
-void run_all_math_tests(t_cub_data *data);
-
-/* Dynamic map testing functions */
-void init_dynamic_map_test(t_cub_data *data);
-void update_dynamic_map_test(t_cub_data *data);
-void stop_dynamic_map_test(void);
-
-
-void print_movements(t_cub_data *data);
-void print_player_pos(t_cub_data *data);
-
-
-void draw_filled_tri(t_cub_data *data, int x, int y, int width, int height, int color);
-void draw_filled_rect(t_cub_data *data, int x, int y, int width, int height, int color);
-
+void	print_map_array(const t_map *map);
+void	draw_map_grid(t_cub_data *data);
+void	test_fixed_point_math(void);
+void	test_trig_tables(t_cub_data *data);
+void	test_coordinate_conversions(t_cub_data *data);
+void	run_all_math_tests(t_cub_data *data);
+void	init_dynamic_map_test(t_cub_data *data);
+void	update_dynamic_map_test(t_cub_data *data);
+void	stop_dynamic_map_test(void);
+void	print_movements(t_cub_data *data);
+void	print_player_pos(t_cub_data *data);
+void	draw_filled_tri(t_cub_data *data, t_draw_shape *shape);
+void	draw_filled_rect(t_cub_data *data, t_draw_shape *shape);
 
 #endif /* FT_DEBUG_H */

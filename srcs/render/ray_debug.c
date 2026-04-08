@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ray_debug.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/01/24 19:35:30 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 00:13:27 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,14 @@ static void	step_line(struct s_ray_line *line, int *err, int dx, int dy)
 	int	sx;
 	int	sy;
 
-	sx = (line->x0 < line->x1) ? 1 : -1;
-	sy = (line->y0 < line->y1) ? 1 : -1;
+	if (line->x0 < line->x1)
+		sx = 1;
+	else
+		sx = -1;
+	if (line->y0 < line->y1)
+		sy = 1;
+	else
+		sy = -1;
 	e2 = 2 * (*err);
 	if (e2 > -dy)
 	{
@@ -100,25 +106,16 @@ static void	step_line(struct s_ray_line *line, int *err, int dx, int dy)
  */
 static void	draw_ray_on_minimap(t_cub_data *data, t_ray *ray, int color)
 {
-	int			start_x;
-	int			start_y;
-	int			end_x;
-	int			end_y;
 	t_fixed32	hit_x;
 	t_fixed32	hit_y;
 	struct s_ray_line	line;
 
-	world_to_minimap(data->player->x, data->player->y, &start_x, &start_y);
-	
+	world_to_minimap(data->player->x, data->player->y, &line.x0, &line.y0);
 	hit_x = fixed32_add(data->player->x, fixed32_mul(ray->dir_x,
 				ray->perp_dist));
 	hit_y = fixed32_add(data->player->y, fixed32_mul(ray->dir_y,
 				ray->perp_dist));
-	world_to_minimap(hit_x, hit_y, &end_x, &end_y);
-	line.x0 = start_x;
-	line.y0 = start_y;
-	line.x1 = end_x;
-	line.y1 = end_y;
+	world_to_minimap(hit_x, hit_y, &line.x1, &line.y1);
 	line.color = color;
 	draw_line(data, &line);
 }

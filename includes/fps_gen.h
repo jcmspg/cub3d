@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fps_gen.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 16:37:03 by joamiran          #+#    #+#             */
-/*   Updated: 2025/08/04 17:02:07 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 01:46:09 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 
 # define MAX_FPS 600
 # define MIN_FPS 300
-# define MIN_FRAME_TIME (1000 / MAX_FPS)
-# define MAX_FRAME_TIME (1000 / MIN_FPS)
+# define MIN_FRAME_TIME 1
+# define MAX_FRAME_TIME 3
 # define MAX_FRAME_SKIP 100
 # define FIXED_STEP_MS 16
 

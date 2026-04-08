@@ -3,71 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   texture_init.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/24 20:00:00 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 17:17:01 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 01:31:06 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cub3d.h"
-
-static void	free_texture_paths(t_textures *textures)
-{
-	if (textures->floor.path)
-		free(textures->floor.path);
-	if (textures->ceiling.path)
-		free(textures->ceiling.path);
-	if (textures->door.path)
-		free(textures->door.path);
-	if (textures->ammo.path)
-		free(textures->ammo.path);
-	if (textures->demon.path)
-		free(textures->demon.path);
-	if (textures->gun_pov.path)
-		free(textures->gun_pov.path);
-}
-
-static void	free_texture_pixels(t_textures *textures)
-{
-	if (textures->floor.pixels)
-		free(textures->floor.pixels);
-	if (textures->ceiling.pixels)
-		free(textures->ceiling.pixels);
-	if (textures->door.pixels)
-		free(textures->door.pixels);
-	if (textures->ammo.pixels)
-		free(textures->ammo.pixels);
-	if (textures->demon.pixels)
-		free(textures->demon.pixels);
-	if (textures->gun_pov.pixels)
-		free(textures->gun_pov.pixels);
-}
-
-static void	destroy_wall_images(t_cub_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < 4)
-	{
-		if (data->textures->walls[i].img)
-		{
-			mlx_destroy_image(data->mlx->mlx_ptr, data->textures->walls[i].img);
-			data->textures->walls[i].img = NULL;
-		}
-		i++;
-	}
-}
-
-static void	destroy_texture_image(t_cub_data *data, t_texture *texture)
-{
-	if (texture->img)
-	{
-		mlx_destroy_image(data->mlx->mlx_ptr, texture->img);
-		texture->img = NULL;
-	}
-}
 
 /**
  * Initialize a single texture with default color
@@ -117,72 +60,4 @@ t_textures	*init_textures(void)
 	init_wall_textures(textures);
 	init_misc_textures(textures);
 	return (textures);
-}
-
-/**
- * Get the wall color based on ray hit side and direction
- *
- * @param ray       The ray that hit the wall
- * @param textures  Texture configuration
- * @return          Color for this wall
- *
- * Note: When a ray going EAST hits a wall, we see the WEST face of that wall!
- * The wall face is opposite to the ray direction.
- */
-int	get_wall_color(t_ray *ray, t_textures *textures)
-{
-	if (ray->hit_content == 'D')
-		return (0x8B4513);
-	if (ray->side == 0)
-	{
-		if (ray->step_x > 0)
-			return (textures->walls[TEX_WEST].color);
-		return (textures->walls[TEX_EAST].color);
-	}
-	if (ray->step_y > 0)
-	{
-		return (textures->walls[TEX_NORTH].color);
-	}
-	return (textures->walls[TEX_SOUTH].color);
-}
-
-/**
- * Free all texture resources
- */
-void	free_textures(t_textures *textures)
-{
-	int	i;
-
-	if (!textures)
-		return ;
-	
-	i = 0;
-	while (i < 4)
-	{
-		if (textures->walls[i].path)
-			free(textures->walls[i].path);
-		if (textures->walls[i].pixels)
-			free(textures->walls[i].pixels);
-		i++;
-	}
-	free_texture_paths(textures);
-	free_texture_pixels(textures);
-	free(textures);
-}
-
-/**
- * Destroy MLX texture images
- * Call this before free_textures and before destroying MLX
- */
-void	cleanup_textures_mlx(t_cub_data *data)
-{
-	if (!data || !data->textures || !data->mlx || !data->mlx->mlx_ptr)
-		return ;
-	destroy_wall_images(data);
-	destroy_texture_image(data, &data->textures->floor);
-	destroy_texture_image(data, &data->textures->ceiling);
-	destroy_texture_image(data, &data->textures->door);
-	destroy_texture_image(data, &data->textures->ammo);
-	destroy_texture_image(data, &data->textures->demon);
-	destroy_texture_image(data, &data->textures->gun_pov);
 }
