@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup_entities.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 00:35:03 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/08 00:35:04 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 22:48:07 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ int	cleanup_player(t_player *player)
 
 int	cleanup_graphics(t_graphics *graphics)
 {
+	if (!graphics)
+		return (ERR_NO_ERROR);
 	ft_printf_fd(STDERR_FILENO, "cleaning t_graphics\n");
 	if (graphics->pixels)
 		free(graphics->pixels);

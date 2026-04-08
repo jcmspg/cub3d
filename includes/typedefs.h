@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/08 21:22:46 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 21:27:33 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,13 @@
 #  define M_PI 3.14159265358979323846
 # endif
 
+# define MINIMAP_CELL_SIZE 12
+# define MINIMAP_OFFSET_X 10
+# define MINIMAP_OFFSET_Y 10
+# define RAY_COLOR 0xFFFF00
+# define RAY_EDGE_COLOR 0x00FFFF
+# define RAY_CENTER_COLOR 0xFFFFFF
+
 enum					e_error
 {
 	ERR_NO_ERROR,
@@ -95,13 +102,6 @@ enum					e_error
 	ERR_UNKNOWN,
 	ERR_CLEAN_UP,
 };
-
-#define MINIMAP_CELL_SIZE 12
-#define MINIMAP_OFFSET_X 10
-#define MINIMAP_OFFSET_Y 10
-#define RAY_COLOR 0xFFFF00
-#define RAY_EDGE_COLOR 0x00FFFF
-#define RAY_CENTER_COLOR 0xFFFFFF
 
 typedef struct s_ray_line
 {

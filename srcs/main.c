@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/08 21:14:05 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 23:38:45 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,5 @@ int	main(int argc, char **argv)
 	if (err != ERR_NO_ERROR)
 		return (err);
 	start_game_loop(&data);
-	cleanup(&data);
 	return (ERR_NO_ERROR);
 }

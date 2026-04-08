@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mylx_runtime.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/06 21:59:50 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/06 21:59:53 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 23:14:37 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int	mylx_destroy_window(t_cub_data *data)
 	if (data && data->mlx && data->mlx->win_ptr)
 	{
 		mlx_destroy_window(data->mlx->mlx_ptr, data->mlx->win_ptr);
-		free(data->mlx->win_ptr);
 		data->mlx->win_ptr = NULL;
 		return (ERR_NO_ERROR);
 	}

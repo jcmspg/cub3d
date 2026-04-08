@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup_systems.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 00:35:22 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/08 00:35:23 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 23:23:37 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

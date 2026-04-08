@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   hooks.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:31:44 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/06 22:17:34 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 23:11:06 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	handle_key_press(int keycode, t_cub_data *data)
 	else
 		set_key_press_state(keycode, data);
 	if (data->input->exit)
-		exit(0);
+		return (cleanup_and_exit(data));
 	return (ERR_NO_ERROR);
 }
 
@@ -70,7 +70,6 @@ int	handle_key_release(int keycode, t_cub_data *data)
 
 int	handle_close(t_cub_data *data)
 {
-	(void)data;
-	exit(0);
-	return (ERR_NO_ERROR);
+	printf("Window close event received\n");
+	return cleanup_and_exit(data);
 }
