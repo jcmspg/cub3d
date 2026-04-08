@@ -6,7 +6,7 @@
 /*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 16:37:03 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/08 01:46:09 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 02:03:33 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 # define MAX_FPS 600
 # define MIN_FPS 300
-# define MIN_FRAME_TIME 1
+# define MIN_FRAME_TIME 3
 # define MAX_FRAME_TIME 3
 # define MAX_FRAME_SKIP 100
 # define FIXED_STEP_MS 16
