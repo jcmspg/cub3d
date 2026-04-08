@@ -12,6 +12,16 @@
 
 #include "map_load_internal.h"
 
+static bool	line_starts_map_block(const char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	return (line[i] == '0' || line[i] == '1');
+}
+
 static char	*normalize_line(const char *line, int width)
 {
 	char	*clean;
@@ -44,13 +54,22 @@ static bool	process_pre_map_line(char *line, bool *map_started)
 		return ((true));
 	if (!is_valid_map_line(line))
 		return ((false));
+	if (!line_starts_map_block(line))
+		return ((true));
 	*map_started = true;
 	return ((true));
 }
 
 static bool	populate_line(char *line, t_map *map, char **dest)
 {
-	if (is_empty_line(line) || !is_valid_map_line(line))
+	if (is_empty_line(line))
+	{
+		*dest = normalize_line("", map->width);
+		if (!*dest)
+			return ((false));
+		return ((true));
+	}
+	if (!is_valid_map_line(line))
 		return ((false));
 	*dest = normalize_line(line, map->width);
 	if (!*dest)

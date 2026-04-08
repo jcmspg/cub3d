@@ -12,6 +12,16 @@
 
 #include "../../includes/cub3d.h"
 
+static bool	line_starts_map_block(const char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i] == ' ' || line[i] == '\t')
+		i++;
+	return (line[i] == '0' || line[i] == '1');
+}
+
 static bool	process_pre_map_line(char *line, bool *map_started, int *count)
 {
 	if (is_texture_or_color(line) || is_empty_line(line))
@@ -21,6 +31,8 @@ static bool	process_pre_map_line(char *line, bool *map_started, int *count)
 		ft_printf_fd(STDERR_FILENO, "invalid line [%s]\n", line);
 		return ((false));
 	}
+	if (!line_starts_map_block(line))
+		return ((true));
 	*map_started = true;
 	if (count)
 		(*count)++;
@@ -31,10 +43,17 @@ static bool	process_map_line(char *line, int *count, int *max_len)
 {
 	int	len;
 
-	if (is_empty_line(line) || !is_valid_map_line(line))
+	if (is_empty_line(line))
+	{
+		(*count)++;
+		return ((true));
+	}
+	if (!is_valid_map_line(line))
 		return ((false));
 	(*count)++;
 	len = ft_strlen(line);
+	if (len > 0 && line[len - 1] == '\n')
+		len--;
 	if (len > *max_len)
 		*max_len = len;
 	return ((true));

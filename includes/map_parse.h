@@ -21,6 +21,7 @@ bool	is_valid_map_char(char c);
 bool	is_valid_map_line(const char *line);
 bool	create_map_array(t_cub_data *data);
 bool	open_map(char *filename, t_cub_data *data);
+bool	validate_loaded_map(t_map *map);
 int		parse_cub_file(char *filename, t_cub_data *data);
 int		parse_textures(char *line, t_cub_data *data);
 int		parse_colors(char *line, t_cub_data *data);

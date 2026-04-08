@@ -15,11 +15,13 @@
 bool	look_for_spawn(t_map *map, int *spawn_x, int *spawn_y, char *direction)
 {
 	int	i;
+	int	total;
 
 	if (!map || !map->map_array)
 		return (false);
+	total = map->width * map->height;
 	i = 0;
-	while (map->map_array[i])
+	while (i < total)
 	{
 		if (map->map_array[i] == 'N' || map->map_array[i] == 'S'
 			|| map->map_array[i] == 'E' || map->map_array[i] == 'W')

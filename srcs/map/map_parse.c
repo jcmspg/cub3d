@@ -28,5 +28,7 @@ bool	open_map(char *filename, t_cub_data *data)
 		return (close(fd), (false));
 	if (!create_map_array(data))
 		return (close(fd), (false));
+	if (!validate_loaded_map(data->map))
+		return (close(fd), (false));
 	return (true);
 }

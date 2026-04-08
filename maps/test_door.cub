@@ -1,14 +1,31 @@
-NO ./assets/textures/_NORTH_.xpm
-SO ./assets/textures/_SOUTH_.xpm
-WE ./assets/textures/_WEST_.xpm
+NO ./assets/textures/_EAST_.xpm
+SO ./assets/textures/_EAST_.xpm
+WE ./assets/textures/_EAST_.xpm
 EA ./assets/textures/_EAST_.xpm
 
-F 100,100,100
-C 135,106,135
+
+C 100,100,100
+
 
 1111111111
-1000010001
-10X0110X01
-10M0D00001
-100010N001
-1111111111
+1DDDD1DDD1
+1DXD11DXD1
+1DMDDDDDD1
+1DD1111WD1
+1111  1111
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
