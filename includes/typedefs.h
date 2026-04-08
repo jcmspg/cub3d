@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   typedefs.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:09:26 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/08 01:50:13 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 21:22:46 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,22 @@ enum					e_error
 	ERR_UNKNOWN,
 	ERR_CLEAN_UP,
 };
+
+#define MINIMAP_CELL_SIZE 12
+#define MINIMAP_OFFSET_X 10
+#define MINIMAP_OFFSET_Y 10
+#define RAY_COLOR 0xFFFF00
+#define RAY_EDGE_COLOR 0x00FFFF
+#define RAY_CENTER_COLOR 0xFFFFFF
+
+typedef struct s_ray_line
+{
+	int	x0;
+	int	y0;
+	int	x1;
+	int	y1;
+	int	color;
+}	t_ray_line;
 
 typedef struct s_trig
 {

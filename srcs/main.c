@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/06 22:15:25 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 21:14:05 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,12 @@ static int	init_parse_map(char *filename, t_cub_data *data)
 		ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
 		return (ERR_FILE_NOT_FOUND);
 	}
-	print_map_array(data->map);
 	if (!init_trig_table(data))
 	{
 		ft_putstr_fd("Error: Failed to initialize trig tables\n",
 			STDERR_FILENO);
 		return (ERR_MEMORY_ALLOCATION);
 	}
-	run_all_math_tests(data);
 	return (ERR_NO_ERROR);
 }
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rng_pixelart.c                                     :+:      :+:    :+:   */
+/*   extra.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 21:40:44 by joamiran          #+#    #+#             */
-/*   Updated: 2025/07/26 22:18:54 by joamiran         ###   ########.fr       */
+/*   Created: 2026/04/08 20:56:58 by joamiran          #+#    #+#             */
+/*   Updated: 2026/04/08 21:11:53 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,27 +29,39 @@ int	graphics_init(t_cub_data *data)
 	return (ERR_NO_ERROR);
 }
 
-int	test_sync(t_cub_data *data)
+static void	draw_filled_rect_row(t_cub_data *data, t_draw_shape *shape,
+		int row_y)
 {
-	if (!data || !data->graphics || !data->mlx)
-		return (ERR_GRAPHICS_INIT);
+	int	i;
+	int	pixel_x;
+	int	pixel_y;
 
-	int px_total;
-	int i;
-
-	px_total = (data->mlx->height * data->mlx->width);
 	i = 0;
-	while (i < px_total)
+	while (i < shape->width)
 	{
-		data->graphics->x = i % data->mlx->width;
-		data->graphics->y = i / data->mlx->width;
-		data->graphics->color = 0xFF000000 | (rand() % 256) << 16 | (rand()
-				% 256) << 8 | (rand() % 256);
-		data->graphics->pixels[i] = data->graphics->color;
-
-		mylx_pixel_put(data, data->graphics->x, data->graphics->y,
-			data->graphics->color);
+		pixel_x = shape->x + i;
+		pixel_y = row_y;
+		if (pixel_x >= 0 && pixel_x < data->mlx->width && pixel_y >= 0
+			&& pixel_y < data->mlx->height)
+		{
+			mylx_pixel_put(data, pixel_x, pixel_y, shape->color);
+		}
 		i++;
 	}
-	return (ERR_NO_ERROR);
+}
+
+void	draw_filled_rect(t_cub_data *data, t_draw_shape *shape)
+{
+	int	start_y;
+	int	j;
+
+	if (!data || !data->mlx || !data->mlx->img || !shape)
+		return ;
+	start_y = shape->y;
+	j = 0;
+	while (j < shape->height)
+	{
+		draw_filled_rect_row(data, shape, start_y + j);
+		j++;
+	}
 }

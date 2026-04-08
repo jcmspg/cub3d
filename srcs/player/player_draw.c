@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   player_draw.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/06 22:30:00 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/08 01:49:45 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/08 21:14:24 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 void	draw_player(t_cub_data *data)
 {
-	int			player_x;
-	int			player_y;
-	int			dir_x;
-	int			dir_y;
+	int				player_x;
+	int				player_y;
+	int				dir_x;
+	int				dir_y;
 	t_draw_shape	shape;
 
 	if (!data || !data->player)

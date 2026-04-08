@@ -6,7 +6,7 @@
 /*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 16:36:37 by joamiran          #+#    #+#             */
-/*   Updated: 2025/09/04 20:44:26 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/08 21:13:00 by joamiran         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,5 @@ int	main_render_loop(t_cub_data *data)
 	fps_update_logic(data, elapsed, current_time);
 	mylx_update_scene(data);
 	fps = 1000.0f / data->fps.delta_time;
-	display_fps(data, fps);
-	print_movements(data);
-	print_player_pos(data);
 	return (ERR_NO_ERROR);
 }
