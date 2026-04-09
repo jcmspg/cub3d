@@ -6,7 +6,7 @@
 #    By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2026/04/09 02:40:07 by hladeiro         ###   ########.fr        #
+#    Updated: 2026/04/09 02:46:57 by hladeiro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,7 @@ NAME = cuboid
 CC = cc
 #CFLAGS = -Wall -Wextra -Werror -std=gnu99
 CFLAGS = -O3
+UNAME_S := $(shell uname)
 
 # MLX behavior flags
 # MLX_COMPAT_FIX=1 applies local header prototype fixes for stricter compilers.
@@ -36,14 +37,14 @@ PMFP_DIR = ./extLibs/poormanfixedpoint
 PMFP = $(PMFP_DIR)/libpoormansfixed.a
 PMFP_REPO = https://github.com/jcmspg/poor-mans-FixedPoint-lib
 
-MLX_DIR = ./extLibs/mlx
+MLX_DIR = ./extLibs/minilibx-linux
 MLX = $(MLX_DIR)/libmlx.a
 MLX_TAR = ./minilibx-linux.tgz
 MLX_STAMP = $(MLX_DIR)/.from_tgz
 MLX_FLAGS= -L $(MLX_DIR) -lmlx -framework OpenGL -framework AppKit -lz
 
 
-ifeq ($(shell uname), Linux)
+ifeq ($(UNAME_S), Linux)
 	MLX_DIR = ./extLibs/minilibx-linux
 	MLX = $(MLX_DIR)/libmlx.a
 	MLX_TAR = ./minilibx-linux.tgz
@@ -56,9 +57,9 @@ INCLUDES = -I$(INC_DIR) -I$(LIBFT_DIR) -I$(PMFP_DIR) -I$(MLX_DIR)
 LDFLAGS = -L$(LIBFT_DIR) -lft -L$(PMFP_DIR) -lpoormansfixed -L$(MLX_DIR) $(MLX_FLAGS)
 
 # Default target
-all: $(LIBFT) $(PMFP) $(MLX) $(NAME)
+all: deps $(NAME)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR) deps
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -71,6 +72,11 @@ $(LIBFT): | check_libft
 $(PMFP): | check_pmfp
 	$(MAKE) -C $(PMFP_DIR)
 
+deps: $(LIBFT) $(PMFP) $(MLX)
+
+.NOTPARALLEL: deps check_libft check_pmfp
+
+ifneq ($(UNAME_S), Darwin)
 $(MLX_STAMP): $(MLX_TAR)
 	@echo "📦 Extracting MLX from $(MLX_TAR)..."
 	rm -rf $(MLX_DIR)
@@ -84,6 +90,16 @@ $(MLX_STAMP): $(MLX_TAR)
 		exit 1; \
 	fi
 	@touch $(MLX_STAMP)
+endif
+
+ifeq ($(UNAME_S), Darwin)
+$(MLX_STAMP):
+	@if [ ! -d "$(MLX_DIR)" ]; then \
+		echo "❌ Missing $(MLX_DIR). Add minilibx-linux or adjust MLX_DIR for macOS."; \
+		exit 1; \
+	fi
+	@touch $(MLX_STAMP)
+endif
 
 $(MLX): $(MLX_STAMP)
 	@if [ "$(MLX_COMPAT_FIX)" = "1" ]; then \
