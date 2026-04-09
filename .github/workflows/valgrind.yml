@@ -69,8 +69,6 @@ jobs:
             exit 1
           fi
 
-          xdotool windowactivate --sync "$WINDOW_ID"
-          sleep 1
           xdotool key --window "$WINDOW_ID" Esc
 
           for _ in $(seq 1 20); do
