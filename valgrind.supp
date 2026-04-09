@@ -1,53 +1,79 @@
-# Suppressions for X11/XCB/minilibx false positives
 {
-   x11_xcb_writev
-   Memcheck:Param
-   writev(vector[...])
+   X11_Reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
    ...
-   fun:_xcb_conn_wait*
-   ...
+   obj:/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0
 }
 
 {
-   x11_xcb_send
-   Memcheck:Param
-   writev(vector[...])
+   Xext_Reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
    ...
-   fun:_XSend
-   ...
+   obj:/usr/lib/x86_64-linux-gnu/libXext.so.6.4.0
 }
 
 {
-   mlx_new_window
-   Memcheck:Param
-   writev(vector[...])
+   MLX_All_Leaks
+   Memcheck:Leak
+   match-leak-kinds: reachable
    ...
-   fun:mlx_new_window
-   ...
+   fun:mlx_*
 }
 
 {
-   mlx_init_display
-   Memcheck:Param
-   writev(vector[...])
-   ...
-   fun:XOpenDisplay
-   ...
-}
-
-{
-   mlx_anti_resize_uninit_writev
+   MLX_Writev_Uninit
    Memcheck:Param
    writev(vector[0])
-   fun:writev
-   fun:*
-   fun:*
-   fun:xcb_writev
-   fun:_XSend
-   fun:_XReadEvents
-   fun:XWindowEvent
-   fun:mlx_int_wait_first_expose
-   fun:mlx_new_window
-   fun:mylx_create_window
-   fun:init_game_window
+   ...
+   fun:mlx_*
+}
+
+{
+   DynamicLinker_dlopen
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:dlopen*
+}
+
+{
+   DynamicLinker_dl_open
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_open
+}
+
+{
+   DynamicLinker_cache
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_load_cache_lookup
+}
+
+{
+   DynamicLinker_new_object
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_new_object
+}
+
+{
+   DynamicLinker_map_object
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_map_object
+}
+
+{
+   DynamicLinker_check_versions
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_dl_check_map_versions
 }

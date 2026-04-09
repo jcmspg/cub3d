@@ -66,6 +66,13 @@ void			cast_all_rays(t_cub_data *data);
 // Draw all rays on the minimap (full FOV fan)
 void			draw_rays_on_minimap(t_cub_data *data);
 
+// Convert world fixed coordinates to minimap screen coordinates
+void			world_to_minimap(t_fixed32 world_x, t_fixed32 world_y,
+					int *screen_x, int *screen_y);
+
+// Draw a line on screen (used by minimap ray debug)
+void			draw_line(t_cub_data *data, t_ray_line *line);
+
 // Complete ray debug visualization (call after cast_all_rays)
 void			draw_ray_debug(t_cub_data *data);
 

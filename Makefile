@@ -10,10 +10,10 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = cuboid
+NAME = cub3D
 CC = cc
-#CFLAGS = -Wall -Wextra -Werror -std=gnu99
-CFLAGS = -O3
+CFLAGS = -Wall -Wextra -Werror -O3
+#CFLAGS = -O3 
 UNAME_S := $(shell uname)
 
 # MLX behavior flags
