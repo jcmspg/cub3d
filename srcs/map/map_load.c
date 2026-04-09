@@ -6,7 +6,7 @@
 /*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 00:54:37 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/09 02:02:23 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:22:04 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,13 @@ bool	create_map_array(t_cub_data *data)
 	line_count = 0;
 	max_len = 0;
 	if (!map_first_pass(map, &line_count, &max_len) || line_count == 0)
+	{
+		close(map->fd);
+		map->fd = -1;
 		return (false);
+	}
 	close(map->fd);
+	map->fd = -1;
 	map->height = line_count;
 	map->width = max_len;
 	map->map_lines = ft_calloc(map->height + 1, sizeof(char *));
@@ -35,8 +40,13 @@ bool	create_map_array(t_cub_data *data)
 	if (map->fd < 0)
 		return (false);
 	if (!map_second_pass(map))
-		return (close(map->fd), false);
+	{
+		close(map->fd);
+		map->fd = -1;
+		return (false);
+	}
 	close(map->fd);
+	map->fd = -1;
 	if (!map_create_array(map) || !map_convert_lines_to_array(map))
 		return (false);
 	return (true);

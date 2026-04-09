@@ -6,7 +6,7 @@
 /*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/09 02:01:56 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:12:46 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ static int	init_parse_map(char *filename, t_cub_data *data)
 	{
 		ft_putstr_fd("Error: Failed to initialize trig tables\n",
 			STDERR_FILENO);
+		cleanup(data);
 		return (ERR_MEMORY_ALLOCATION);
 	}
 	return (ERR_NO_ERROR);
@@ -86,7 +87,10 @@ int	main(int argc, char **argv)
 	print_game_init_message(argv[1]);
 	err = init_parse_map(argv[1], &data);
 	if (err != ERR_NO_ERROR)
+	{
+		cleanup(&data);
 		return (err);
+	}
 	start_game_loop(&data);
 	cleanup(&data);
 	return (ERR_NO_ERROR);

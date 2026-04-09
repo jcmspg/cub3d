@@ -1,0 +1,103 @@
+name: Valgrind GUI Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  valgrind-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            valgrind \
+            xvfb \
+            xdotool \
+            libx11-dev \
+            libxext-dev \
+            zlib1g-dev
+
+      - name: Build project
+        run: make -j"$(nproc)"
+
+      - name: Run under Valgrind and close with Escape
+        run: |
+          set -euo pipefail
+
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1280x720x24 -ac +extension GLX +render -noreset &
+          XVFB_PID=$!
+          trap 'kill "$XVFB_PID" 2>/dev/null || true' EXIT
+
+          valgrind \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --track-origins=yes \
+            --error-exitcode=1 \
+            --suppressions=valgrind.supp \
+            --log-file=valgrind.log \
+            ./cuboid map.cub &
+          GAME_PID=$!
+
+          WINDOW_ID=""
+          for _ in $(seq 1 60); do
+            WINDOW_ID="$(xdotool search --name 'Cub3D Game' 2>/dev/null | head -n 1 || true)"
+            if [ -n "$WINDOW_ID" ]; then
+              break
+            fi
+            if ! kill -0 "$GAME_PID" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [ -z "$WINDOW_ID" ]; then
+            echo "Could not find game window"
+            kill "$GAME_PID" 2>/dev/null || true
+            wait "$GAME_PID" || true
+            exit 1
+          fi
+
+          xdotool windowactivate --sync "$WINDOW_ID"
+          sleep 1
+          xdotool key --window "$WINDOW_ID" Escape
+
+          for _ in $(seq 1 20); do
+            if ! kill -0 "$GAME_PID" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          if kill -0 "$GAME_PID" 2>/dev/null; then
+            echo "Game did not exit after Escape"
+            kill "$GAME_PID" 2>/dev/null || true
+            wait "$GAME_PID" || true
+            exit 1
+          fi
+
+          wait "$GAME_PID"
+
+      - name: Print valgrind summary
+        if: always()
+        run: |
+          if [ -f valgrind.log ]; then
+            tail -n 80 valgrind.log
+          else
+            echo "valgrind.log not found"
+          fi
+
+      - name: Upload valgrind log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: valgrind-log
+          path: valgrind.log

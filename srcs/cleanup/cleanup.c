@@ -25,14 +25,17 @@ int	cleanup_mylx(t_cub_data *data)
 	mylx_destroy_mlx(data);
 	return (ERR_NO_ERROR);
 }
-static int cleanup_systems(t_cub_data *data)
+
+static int	cleanup_systems(t_cub_data *data)
 {
 	if (!data)
 		return (ERR_UNKNOWN);
 	if (data->textures)
 		cleanup_textures(data->textures);
+	data->textures = NULL;
 	if (data->sprites)
 		cleanup_sprites(data->sprites);
+	data->sprites = NULL;
 	cleanup_fps(data->fps);
 	if (data->raycasting)
 		cleanup_raycasting(data->raycasting);
@@ -40,12 +43,12 @@ static int cleanup_systems(t_cub_data *data)
 	ft_printf_fd(STDERR_FILENO, "cleaning systems\n");
 	return (ERR_NO_ERROR);
 }
+
 int	cleanup(t_cub_data *data)
 {
 	if (!data)
 		return (ERR_UNKNOWN);
 	cleanup_trig_table(&data->trig);
-
 	if (data->game)
 		cleanup_game(data->game);
 	data->game = NULL;
@@ -65,21 +68,17 @@ int	cleanup(t_cub_data *data)
 		cleanup_hud(data->hud);
 	data->hud = NULL;
 	if (data->mlx)
-	cleanup_mylx(data);
+		cleanup_mylx(data);
 	data->mlx = NULL;
-	if(data)
-		cleanup_systems(data);
-	data->textures = NULL;
-	exit(0);
+	cleanup_systems(data);
 	return (ERR_NO_ERROR);
 }
 
 int	cleanup_and_exit(t_cub_data *data)
 {
-	printf("Hello from cleanup_and_exit\n");
 	if (!data)
-		return (ERR_UNKNOWN);
-	if (cleanup(data) != 0)
-		return (ERR_CLEAN_UP);
+		exit(ERR_UNKNOWN);
+	cleanup(data);
+	exit(ERR_NO_ERROR);
 	return (ERR_NO_ERROR);
 }

@@ -6,7 +6,7 @@
 /*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 21:19:09 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/09 02:02:23 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:22:04 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,7 @@ static void	init_mlx_runtime(t_cub_data *data)
 	}
 	if (mylx_create_window(data) != ERR_NO_ERROR)
 		cleanup_and_exit(data);
-	if (mylx_create_image(data) != ERR_NO_ERROR)
-		cleanup_and_exit(data);
+	mylx_create_image(data);
 	if (load_all_textures(data) != 0)
 		ft_putstr_fd("Warning: Failed to load textures, using colors.\n",
 			STDERR_FILENO);
@@ -98,7 +97,7 @@ static void	init_mlx_runtime(t_cub_data *data)
 
 void	init_game_window(t_cub_data *data)
 {
-	data->mlx = ft_calloc(1, sizeof(t_mlx));
+	data->mlx = malloc(sizeof(t_mlx));
 	if (!data->mlx)
 	{
 		ft_putstr_fd("Error: Memory allocation failed for MLX.\n",

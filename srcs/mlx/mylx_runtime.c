@@ -35,6 +35,8 @@ int	mylx_destroy_mlx(t_cub_data *data)
 			mylx_destroy_image(data);
 		if (data->mlx->win_ptr != NULL)
 			mylx_destroy_window(data);
+		if (data->mlx->mlx_ptr)
+			mlx_destroy_display(data->mlx->mlx_ptr);
 		free(data->mlx->mlx_ptr);
 		data->mlx->mlx_ptr = NULL;
 		free(data->mlx);
