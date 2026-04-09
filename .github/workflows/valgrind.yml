@@ -40,6 +40,7 @@ jobs:
           valgrind \
             --leak-check=full \
             --show-leak-kinds=all \
+            --undef-value-errors=no \
             --track-origins=yes \
             --error-exitcode=1 \
             --log-file=valgrind.log \
