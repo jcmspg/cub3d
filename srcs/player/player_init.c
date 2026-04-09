@@ -6,7 +6,7 @@
 /*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/06 22:30:00 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/06 21:43:04 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:01:56 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,14 @@ static void	set_player_spawn(t_player *player, int x, int y, char direction)
 	player->rotate_speed = to_fixed32(ROTATE_SPEED);
 }
 
-static void	exit_player_init_err(char *msg, int err, t_player *player)
+static void	exit_player_init_err(char *msg, int err, t_player *player,
+		t_cub_data *data)
 {
 	if (msg)
 		ft_putstr_fd(msg, STDERR_FILENO);
 	if (player)
 		free(player);
+	cleanup(data);
 	exit(err);
 }
 
@@ -68,17 +70,17 @@ t_player	*init_player(t_cub_data *data)
 
 	if (!data || !data->map)
 		exit_player_init_err("Error: Invalid data or map\n", ERR_PLAYER_INIT,
-			NULL);
+			NULL, data);
 	player = ft_calloc(sizeof(t_player), 1);
 	if (!player)
 		exit_player_init_err("Error: Memory allocation failed for player\n",
-			ERR_MEMORY_ALLOCATION, NULL);
+			ERR_MEMORY_ALLOCATION, NULL, data);
 	spawn_x = -1;
 	spawn_y = -1;
 	direction = 'X';
 	if (!find_and_validate_spawn(data, &spawn_x, &spawn_y, &direction))
 		exit_player_init_err("Error: Failed to find player spawn position\n",
-			ERR_PLAYER_INIT, player);
+			ERR_PLAYER_INIT, player, data);
 	set_player_spawn(player, spawn_x, spawn_y, direction);
 	calc_player_dirs(data);
 	return (player);

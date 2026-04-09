@@ -1,0 +1,85 @@
+name: cub3d gui leak check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-gui-and-valgrind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential make gcc g++ clang \
+            libx11-dev libxext-dev libbsd-dev \
+            libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            xvfb xauth xdotool valgrind
+
+      - name: Build project
+        run: make
+
+      - name: Run cub3d, wait 60s, press Escape, print leaks
+        run: |
+          xvfb-run -a --server-args="-screen 0 1280x720x24" bash -lc '
+            set -euo pipefail
+
+            valgrind \
+              --leak-check=full \
+              --show-leak-kinds=all \
+              --track-origins=yes \
+              --log-file=valgrind.log \
+              ./cub3d map.cub &
+            GAME_PID=$!
+
+            WINDOW_ID=""
+            for i in $(seq 1 30); do
+              WINDOW_ID=$(xdotool search --name "Cub3D Game" 2>/dev/null | head -n 1 || true)
+              if [ -n "$WINDOW_ID" ]; then
+                break
+              fi
+              sleep 1
+            done
+
+            sleep 60
+
+            if [ -n "$WINDOW_ID" ]; then
+              xdotool windowactivate "$WINDOW_ID" key Escape || true
+            else
+              echo "Window not found, sending INT to process"
+              kill -INT "$GAME_PID" || true
+            fi
+
+            for i in $(seq 1 20); do
+              if ! kill -0 "$GAME_PID" 2>/dev/null; then
+                break
+              fi
+              sleep 1
+            done
+
+            if kill -0 "$GAME_PID" 2>/dev/null; then
+              echo "Process still alive, forcing TERM"
+              kill -TERM "$GAME_PID" || true
+            fi
+
+            wait "$GAME_PID" || true
+
+            echo "===== Valgrind leak summary ====="
+            grep -E "HEAP SUMMARY|definitely lost|indirectly lost|possibly lost|still reachable|ERROR SUMMARY" valgrind.log || true
+
+            echo "===== Full valgrind log ====="
+            cat valgrind.log
+          '
+
+      - name: Upload valgrind log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: valgrind-log
+          path: valgrind.log

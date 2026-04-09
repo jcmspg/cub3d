@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_load.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hladeiro <hladeiro@student.42lisboa.com>   +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 00:54:37 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/08 00:54:38 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:02:23 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,10 @@ bool	create_map_array(t_cub_data *data)
 	if (!map->map_lines)
 		return (false);
 	map->fd = open(map->filename, O_RDONLY);
-	if (map->fd < 0 || !map_second_pass(map))
+	if (map->fd < 0)
 		return (false);
+	if (!map_second_pass(map))
+		return (close(map->fd), false);
 	close(map->fd);
 	if (!map_create_array(map) || !map_convert_lines_to_array(map))
 		return (false);

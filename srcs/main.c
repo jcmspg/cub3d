@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2026/04/08 23:38:45 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:01:56 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ static int	init_parse_map(char *filename, t_cub_data *data)
 	if (parse_cub_file(filename, data) != ERR_NO_ERROR)
 	{
 		ft_putstr_fd("Error parsing .cub file.\n", STDERR_FILENO);
+		cleanup(data);
 		return (ERR_FILE_NOT_FOUND);
 	}
 	if (!init_trig_table(data))
@@ -87,5 +88,6 @@ int	main(int argc, char **argv)
 	if (err != ERR_NO_ERROR)
 		return (err);
 	start_game_loop(&data);
+	cleanup(&data);
 	return (ERR_NO_ERROR);
 }
