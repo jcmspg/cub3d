@@ -69,6 +69,7 @@ jobs:
             exit 1
           fi
 
+          sleep 30
           xdotool key --window "$WINDOW_ID" Esc
 
           for _ in $(seq 1 20); do
