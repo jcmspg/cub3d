@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+         #
+#    By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2026/04/08 20:20:43 by joamiran         ###   ########.fr        #
+#    Updated: 2026/04/09 02:40:07 by hladeiro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,6 +76,13 @@ $(MLX_STAMP): $(MLX_TAR)
 	rm -rf $(MLX_DIR)
 	mkdir -p ./extLibs
 	tar -xzf $(MLX_TAR) -C ./extLibs
+	@if [ ! -d "$(MLX_DIR)" ] && [ -d "./extLibs/minilibx-linux" ]; then \
+		mv ./extLibs/minilibx-linux $(MLX_DIR); \
+	fi
+	@if [ ! -d "$(MLX_DIR)" ]; then \
+		echo "❌ MLX extraction failed: expected $(MLX_DIR)"; \
+		exit 1; \
+	fi
 	@touch $(MLX_STAMP)
 
 $(MLX): $(MLX_STAMP)
