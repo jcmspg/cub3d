@@ -32,6 +32,8 @@ jobs:
         run: |
           set -euo pipefail
 
+          rm -f game.log valgrind.log
+
           export DISPLAY=:99
           Xvfb :99 -screen 0 1280x720x24 -ac +extension GLX +render -noreset &
           XVFB_PID=$!
@@ -41,15 +43,14 @@ jobs:
             --leak-check=full \
             --show-leak-kinds=all \
             --undef-value-errors=no \
-            --track-origins=yes \
             --error-exitcode=1 \
             --log-file=valgrind.log \
-            ./cuboid map.cub &
+            ./cuboid map.cub > game.log 2>&1 &
           GAME_PID=$!
 
           WINDOW_ID=""
-          for _ in $(seq 1 60); do
-            WINDOW_ID="$(xdotool search --name 'Cub3D Game' 2>/dev/null | head -n 1 || true)"
+          for _ in $(seq 1 120); do
+            WINDOW_ID="$(xdotool search --onlyvisible --name 'Cub3D Game|cuboid|Cub3D' 2>/dev/null | head -n 1 || true)"
             if [ -n "$WINDOW_ID" ]; then
               break
             fi
@@ -61,6 +62,8 @@ jobs:
 
           if [ -z "$WINDOW_ID" ]; then
             echo "Could not find game window"
+            echo "--- game.log ---"
+            cat game.log || true
             kill "$GAME_PID" 2>/dev/null || true
             wait "$GAME_PID" || true
             exit 1
@@ -68,7 +71,7 @@ jobs:
 
           xdotool windowactivate --sync "$WINDOW_ID"
           sleep 1
-          xdotool key --window "$WINDOW_ID" Escape
+          xdotool key --window "$WINDOW_ID" Esc
 
           for _ in $(seq 1 20); do
             if ! kill -0 "$GAME_PID" 2>/dev/null; then
