@@ -6,7 +6,7 @@
 #    By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2026/04/09 02:46:57 by hladeiro         ###   ########.fr        #
+#    Updated: 2026/04/09 02:49:58 by hladeiro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,6 @@ deps: $(LIBFT) $(PMFP) $(MLX)
 
 .NOTPARALLEL: deps check_libft check_pmfp
 
-ifneq ($(UNAME_S), Darwin)
 $(MLX_STAMP): $(MLX_TAR)
 	@echo "📦 Extracting MLX from $(MLX_TAR)..."
 	rm -rf $(MLX_DIR)
@@ -90,16 +89,6 @@ $(MLX_STAMP): $(MLX_TAR)
 		exit 1; \
 	fi
 	@touch $(MLX_STAMP)
-endif
-
-ifeq ($(UNAME_S), Darwin)
-$(MLX_STAMP):
-	@if [ ! -d "$(MLX_DIR)" ]; then \
-		echo "❌ Missing $(MLX_DIR). Add minilibx-linux or adjust MLX_DIR for macOS."; \
-		exit 1; \
-	fi
-	@touch $(MLX_STAMP)
-endif
 
 $(MLX): $(MLX_STAMP)
 	@if [ "$(MLX_COMPAT_FIX)" = "1" ]; then \
