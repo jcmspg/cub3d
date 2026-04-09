@@ -42,7 +42,6 @@ jobs:
             --show-leak-kinds=all \
             --track-origins=yes \
             --error-exitcode=1 \
-            --suppressions=valgrind.supp \
             --log-file=valgrind.log \
             ./cuboid map.cub &
           GAME_PID=$!

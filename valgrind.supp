@@ -34,3 +34,20 @@
    fun:XOpenDisplay
    ...
 }
+
+{
+   mlx_anti_resize_uninit_writev
+   Memcheck:Param
+   writev(vector[0])
+   fun:writev
+   fun:*
+   fun:*
+   fun:xcb_writev
+   fun:_XSend
+   fun:_XReadEvents
+   fun:XWindowEvent
+   fun:mlx_int_wait_first_expose
+   fun:mlx_new_window
+   fun:mylx_create_window
+   fun:init_game_window
+}
