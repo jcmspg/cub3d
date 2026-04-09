@@ -6,7 +6,7 @@
 #    By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/20 20:25:15 by joamiran          #+#    #+#              #
-#    Updated: 2026/04/09 02:49:58 by hladeiro         ###   ########.fr        #
+#    Updated: 2026/04/09 02:52:27 by hladeiro         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,6 +41,7 @@ MLX_DIR = ./extLibs/minilibx-linux
 MLX = $(MLX_DIR)/libmlx.a
 MLX_TAR = ./minilibx-linux.tgz
 MLX_STAMP = $(MLX_DIR)/.from_tgz
+MLX_REPO = https://github.com/42Paris/minilibx-linux.git
 MLX_FLAGS= -L $(MLX_DIR) -lmlx -framework OpenGL -framework AppKit -lz
 
 
@@ -76,11 +77,16 @@ deps: $(LIBFT) $(PMFP) $(MLX)
 
 .NOTPARALLEL: deps check_libft check_pmfp
 
-$(MLX_STAMP): $(MLX_TAR)
-	@echo "📦 Extracting MLX from $(MLX_TAR)..."
+$(MLX_STAMP):
 	rm -rf $(MLX_DIR)
 	mkdir -p ./extLibs
-	tar -xzf $(MLX_TAR) -C ./extLibs
+	@if [ -f "$(MLX_TAR)" ]; then \
+		echo "📦 Extracting MLX from $(MLX_TAR)..."; \
+		tar -xzf $(MLX_TAR) -C ./extLibs; \
+	else \
+		echo "📥 $(MLX_TAR) not found, cloning $(MLX_REPO)..."; \
+		git clone --depth 1 $(MLX_REPO) $(MLX_DIR); \
+	fi
 	@if [ ! -d "$(MLX_DIR)" ] && [ -d "./extLibs/minilibx-linux" ]; then \
 		mv ./extLibs/minilibx-linux $(MLX_DIR); \
 	fi
