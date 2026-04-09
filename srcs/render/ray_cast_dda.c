@@ -6,23 +6,30 @@
 /*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/08 01:08:49 by hladeiro          #+#    #+#             */
-/*   Updated: 2026/04/08 01:08:50 by hladeiro         ###   ########.fr       */
+/*   Updated: 2026/04/09 02:57:22 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/cub3d.h"
 
+static t_fixed32	abs_fixed32(t_fixed32 value)
+{
+	if (value < 0)
+		return (-value);
+	return (value);
+}
+
 static void	set_dda_deltas(t_ray *ray)
 {
-	if (fixed32_abs(ray->dir_x) < to_fixed32(0.0001f))
+	if (abs_fixed32(ray->dir_x) < to_fixed32(0.0001f))
 		ray->delta_dist_x = to_fixed32(10000.0f);
 	else
-		ray->delta_dist_x = fixed32_abs(fixed32_div(to_fixed32(1.0f),
+		ray->delta_dist_x = abs_fixed32(fixed32_div(to_fixed32(1.0f),
 					ray->dir_x));
-	if (fixed32_abs(ray->dir_y) < to_fixed32(0.0001f))
+	if (abs_fixed32(ray->dir_y) < to_fixed32(0.0001f))
 		ray->delta_dist_y = to_fixed32(10000.0f);
 	else
-		ray->delta_dist_y = fixed32_abs(fixed32_div(to_fixed32(1.0f),
+		ray->delta_dist_y = abs_fixed32(fixed32_div(to_fixed32(1.0f),
 					ray->dir_y));
 }
 
