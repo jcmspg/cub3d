@@ -26,6 +26,9 @@ cuboid
 #ignore temporary files
 *.tmp
 
+#ignore valgrind core dumps
+vgcore*
+
 #ignore minilibx
 extLibs/minilibx-linux/*
 
