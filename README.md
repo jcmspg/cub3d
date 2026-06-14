@@ -204,6 +204,19 @@ cub3d/
 | `make pmfp_clean` | Remove poormanfixedpoint |
 | `make mlx_clean` | Remove minilibx |
 
+## Technical Overview
+
+For a comprehensive deep-dive into the engine's design and mathematics, see **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
+Key technical highlights:
+
+- **Raycasting**: DDA algorithm with per-column rendering, one ray per screen column
+- **Fixed-Point Math**: 16.16 format via the `poormanfixedpoint` library for deterministic cross-platform behavior
+- **Trig Lookup Tables**: Pre-computed sin/cos tables with 0.01° precision and quadrant-based transformation
+- **Sprite Pipeline**: Billboard transform → distance sort (painter's algorithm) → per-scanline door occlusion → view offset compensation
+- **Coordinate System**: Custom design with fixed-point ↔ float conversion layers documented in `ARCHITECTURE.md`
+- **Memory Management**: Structured cleanup with error-path safety across all systems
+
 ## Debugging Tools
 
 - `print_map_array(map)` — Character-by-character map display
