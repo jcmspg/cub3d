@@ -40,6 +40,7 @@ Cub3D is a 3D game engine inspired by Wolfenstein 3D, built as part of the 42 sc
 - Health tracking (50 HP, dies in 3 hits)
 - States: IDLE, CHASE, ATTACK, HIT, DEAD
 - Collision blocking (player cannot walk through enemies)
+- Currently **static** — no movement or attack AI (enemies stand in place and can be shot)
 
 ### Combat System
 - Mouse-click shooting with center-screen hit detection
