@@ -12,7 +12,13 @@
 
 NAME = cuboid
 CC = cc
-CFLAGS = -Wall -Wextra -Werror 
+#CFLAGS = -Wall -Wextra -Werror -std=gnu99
+CFLAGS = -O3
+
+# MLX behavior flags
+# MLX_COMPAT_FIX=1 applies local header prototype fixes for stricter compilers.
+# Set to 0 on 42 evaluators if their minilibx builds as-is.
+MLX_COMPAT_FIX ?= 1
 
 # MLX behavior flags
 # MLX_COMPAT_FIX=1 applies local header prototype fixes for stricter compilers.

@@ -42,23 +42,8 @@ void	init_fps_sync(t_fps_data *fps)
 	fps->frame_count = 0;
 }
 
-void	init_game_window(t_cub_data *data)
+static void	init_game_state(t_cub_data *data)
 {
-	data->mlx = malloc(sizeof(t_mlx));
-	if (!data->mlx)
-	{
-		ft_putstr_fd("Error: Memory allocation failed for MLX.\n",
-			STDERR_FILENO);
-		exit(ERR_MEMORY_ALLOCATION);
-	}
-	data->mlx->width = START_WIDTH;
-	data->mlx->height = START_HEIGHT;
-	data->mlx->title = "Cub3D Game";
-	if (!init_trig_table(data))
-	{
-		ft_putstr_fd("Error: Lookup Tables Failed to init\n", STDERR_FILENO);
-		cleanup_and_exit(data);
-	}
 	data->player = init_player(data);
 	if (!data->player)
 	{
@@ -77,35 +62,20 @@ void	init_game_window(t_cub_data *data)
 		cleanup_and_exit(data);
 	}
 	data->game->fov = to_fixed32(START_FOV);
-	if (!init_doors(data))
-	{
-		ft_putstr_fd("Error: Doors initialization failed.\n", STDERR_FILENO);
+	if (!init_doors(data) || init_enemies(data) || !data->textures)
 		cleanup_and_exit(data);
-	}
-	if (init_enemies(data))
-	{
-		ft_putstr_fd("Error: Enemies initialization failed.\n", STDERR_FILENO);
-		cleanup_and_exit(data);
-	}
-	if (!data->textures)
-	{
-		ft_putstr_fd("Error: Textures not initialized.\n", STDERR_FILENO);
-		cleanup_and_exit(data);
-	}
 	data->raycasting = init_raycasting(data->mlx->width);
-	if (!data->raycasting)
-	{
-		ft_putstr_fd("Error: Raycaster initialization failed.\n",
-			STDERR_FILENO);
+	if (!data->raycasting || !init_input(data))
 		cleanup_and_exit(data);
-	}
-	if (!init_input(data))
-	{
-		ft_putstr_fd("Error: Input initialization failed.\n", STDERR_FILENO);
-		cleanup_and_exit(data);
-	}
+}
+
+static void	init_mlx_runtime(t_cub_data *data)
+{
+	void	*mlx_ptr;
+
 	mylx_init(data);
-	if (!data->mlx->mlx_ptr)
+	mlx_ptr = data->mlx->mlx_ptr;
+	if (!mlx_ptr)
 	{
 		ft_putstr_fd("Error: MLX initialization failed.\n", STDERR_FILENO);
 		exit(ERR_MLX_INIT);
@@ -113,12 +83,9 @@ void	init_game_window(t_cub_data *data)
 	if (mylx_create_window(data) != ERR_NO_ERROR)
 		exit(ERR_WINDOW_CREATE);
 	mylx_create_image(data);
-	ft_printf("Loading textures...\n");
 	if (load_all_textures(data) != 0)
-	{
 		ft_putstr_fd("Warning: Failed to load textures, using colors.\n",
 			STDERR_FILENO);
-	}
 	if (!init_hud(data))
 	{
 		ft_putstr_fd("Error: HUD initialization failed.\n", STDERR_FILENO);
@@ -126,4 +93,25 @@ void	init_game_window(t_cub_data *data)
 	}
 	mylx_clear_image(data);
 	mylx_make_image(data);
+}
+
+void	init_game_window(t_cub_data *data)
+{
+	data->mlx = malloc(sizeof(t_mlx));
+	if (!data->mlx)
+	{
+		ft_putstr_fd("Error: Memory allocation failed for MLX.\n",
+			STDERR_FILENO);
+		exit(ERR_MEMORY_ALLOCATION);
+	}
+	data->mlx->width = START_WIDTH;
+	data->mlx->height = START_HEIGHT;
+	data->mlx->title = "Cub3D Game";
+	if (!init_trig_table(data))
+	{
+		ft_putstr_fd("Error: Lookup Tables Failed to init\n", STDERR_FILENO);
+		cleanup_and_exit(data);
+	}
+	init_game_state(data);
+	init_mlx_runtime(data);
 }

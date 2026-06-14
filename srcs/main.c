@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joamiran <joamiran@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: hladeiro <hladeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 20:39:30 by joamiran          #+#    #+#             */
-/*   Updated: 2026/03/22 18:20:16 by joamiran         ###   ########.fr       */
+/*   Updated: 2026/04/06 22:15:25 by hladeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,37 @@ static int	init_parse_map(char *filename, t_cub_data *data)
 
 static void	setup_mlx_hooks(t_cub_data *data)
 {
-	mlx_loop_hook(data->mlx->mlx_ptr, (int (*)(void *))main_render_loop, data);
-	mlx_hook(data->mlx->win_ptr, 2, 1L << 0, handle_key_press, data);
-	mlx_hook(data->mlx->win_ptr, 3, 1L << 1, handle_key_release, data);
-	mlx_hook(data->mlx->win_ptr, 17, 0L, handle_close, data);
-	mlx_hook(data->mlx->win_ptr, 6, 1L << 6, handle_mouse_move, data);
-	mlx_hook(data->mlx->win_ptr, 4, 1L << 2, handle_mouse_button, data);
-	mlx_hook(data->mlx->win_ptr, 5, 1L << 3, handle_mouse_release, data);
+	mlx_loop_hook(data->mlx->mlx_ptr, (int (*)())main_render_loop, data);
+	mlx_hook(data->mlx->win_ptr, 2, 1L << 0, (int (*)())handle_key_press,
+		data);
+	mlx_hook(data->mlx->win_ptr, 3, 1L << 1, (int (*)())handle_key_release,
+		data);
+	mlx_hook(data->mlx->win_ptr, 17, 0L, (int (*)())handle_close, data);
+	mlx_hook(data->mlx->win_ptr, 6, 1L << 6, (int (*)())handle_mouse_move,
+		data);
+	mlx_hook(data->mlx->win_ptr, 4, 1L << 2, (int (*)())handle_mouse_button,
+		data);
+	mlx_hook(data->mlx->win_ptr, 5, 1L << 3, (int (*)())handle_mouse_release,
+		data);
+}
+
+static void	print_game_init_message(char *map_file)
+{
+	ft_putstr_fd("Game initialized with map: ", 1);
+	ft_putstr_fd(map_file, 1);
+	ft_putchar_fd('\n', 1);
+}
+
+static void	start_game_loop(t_cub_data *data)
+{
+	init_game_window(data);
+	graphics_init(data);
+	init_fps_sync(&data->fps);
+	mlx_mouse_hide(data->mlx->mlx_ptr, data->mlx->win_ptr);
+	mlx_mouse_move(data->mlx->mlx_ptr, data->mlx->win_ptr,
+		data->mlx->width / 2, data->mlx->height / 2);
+	setup_mlx_hooks(data);
+	mlx_loop(data->mlx->mlx_ptr);
 }
 
 int	main(int argc, char **argv)
@@ -60,24 +84,11 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("Usage: ./cub3d <map_file>\n", 2);
 		return (ERR_INVALID_ARG);
 	}
-	ft_putstr_fd("Game initialized with map: ", 1);
-	ft_putstr_fd(argv[1], 1);
-	ft_putchar_fd('\n', 1);
+	print_game_init_message(argv[1]);
 	err = init_parse_map(argv[1], &data);
 	if (err != ERR_NO_ERROR)
 		return (err);
-	init_game_window(&data);
-	graphics_init(&data);
-	init_fps_sync(&data.fps);
-#ifdef __APPLE__
-	mlx_mouse_hide();
-	mlx_mouse_move(data.mlx->win_ptr, data.mlx->width / 2, data.mlx->height / 2);
-#else
-	mlx_mouse_hide(data.mlx->mlx_ptr, data.mlx->win_ptr);
-	mlx_mouse_move(data.mlx->mlx_ptr, data.mlx->win_ptr, data.mlx->width / 2, data.mlx->height / 2);
-#endif
-	setup_mlx_hooks(&data);
-	mlx_loop(data.mlx->mlx_ptr);
+	start_game_loop(&data);
 	cleanup(&data);
 	return (ERR_NO_ERROR);
 }
